@@ -152,7 +152,7 @@ jobs:
         with:
           name: TraktPlugin MPE1
           path: |
-            ${{ github.workspace }}\MPEI\Release\TraktPlugin-*.mpe1
+            ${{ github.workspace }}\MPEI\Release\TraktPlugin*.mpe1
           retention-days: ${{ inputs.retention-build || 90 }}
           if-no-files-found: error
 
