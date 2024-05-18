@@ -1,5 +1,6 @@
-@echo off
-cls
+@ECHO OFF
+CLS
+
 Title Creating Trakt Installer
 
 IF "%programfiles(x86)%XXX"=="XXX" GOTO 32BIT
@@ -24,4 +25,4 @@ CD ..\MPEI
 CD ..\build
 
 :: Cleanup
-del ..\MPEI\TraktInstallerTemp.xmp2
+DEL ..\MPEI\TraktInstallerTemp.xmp2
