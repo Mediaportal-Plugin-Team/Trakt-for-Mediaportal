@@ -5559,7 +5559,7 @@ Trakt will also synchronize your watched flags across multiple installations.</E
         <VersionDescription>* x86/x64 (AnyCPU) Version
 </VersionDescription>
         <DevelopmentStatus>Stable</DevelopmentStatus>
-        <OnlineLocation>https://github.com/Mediaportal-Plugin-Team/Trakt-for-Mediaportal/releases/download/v6.0.5.350/MP-TVSeries-6.0.5.350.mpe1</OnlineLocation>
+        <OnlineLocation>https://github.com/Mediaportal-Plugin-Team/Trakt-for-Mediaportal/releases/download/v6.0.5.350/TraktPlugin_v6.0.5.350.mpe1</OnlineLocation>
         <ReleaseDate>2024-05-19T09:34:47.6824911+00:00</ReleaseDate>
         <Tags>trakt,tv shows,movies,mp-tvseries,movingpictures,my videos,my films</Tags>
         <PlatformCompatibility>AnyCPU</PlatformCompatibility>
