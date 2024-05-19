@@ -17,19 +17,19 @@
               <ZipFileName>Installer{CopyFile}\{0b27deae-de56-414c-b912-32221b6ef752}-TraktPlugin.dll</ZipFileName>
               <DestinationFilename>%Plugins%\Windows\TraktPlugin.dll</DestinationFilename>
             </FileItem>
-            <FileItem InstallType="CopyFile" SystemFile="false" Modified="true" Condition="PlatformTarget_x86">
-              <Param1 />
-              <UpdateOption>AlwaysOverwrite</UpdateOption>
-              <LocalFileName>..\ConfigLauncher\bin\x86\Release\Trakt.exe</LocalFileName>
-              <ZipFileName>Installer{CopyFile}\{9924bc45-f2cc-4ecb-9665-9d6191caff84}-Trakt.exe</ZipFileName>
-              <DestinationFilename>%Base%\Trakt.exe</DestinationFilename>
-            </FileItem>
             <FileItem InstallType="CopyFile" SystemFile="false" Modified="true" Condition="None">
               <Param1 />
               <UpdateOption>AlwaysOverwrite</UpdateOption>
               <LocalFileName>..\TraktAPI\bin\Release\TraktAPI.dll</LocalFileName>
               <ZipFileName>Installer{CopyFile}\{a32f0541-18fe-4eeb-b2be-63480a564fa0}-TraktAPI.dll</ZipFileName>
               <DestinationFilename>%Base%\TraktAPI.dll</DestinationFilename>
+            </FileItem>
+            <FileItem InstallType="CopyFile" SystemFile="false" Modified="true" Condition="PlatformTarget_x86">
+              <Param1 />
+              <UpdateOption>AlwaysOverwrite</UpdateOption>
+              <LocalFileName>..\ConfigLauncher\bin\x86\Release\Trakt.exe</LocalFileName>
+              <ZipFileName>Installer{CopyFile}\{9924bc45-f2cc-4ecb-9665-9d6191caff84}-Trakt.exe</ZipFileName>
+              <DestinationFilename>%Base%\Trakt.exe</DestinationFilename>
             </FileItem>
             <FileItem InstallType="CopyFile" SystemFile="false" Modified="true" Condition="PlatformTarget_x64">
               <Param1 />
@@ -1562,28 +1562,11 @@ Click Next to continue or Cancel to exit Setup.
 
 
 Trakt will also synchronize your watched flags across multiple installations.</ExtensionDescription>
-    <VersionDescription>* Fixed issues with invalid dates in settings file when opening configuration tool;
-
-* Fixed issue with loading plugin if TMDb cache contained invalid NUL characters;
-
-* Fixed Invalid Operation Exception when naming threads, issue appears when running imports between trakt and tvseries in config mode;
-
-* Added tv season ratings sync for MP-TVSeries plugin;
-
-* Added support to send HDR information during sync for TVSeries and MovingPictures;
-
-* Added support for 8 digit IMDb ID's;
-
-* Added EpisodeCount and IsSeriesRegular skin properties to show credits;
-
-* Updated MediaInfo support during collection sync for MovingPictures to support MP 1.23 changes;
-
-* Updated Swedish translations, thanks emphatic.
-
+    <VersionDescription>* x86/x64 (AnyCPU) Version
 </VersionDescription>
     <DevelopmentStatus>Stable</DevelopmentStatus>
     <OnlineLocation>https://github.com/Mediaportal-Plugin-Team/Trakt-for-Mediaportal/releases/download/v[Version]/MP-TVSeries-[Version].mpe1</OnlineLocation>
-    <ReleaseDate>2024-05-18T10:00:00</ReleaseDate>
+    <ReleaseDate>2024-05-19T10:00:00</ReleaseDate>
     <Tags>trakt,tv shows,movies,mp-tvseries,movingpictures,my videos,my films</Tags>
     <PlatformCompatibility>AnyCPU</PlatformCompatibility>
     <Location>.\Release\TraktPlugin_v[Version].mpe1</Location>
@@ -1633,16 +1616,16 @@ Trakt will also synchronize your watched flags across multiple installations.</E
       <FileItem InstallType="CopyFile" SystemFile="false" Modified="true" Condition="None">
         <Param1 />
         <UpdateOption>AlwaysOverwrite</UpdateOption>
-        <LocalFileName>..\ConfigLauncher\bin\x86\Release\Trakt.exe</LocalFileName>
-        <ZipFileName>Installer{CopyFile}\{9924bc45-f2cc-4ecb-9665-9d6191caff84}-Trakt.exe</ZipFileName>
-        <DestinationFilename>%Base%\Trakt.exe</DestinationFilename>
+        <LocalFileName>..\TraktAPI\bin\Release\TraktAPI.dll</LocalFileName>
+        <ZipFileName>Installer{CopyFile}\{a32f0541-18fe-4eeb-b2be-63480a564fa0}-TraktAPI.dll</ZipFileName>
+        <DestinationFilename>%Base%\TraktAPI.dll</DestinationFilename>
       </FileItem>
       <FileItem InstallType="CopyFile" SystemFile="false" Modified="true" Condition="None">
         <Param1 />
         <UpdateOption>AlwaysOverwrite</UpdateOption>
-        <LocalFileName>..\TraktAPI\bin\Release\TraktAPI.dll</LocalFileName>
-        <ZipFileName>Installer{CopyFile}\{a32f0541-18fe-4eeb-b2be-63480a564fa0}-TraktAPI.dll</ZipFileName>
-        <DestinationFilename>%Base%\TraktAPI.dll</DestinationFilename>
+        <LocalFileName>..\ConfigLauncher\bin\x86\Release\Trakt.exe</LocalFileName>
+        <ZipFileName>Installer{CopyFile}\{9924bc45-f2cc-4ecb-9665-9d6191caff84}-Trakt.exe</ZipFileName>
+        <DestinationFilename>%Base%\Trakt.exe</DestinationFilename>
       </FileItem>
       <FileItem InstallType="CopyFile" SystemFile="false" Modified="true" Condition="None">
         <Param1 />

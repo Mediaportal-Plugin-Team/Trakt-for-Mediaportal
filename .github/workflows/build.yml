@@ -140,11 +140,6 @@ jobs:
         working-directory: ${{ github.workspace }}\Tools\MPEMaker
         shell: cmd
 
-      - name: MP Externals to MPEMaker folder
-        run: |
-          copy "${{ github.workspace }}\Externals\*.*" "C:\Team MediaPortal\MediaPortal\" /y
-        shell: cmd
-
       - name: Build MPE1
         run: |
           installer.cmd
