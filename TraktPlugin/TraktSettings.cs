@@ -849,7 +849,7 @@ namespace TraktPlugin
                 MaxPopularShowsRequest = GetValueAsIntAndValidate(cTrakt, cMaxPopularShowsRequest, 40, 1, 1000);
                 MaxAnticipatedMoviesRequest = GetValueAsIntAndValidate(cTrakt, cMaxAnticipatedMoviesRequest, 40, 1, 1000);
                 MaxAnticipatedShowsRequest = GetValueAsIntAndValidate(cTrakt, cMaxAnticipatedShowsRequest, 40, 1, 1000);
-                UseSSL = xmlreader.GetValueAsBool(cTrakt, cUseSSL, false);
+                UseSSL = xmlreader.GetValueAsBool(cTrakt, cUseSSL, true);
                 LastListActivities = xmlreader.GetValueAsString(cTrakt, cLastListActivities, "[]").FromJSONArray<TraktCache.ListActivity>();
                 MaxRelatedMoviesRequest = GetValueAsIntAndValidate(cTrakt, cMaxRelatedMoviesRequest, 10, 1, 100);
                 MaxRelatedMoviesUnWatchedRequest = GetValueAsIntAndValidate(cTrakt, cMaxRelatedMoviesUnWatchedRequest, 40, 1, 100);
