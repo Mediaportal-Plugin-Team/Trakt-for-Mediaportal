@@ -51,6 +51,7 @@ namespace TraktAPI
         public static string UserAccessToken { get; set; }
         
         public static string UserAgent { get; set; }
+        [Obsolete("The UseSSL property is deprecated, will now use https for all API endpoints.", false)]
         public static bool UseSSL { get; set; }
         /// <summary>
         /// Set this when acess token polling should halt
@@ -2114,11 +2115,6 @@ namespace TraktAPI
         {
             headerCollection = new WebHeaderCollection();
 
-            if (!UseSSL)
-            {
-                address = address.Replace("https://", "http://");
-            }
-
             OnDataSend?.Invoke(address, null);
 
             Stopwatch watch;
@@ -2214,11 +2210,6 @@ namespace TraktAPI
 
         static string PostToTrakt(string address, string postData, bool logRequest = true, string method = "POST", string contentType = "application/json")
         {
-            if (!UseSSL)
-            {
-                address = address.Replace("https://", "http://");
-            }
-
             if (OnDataSend != null && logRequest)
                 OnDataSend(address, postData);
 
