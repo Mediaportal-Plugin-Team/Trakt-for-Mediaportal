@@ -2163,6 +2163,7 @@ namespace TraktAPI
                 }
                 catch (WebException ex) when (IsTokenExpired(ex))
                 {
+                    (ex.Response as HttpWebResponse).Close();
                     OnDataError?.Invoke("Token expired, refreshing");
                     if (OnTokenExpired())
                     {
@@ -2180,11 +2181,13 @@ namespace TraktAPI
                     return null;
                 }
 
-                Stream stream = response.GetResponseStream();
-                watch.Stop();
+                using (Stream stream = response.GetResponseStream())
+                using (StreamReader reader = new StreamReader(stream))
+                {
+                    watch.Stop();
 
-                StreamReader reader = new StreamReader(stream);
-                strResponse = reader.ReadToEnd();
+                    strResponse = reader.ReadToEnd();
+                }
 
                 headerCollection = response.Headers;
 
@@ -2197,8 +2200,6 @@ namespace TraktAPI
 
                 OnLatency?.Invoke(watch.Elapsed.TotalMilliseconds, response, 0, strResponse.Length * sizeof(Char));
 
-                stream.Close();
-                reader.Close();
                 response.Close();
             }
             catch (WebException wex)
@@ -2264,9 +2265,10 @@ namespace TraktAPI
             }
 
             // post to trakt
-            Stream postStream = request.GetRequestStream();
-            postStream.Write(data, 0, data.Length);
-            postStream.Close();
+            using (Stream postStream = request.GetRequestStream())
+            {
+                postStream.Write(data, 0, data.Length);
+            }
 
             return request;
         }
@@ -2293,6 +2295,7 @@ namespace TraktAPI
                 }
                 catch (WebException ex) when (IsTokenExpired(ex) && tryRefresh)
                 {
+                    (ex.Response as HttpWebResponse).Close();
                     OnDataError?.Invoke("Token expired, refreshing");
                     if (OnTokenExpired())
                     {
@@ -2309,9 +2312,12 @@ namespace TraktAPI
                 if (response == null)
                     return null;
 
-                Stream responseStream = response.GetResponseStream();
-                var reader = new StreamReader(responseStream);
-                string strResponse = reader.ReadToEnd();
+                string strResponse;
+                using (Stream responseStream = response.GetResponseStream())
+                using (var reader = new StreamReader(responseStream))
+                {
+                    strResponse = reader.ReadToEnd();
+                }
 
                 if (string.IsNullOrEmpty(strResponse))
                 {
@@ -2323,8 +2329,6 @@ namespace TraktAPI
                 OnLatency?.Invoke(watch.Elapsed.TotalMilliseconds, response, postData.Length * sizeof(Char), strResponse.Length * sizeof(Char));
 
                 // cleanup
-                responseStream.Close();
-                reader.Close();
                 response.Close();
 
                 return strResponse;
