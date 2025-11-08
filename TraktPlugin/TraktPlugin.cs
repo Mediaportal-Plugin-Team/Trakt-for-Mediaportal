@@ -59,6 +59,20 @@ namespace TraktPlugin
             }
         }
 
+        private static bool TraktAPI_TokenExpired()
+        {
+            var refreshResponse = TraktAPI.TraktAPI.RefreshAccessToken(TraktSettings.UserRefreshToken);
+            if (refreshResponse != null && !string.IsNullOrEmpty(refreshResponse.AccessToken))
+            {
+                TraktSettings.UserAccessToken = refreshResponse.AccessToken;
+                TraktSettings.UserRefreshToken = refreshResponse.RefreshToken;
+                TraktSettings.UserAccessTokenExpiry = DateTime.UtcNow.AddSeconds(refreshResponse.ExpiresIn).ToString();
+                TraktSettings.SaveSettings(false);
+                return true;
+            }
+            return false;
+        }
+
         /// <summary>
         /// Starting Point
         /// </summary>
@@ -68,6 +82,7 @@ namespace TraktPlugin
 
             TraktSettings.PerformMaintenance();
             TraktSettings.LoadSettings();
+            TraktAPI.TraktAPI.OnTokenExpired += new TraktAPI.TraktAPI.OnTokenExpiredDelegate(TraktAPI_TokenExpired);
 
             // Load plugins we want to sync
             LoadPluginHandlers();
