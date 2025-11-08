@@ -51,7 +51,7 @@ namespace TraktAPI
         /// The application using the API should persist this as well as the refresh token
         /// </summary>
         public static string UserAccessToken { get; set; }
-        
+
         public static string UserAgent { get; set; }
         [Obsolete("The UseSSL property is deprecated, will now use https for all API endpoints.", false)]
         public static bool UseSSL { get; set; }
@@ -70,7 +70,7 @@ namespace TraktAPI
         /// View Documentation to understand the the flow @
         /// http://docs.trakt.apiary.io/#reference/authentication-devices/authorize-application
         /// </summary>
-        
+
         public static TraktDeviceCode GetDeviceCode()
         {
             var response = PostToTrakt(TraktURIs.DeviceCode, new TraktClientId { ClientId = ClientId }.ToJSON(), tryRefresh: false);
@@ -87,7 +87,7 @@ namespace TraktAPI
                 ClientId = ClientId,
                 ClientSecret = ClientSecret
             };
-            
+
             int pollCounter = 0;
 
             do
@@ -134,7 +134,7 @@ namespace TraktAPI
 
             return null;
         }
-        
+
         /// <summary>
         /// This should be called approx 3 months after successfully retrieving the access token
         /// </summary> 
@@ -156,10 +156,10 @@ namespace TraktAPI
         public static void RevokeToken()
         {
             // note: this method does not use JSON!
-            PostToTrakt(TraktURIs.RevokeToken, 
-                        string.Format("token={0}", UserAccessToken), 
-                        true, 
-                        "POST", 
+            PostToTrakt(TraktURIs.RevokeToken,
+                        string.Format("token={0}", UserAccessToken),
+                        true,
+                        "POST",
                         "application/x-www-form-urlencoded", tryRefresh: false);
         }
 
@@ -259,7 +259,7 @@ namespace TraktAPI
             var response = GetFromTrakt(TraktURIs.UserSettings, out headerCollection, "GET", true);
             return response.FromJSON<TraktSettings>();
         }
-            
+
         public static TraktUserStatistics GetUserStatistics(string username = "me")
         {
             var response = GetFromTrakt(string.Format(TraktURIs.UserStats, username));
@@ -534,7 +534,7 @@ namespace TraktAPI
                     CurrentPage = page,
                     TotalItemsPerPage = maxItems,
                     TotalPages = int.Parse(headers["X-Pagination-Page-Count"]),
-                    TotalItems = int.Parse(headers["X-Pagination-Item-Count"]),                    
+                    TotalItems = int.Parse(headers["X-Pagination-Item-Count"]),
                     Lists = response.FromJSONArray<TraktListTrending>()
                 };
             }
@@ -614,7 +614,7 @@ namespace TraktAPI
 
         public static bool LikeList(string username, int id)
         {
-            var response = PostToTrakt(string.Format(TraktURIs.UserListLike, username,id), null);
+            var response = PostToTrakt(string.Format(TraktURIs.UserListLike, username, id), null);
             return response != null;
         }
 
@@ -1068,7 +1068,7 @@ namespace TraktAPI
         #endregion
 
         #region TV Calendar
-        
+
         /// <summary>
         /// Returns list of episodes in the users Calendar
         /// </summary>
@@ -1101,7 +1101,7 @@ namespace TraktAPI
             string calendar = GetFromTrakt(string.Format(TraktURIs.CalendarMySeasonPremieresShows, startDate, days), "GET");
             return calendar.FromJSONArray<TraktShowCalendar>();
         }
-        
+
         /// <summary>
         /// Returns list of all episodes in the Calendar
         /// </summary>
@@ -1220,9 +1220,9 @@ namespace TraktAPI
         #endregion
 
         #endregion
-        
+
         #region Search
-        
+
         /// <summary>
         /// Search from one or more types, movies, episodes, shows etc...
         /// </summary>
@@ -1380,7 +1380,7 @@ namespace TraktAPI
             var response = PostToTrakt(TraktURIs.SyncCollectionAdd, shows.ToJSON());
             return response.FromJSON<TraktSyncResponse>();
         }
-        
+
         public static TraktSyncResponse RemoveShowsFromCollectonEx(TraktSyncShowsEx shows)
         {
             var response = PostToTrakt(TraktURIs.SyncCollectionRemove, shows.ToJSON());
@@ -1912,7 +1912,7 @@ namespace TraktAPI
             var response = PostToTrakt(TraktURIs.SyncWatchlistRemove, shows.ToJSON());
             return response.FromJSON<TraktSyncResponse>();
         }
-        
+
         public static TraktSyncResponse AddSeasonsToWatchlist(TraktSyncSeasonsEx shows)
         {
             var response = PostToTrakt(TraktURIs.SyncWatchlistAdd, shows.ToJSON());
@@ -2090,7 +2090,7 @@ namespace TraktAPI
 
         static string ReplaceOnTrakt(string address, string postData)
         {
-            return PostToTrakt(address, postData, true, "PUT");            
+            return PostToTrakt(address, postData, true, "PUT");
         }
 
         static bool DeleteFromTrakt(string address)
@@ -2204,7 +2204,7 @@ namespace TraktAPI
             catch (WebException wex)
             {
                 watch.Stop();
-                
+
                 string errorMessage = wex.Message;
                 if (wex.Status == WebExceptionStatus.ProtocolError)
                 {
