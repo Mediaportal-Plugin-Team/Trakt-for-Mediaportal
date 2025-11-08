@@ -591,6 +591,7 @@ namespace TraktPlugin
 
                                 // new access token expires in 90 days
                                 TraktSettings.UserAccessTokenExpiry = DateTime.UtcNow.AddSeconds(refreshResponse.ExpiresIn).ToString();
+                                SaveSettings(false);
                             }
                             else
                             {
