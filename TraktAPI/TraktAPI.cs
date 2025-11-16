@@ -137,6 +137,7 @@ namespace TraktAPI
 
         /// <summary>
         /// This should be called approx 3 months after successfully retrieving the access token
+        /// or when a 401 is returned with The access token expired in the headers
         /// </summary> 
         public static TraktAuthenticationToken RefreshAccessToken(string token)
         {
