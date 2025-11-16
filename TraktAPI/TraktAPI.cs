@@ -21,11 +21,13 @@ namespace TraktAPI
         public delegate void OnDataReceivedDelegate(string response, HttpWebResponse webResponse);
         public delegate void OnDataErrorDelegate(string error);
         public delegate void OnLatencyDelegate(double totalElapsedTime, HttpWebResponse webResponse, int dataSent, int dataReceived);
+        public delegate bool OnTokenExpiredDelegate();
 
         public static event OnDataSendDelegate OnDataSend;
         public static event OnDataReceivedDelegate OnDataReceived;
         public static event OnDataErrorDelegate OnDataError;
         public static event OnLatencyDelegate OnLatency;
+        public static event OnTokenExpiredDelegate OnTokenExpired;
 
         #endregion
 
@@ -49,7 +51,7 @@ namespace TraktAPI
         /// The application using the API should persist this as well as the refresh token
         /// </summary>
         public static string UserAccessToken { get; set; }
-        
+
         public static string UserAgent { get; set; }
         [Obsolete("The UseSSL property is deprecated, will now use https for all API endpoints.", false)]
         public static bool UseSSL { get; set; }
@@ -68,10 +70,10 @@ namespace TraktAPI
         /// View Documentation to understand the the flow @
         /// http://docs.trakt.apiary.io/#reference/authentication-devices/authorize-application
         /// </summary>
-        
+
         public static TraktDeviceCode GetDeviceCode()
         {
-            var response = PostToTrakt(TraktURIs.DeviceCode, new TraktClientId { ClientId = ClientId }.ToJSON());
+            var response = PostToTrakt(TraktURIs.DeviceCode, new TraktClientId { ClientId = ClientId }.ToJSON(), tryRefresh: false);
             return response.FromJSON<TraktDeviceCode>();
         }
 
@@ -85,14 +87,14 @@ namespace TraktAPI
                 ClientId = ClientId,
                 ClientSecret = ClientSecret
             };
-            
+
             int pollCounter = 0;
 
             do
             {
                 if (AuthorisationCancelled) return null;
 
-                var response = PostToTrakt(TraktURIs.AccessToken, clientCode.ToJSON()).FromJSON<TraktAuthenticationToken>();
+                var response = PostToTrakt(TraktURIs.AccessToken, clientCode.ToJSON(), tryRefresh: false).FromJSON<TraktAuthenticationToken>();
 
                 if (response == null || AuthorisationCancelled) return null;
 
@@ -132,9 +134,10 @@ namespace TraktAPI
 
             return null;
         }
-        
+
         /// <summary>
         /// This should be called approx 3 months after successfully retrieving the access token
+        /// or when a 401 is returned with The access token expired in the headers
         /// </summary> 
         public static TraktAuthenticationToken RefreshAccessToken(string token)
         {
@@ -147,18 +150,18 @@ namespace TraktAPI
                 GrantType = "refresh_token"
             };
 
-            var response = PostToTrakt(TraktURIs.RefreshToken, refreshToken.ToJSON());
+            var response = PostToTrakt(TraktURIs.RefreshToken, refreshToken.ToJSON(), tryRefresh: false);
             return response.FromJSON<TraktAuthenticationToken>();
         }
 
         public static void RevokeToken()
         {
             // note: this method does not use JSON!
-            PostToTrakt(TraktURIs.RevokeToken, 
-                        string.Format("token={0}", UserAccessToken), 
-                        true, 
-                        "POST", 
-                        "application/x-www-form-urlencoded");
+            PostToTrakt(TraktURIs.RevokeToken,
+                        string.Format("token={0}", UserAccessToken),
+                        true,
+                        "POST",
+                        "application/x-www-form-urlencoded", tryRefresh: false);
         }
 
         #endregion
@@ -257,7 +260,7 @@ namespace TraktAPI
             var response = GetFromTrakt(TraktURIs.UserSettings, out headerCollection, "GET", true);
             return response.FromJSON<TraktSettings>();
         }
-            
+
         public static TraktUserStatistics GetUserStatistics(string username = "me")
         {
             var response = GetFromTrakt(string.Format(TraktURIs.UserStats, username));
@@ -532,7 +535,7 @@ namespace TraktAPI
                     CurrentPage = page,
                     TotalItemsPerPage = maxItems,
                     TotalPages = int.Parse(headers["X-Pagination-Page-Count"]),
-                    TotalItems = int.Parse(headers["X-Pagination-Item-Count"]),                    
+                    TotalItems = int.Parse(headers["X-Pagination-Item-Count"]),
                     Lists = response.FromJSONArray<TraktListTrending>()
                 };
             }
@@ -612,7 +615,7 @@ namespace TraktAPI
 
         public static bool LikeList(string username, int id)
         {
-            var response = PostToTrakt(string.Format(TraktURIs.UserListLike, username,id), null);
+            var response = PostToTrakt(string.Format(TraktURIs.UserListLike, username, id), null);
             return response != null;
         }
 
@@ -1066,7 +1069,7 @@ namespace TraktAPI
         #endregion
 
         #region TV Calendar
-        
+
         /// <summary>
         /// Returns list of episodes in the users Calendar
         /// </summary>
@@ -1099,7 +1102,7 @@ namespace TraktAPI
             string calendar = GetFromTrakt(string.Format(TraktURIs.CalendarMySeasonPremieresShows, startDate, days), "GET");
             return calendar.FromJSONArray<TraktShowCalendar>();
         }
-        
+
         /// <summary>
         /// Returns list of all episodes in the Calendar
         /// </summary>
@@ -1218,9 +1221,9 @@ namespace TraktAPI
         #endregion
 
         #endregion
-        
+
         #region Search
-        
+
         /// <summary>
         /// Search from one or more types, movies, episodes, shows etc...
         /// </summary>
@@ -1378,7 +1381,7 @@ namespace TraktAPI
             var response = PostToTrakt(TraktURIs.SyncCollectionAdd, shows.ToJSON());
             return response.FromJSON<TraktSyncResponse>();
         }
-        
+
         public static TraktSyncResponse RemoveShowsFromCollectonEx(TraktSyncShowsEx shows)
         {
             var response = PostToTrakt(TraktURIs.SyncCollectionRemove, shows.ToJSON());
@@ -1910,7 +1913,7 @@ namespace TraktAPI
             var response = PostToTrakt(TraktURIs.SyncWatchlistRemove, shows.ToJSON());
             return response.FromJSON<TraktSyncResponse>();
         }
-        
+
         public static TraktSyncResponse AddSeasonsToWatchlist(TraktSyncSeasonsEx shows)
         {
             var response = PostToTrakt(TraktURIs.SyncWatchlistAdd, shows.ToJSON());
@@ -2088,7 +2091,7 @@ namespace TraktAPI
 
         static string ReplaceOnTrakt(string address, string postData)
         {
-            return PostToTrakt(address, postData, true, "PUT");            
+            return PostToTrakt(address, postData, true, "PUT");
         }
 
         static bool DeleteFromTrakt(string address)
@@ -2103,21 +2106,17 @@ namespace TraktAPI
             return GetFromTrakt(address, out headerCollection, method);
         }
 
-        /// <summary>
-        /// Requests data from trakt.tv 
-        /// </summary>
-        /// <param name="address">Address of the trakt resource</param>
-        /// <param name="headerCollection">returns the headers from the response</param>
-        /// <param name="method">overrides the request method: GET, DELETE, PUT</param>
-        /// <param name="sendOAuth">send user access token for methods that require oAuth</param>
-        /// <param name="serialiseError">return error code and description as JSON on the response when there is an error, otherwise return null (default)</param>
-        static string GetFromTrakt(string address, out WebHeaderCollection headerCollection, string method = "GET", bool serialiseError = false)
+        private static bool IsTokenExpired(WebException ex)
+        {
+            return ex.Status == WebExceptionStatus.ProtocolError &&
+                ex.Response.Headers["WWW-Authenticate"].Contains("The access token expired");
+        }
+
+        private static HttpWebRequest CreateGetRequest(string address, out WebHeaderCollection headerCollection, string method)
         {
             headerCollection = new WebHeaderCollection();
 
-            OnDataSend?.Invoke(address, null);
 
-            Stopwatch watch;
 
             var request = WebRequest.Create(address) as HttpWebRequest;
 
@@ -2136,25 +2135,60 @@ namespace TraktAPI
             {
                 request.Headers.Add("Authorization", string.Format("Bearer {0}", UserAccessToken));
             }
+            return request;
+        }
 
+        /// <summary>
+        /// Requests data from trakt.tv 
+        /// </summary>
+        /// <param name="address">Address of the trakt resource</param>
+        /// <param name="headerCollection">returns the headers from the response</param>
+        /// <param name="method">overrides the request method: GET, DELETE, PUT</param>
+        /// <param name="sendOAuth">send user access token for methods that require oAuth</param>
+        /// <param name="serialiseError">return error code and description as JSON on the response when there is an error, otherwise return null (default)</param>
+        static string GetFromTrakt(string address, out WebHeaderCollection headerCollection, string method = "GET", bool serialiseError = false)
+        {
+            OnDataSend?.Invoke(address, null);
+            Stopwatch watch;
+            var request = CreateGetRequest(address, out headerCollection, method);
             // measure how long it took to get a response
             watch = Stopwatch.StartNew();
             string strResponse = null;
 
             try
             {
-                HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+                HttpWebResponse response = null;
+                try
+                {
+                    response = (HttpWebResponse)request.GetResponse();
+                }
+                catch (WebException ex) when (IsTokenExpired(ex))
+                {
+                    (ex.Response as HttpWebResponse).Close();
+                    OnDataError?.Invoke("Token expired, refreshing");
+                    if (OnTokenExpired())
+                    {
+                        request = CreateGetRequest(address, out headerCollection, method);
+                        // measure how long it took to get a response
+                        watch = Stopwatch.StartNew();
+                        response = (HttpWebResponse)request.GetResponse();
+                    }
+                    else
+                        return "Something went wrong with refreshing tokens";
+                }
                 if (response == null)
                 {
                     watch.Stop();
                     return null;
                 }
 
-                Stream stream = response.GetResponseStream();
-                watch.Stop();
+                using (Stream stream = response.GetResponseStream())
+                using (StreamReader reader = new StreamReader(stream))
+                {
+                    watch.Stop();
 
-                StreamReader reader = new StreamReader(stream);
-                strResponse = reader.ReadToEnd();
+                    strResponse = reader.ReadToEnd();
+                }
 
                 headerCollection = response.Headers;
 
@@ -2167,14 +2201,12 @@ namespace TraktAPI
 
                 OnLatency?.Invoke(watch.Elapsed.TotalMilliseconds, response, 0, strResponse.Length * sizeof(Char));
 
-                stream.Close();
-                reader.Close();
                 response.Close();
             }
             catch (WebException wex)
             {
                 watch.Stop();
-                
+
                 string errorMessage = wex.Message;
                 if (wex.Status == WebExceptionStatus.ProtocolError)
                 {
@@ -2208,13 +2240,8 @@ namespace TraktAPI
             return strResponse;
         }
 
-        static string PostToTrakt(string address, string postData, bool logRequest = true, string method = "POST", string contentType = "application/json")
+        private static HttpWebRequest CreatePostRequest(string address, string postData, string method, string contentType)
         {
-            if (OnDataSend != null && logRequest)
-                OnDataSend(address, postData);
-
-            Stopwatch watch;
-
             if (postData == null)
                 postData = string.Empty;
 
@@ -2232,31 +2259,66 @@ namespace TraktAPI
             // add required headers for authorisation
             request.Headers.Add("trakt-api-version", "2");
             request.Headers.Add("trakt-api-key", ClientId);
-           
+
             if (!string.IsNullOrEmpty(UserAccessToken))
             {
                 request.Headers.Add("Authorization", string.Format("Bearer {0}", UserAccessToken));
             }
+
+            // post to trakt
+            using (Stream postStream = request.GetRequestStream())
+            {
+                postStream.Write(data, 0, data.Length);
+            }
+
+            return request;
+        }
+
+        static string PostToTrakt(string address, string postData, bool logRequest = true, string method = "POST", string contentType = "application/json",
+            bool tryRefresh = true)
+        {
+            if (OnDataSend != null && logRequest)
+                OnDataSend(address, postData);
+
+            Stopwatch watch;
+            var request = CreatePostRequest(address, postData, method, contentType);
 
             // measure how long it took to get a response
             watch = Stopwatch.StartNew();
 
             try
             {
-                // post to trakt
-                Stream postStream = request.GetRequestStream();
-                postStream.Write(data, 0, data.Length);
-
                 // get the response
-                var response = (HttpWebResponse)request.GetResponse();
+                HttpWebResponse response = null;
+                try
+                {
+                    response = (HttpWebResponse)request.GetResponse();
+                }
+                catch (WebException ex) when (IsTokenExpired(ex) && tryRefresh)
+                {
+                    (ex.Response as HttpWebResponse).Close();
+                    OnDataError?.Invoke("Token expired, refreshing");
+                    if (OnTokenExpired())
+                    {
+                        request = CreatePostRequest(address, postData, method, contentType);
+                        // measure how long it took to get a response
+                        watch = Stopwatch.StartNew();
+                        response = (HttpWebResponse)request.GetResponse();
+                    }
+                    else
+                        return "Something went wrong with refreshing tokens";
+                }
                 watch.Stop();
 
                 if (response == null)
                     return null;
 
-                Stream responseStream = response.GetResponseStream();
-                var reader = new StreamReader(responseStream);
-                string strResponse = reader.ReadToEnd();
+                string strResponse;
+                using (Stream responseStream = response.GetResponseStream())
+                using (var reader = new StreamReader(responseStream))
+                {
+                    strResponse = reader.ReadToEnd();
+                }
 
                 if (string.IsNullOrEmpty(strResponse))
                 {
@@ -2268,9 +2330,6 @@ namespace TraktAPI
                 OnLatency?.Invoke(watch.Elapsed.TotalMilliseconds, response, postData.Length * sizeof(Char), strResponse.Length * sizeof(Char));
 
                 // cleanup
-                postStream.Close();
-                responseStream.Close();
-                reader.Close();
                 response.Close();
 
                 return strResponse;

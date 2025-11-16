@@ -33,7 +33,7 @@ namespace TraktPlugin
         ExtensionSettings GUIExtensionSettings = new ExtensionSettings();
         // Dashboard - Activity / Trending Items
         TraktDashboard DashBoard = new TraktDashboard();
-    
+
         #endregion
 
         #region Public Properties
@@ -59,6 +59,24 @@ namespace TraktPlugin
             }
         }
 
+        private static bool TraktAPI_TokenExpired()
+        {
+            // If done immediately after a failed request it triggers a 429 with
+            // "name":"AUTHED_API_POST_LIMIT","period":1,"limit":1,"remaining":0,"until":"2025-11-16T11:53:56Z"}, retry-after: 0
+            // documented time is 1 second so for safety wait 2 seconds
+            Thread.Sleep(2000);
+            var refreshResponse = TraktAPI.TraktAPI.RefreshAccessToken(TraktSettings.UserRefreshToken);
+            if (refreshResponse != null && !string.IsNullOrEmpty(refreshResponse.AccessToken))
+            {
+                TraktSettings.UserAccessToken = refreshResponse.AccessToken;
+                TraktSettings.UserRefreshToken = refreshResponse.RefreshToken;
+                TraktSettings.UserAccessTokenExpiry = DateTime.UtcNow.AddSeconds(refreshResponse.ExpiresIn).ToString();
+                TraktSettings.SaveSettings(false);
+                return true;
+            }
+            return false;
+        }
+
         /// <summary>
         /// Starting Point
         /// </summary>
@@ -68,6 +86,7 @@ namespace TraktPlugin
 
             TraktSettings.PerformMaintenance();
             TraktSettings.LoadSettings();
+            TraktAPI.TraktAPI.OnTokenExpired += new TraktAPI.TraktAPI.OnTokenExpiredDelegate(TraktAPI_TokenExpired);
 
             // Load plugins we want to sync
             LoadPluginHandlers();
@@ -158,7 +177,7 @@ namespace TraktPlugin
 
             // save tmdb cache
             TmdbCache.DeInit();
-            
+
             TraktLogger.Info("Plugin has successfully unloaded");
             base.DeInit();
         }
@@ -267,7 +286,7 @@ namespace TraktPlugin
         {
             TraktLogger.Debug("Loading Plugin Handlers");
             string errorMessage = "Tried to load plugin handler '{0}' but failed, check minimum requirements have been met!";
-            
+
             #region MovingPictures
             try
             {
@@ -427,7 +446,7 @@ namespace TraktPlugin
             else
             {
                 TraktLogger.Debug("Sorting Plugin Handlers by priority");
-                TraktHandlers.Sort(delegate(ITraktHandler t1, ITraktHandler t2) { return t1.Priority.CompareTo(t2.Priority); });
+                TraktHandlers.Sort(delegate (ITraktHandler t1, ITraktHandler t2) { return t1.Priority.CompareTo(t2.Priority); });
             }
         }
 
@@ -547,8 +566,8 @@ namespace TraktPlugin
             LibrarySyncRunning = true;
             SyncStartTime = DateTime.UtcNow;
 
-            if ( Thread.CurrentThread.Name == null )
-                 Thread.CurrentThread.Name = "Sync";
+            if (Thread.CurrentThread.Name == null)
+                Thread.CurrentThread.Name = "Sync";
 
             if (TraktSettings.AccountStatus != ConnectionState.Connected)
                 return;
@@ -578,11 +597,11 @@ namespace TraktPlugin
                 {
                     TraktLogger.Error("Error synchronising library. Plugin = '{0}', Error = '{1}'", traktHandler.Name, ex.Message);
                 }
-            } 
+            }
         }
 
         #endregion
-                
+
         #region MediaPortal Playback Hooks
 
         private void g_Player_PlayBackStarted(g_Player.MediaType type, string filename)
@@ -608,7 +627,7 @@ namespace TraktPlugin
                 StopScrobble();
             }
         }
-        
+
         private void g_Player_PlayBackEnded(g_Player.MediaType type, string filename)
         {
             if (IsValidScrobbleType(type))
@@ -702,10 +721,10 @@ namespace TraktPlugin
                             }
                         }
                     })
-                    {
-                        IsBackground = true,
-                        Name = "PlaySync"
-                    };
+                {
+                    IsBackground = true,
+                    Name = "PlaySync"
+                };
 
                 playSyncThread.Start(windowID);
             }
@@ -742,7 +761,7 @@ namespace TraktPlugin
             string fanart = string.Empty;
             bool isWatched = false;
             SearchPeople searchPeople = null;
-            string type = "movie";            
+            string type = "movie";
 
             switch (message.Message)
             {
@@ -803,7 +822,7 @@ namespace TraktPlugin
                                         {
                                             year = releaseDate.Year.ToString();
                                         }
-                                                                               
+
                                         imdbid = GUIPropertyManager.GetProperty("#st_imdb");
                                         if (imdbid == null) imdbid = string.Empty;
 
@@ -845,7 +864,7 @@ namespace TraktPlugin
                                         string movieid = GUIPropertyManager.GetProperty("#movieid").Trim();
                                         MediaPortal.Util.FanArt.GetFanArtfilename(movieid, 0, out fanart);
                                     }
-                                    
+
                                     searchPeople = new SearchPeople();
                                     string people = GUIPropertyManager.GetProperty("#cast").Trim();
                                     if (people != string.Empty && people != "unknown")
@@ -871,7 +890,7 @@ namespace TraktPlugin
                                     if (people != string.Empty && people != "unknown")
                                     {
                                         var writers = people.Split(',').Select(s => s.Trim());
-                                        foreach(var writer in writers)
+                                        foreach (var writer in writers)
                                         {
                                             // remove the writer type e.g. (Story), (Screenplay)
                                             searchPeople.Writers.Add(writer.Split('(').First().Trim());
@@ -922,7 +941,7 @@ namespace TraktPlugin
                                         if (MovingPictures.FindMovieID(title, iYear, imdbid, tmdbid.ToNullableInt32(), ref movieID))
                                             MovingPictures.GetMoviePersonInfo(movieID, out searchPeople);
                                     }
-                                    
+
                                     if (!string.IsNullOrEmpty(imdbid) || (!string.IsNullOrEmpty(title) && !string.IsNullOrEmpty(year)))
                                     {
                                         if (message.SenderControlId == (int)ExternalPluginControls.WatchList) validWatchListItem = true;
@@ -967,7 +986,7 @@ namespace TraktPlugin
 
                                             case TVSeries.SelectedType.Series:
                                                 type = "series";
-                                                validItem =  TVSeries.GetSeriesInfo(obj, out title, out year, out showtvdbid);
+                                                validItem = TVSeries.GetSeriesInfo(obj, out title, out year, out showtvdbid);
                                                 validItem |= TVSeries.GetSeriesPersonInfo(obj, out searchPeople);
                                                 break;
 
@@ -1234,7 +1253,7 @@ namespace TraktPlugin
                         TraktLogger.Info("Displaying Shouts for {0}. Title = '{0}', Year = '{1}', TVDb ID = '{2}'", title, year, showtvdbid);
                         TraktHelper.ShowTVShowShouts(title, showtvdbid.ToNullableInt32(), null, isWatched, fanart);
                         break;
-                    #endregion
+                        #endregion
                 }
             }
             #endregion
@@ -1256,7 +1275,7 @@ namespace TraktPlugin
                         TraktLogger.Info("Displaying Related Shows for {0}. Title = '{0}', Year = '{1}', TVDb ID = '{2}'", title, year, showtvdbid);
                         TraktHelper.ShowRelatedShows(title, showtvdbid);
                         break;
-                    #endregion
+                        #endregion
                 }
             }
             #endregion
@@ -1308,13 +1327,13 @@ namespace TraktPlugin
             if (e.Mode == Microsoft.Win32.PowerModes.Resume)
             {
                 TraktLogger.Info("Trakt has detected that the system is resuming from standby mode");
-                
+
                 // determine when next library sync is due
                 var nextSyncDate = SyncStartTime.Add(TimeSpan.FromHours(TraktSettings.SyncTimerLength));
 
                 // determine how long to wait from 'now' to start the next sync, set the start delay if it is 'now'
                 int startDelay = nextSyncDate <= DateTime.Now ? TraktSettings.SyncStartDelay : (int)(nextSyncDate.Subtract(DateTime.Now).TotalMilliseconds);
-                    
+
                 TraktLogger.Info("Last library sync started at {0}, next sync will start at {1}", SyncStartTime, DateTime.Now.Add(new TimeSpan(0, 0, 0, 0, startDelay)));
 
                 // initialise timer for library sync

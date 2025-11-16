@@ -20,10 +20,10 @@ namespace TraktPlugin
     public class TraktSettings
     {
         private static Object lockObject = new object();
-        
+
         #region Settings
         static int SettingsVersion = 12;
-        
+
         public static int MovingPictures { get; set; }
         public static int TVSeries { get; set; }
         public static int MyVideos { get; set; }
@@ -227,13 +227,13 @@ namespace TraktPlugin
         private const string RedirectUri = "urn:ietf:wg:oauth:2.0:oob";
 
         public const string cGuid = "a9c3845a-8718-4712-85cc-26f56520bb9a";
-        
+
         private static string cLastActivityFileCache = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\{username}\Dashboard\NetworkActivity.json");
         private static string cLastStatisticsFileCache = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\{username}\Dashboard\UserStatistics.json");
         private static string cLastUserProfileFileCache = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\{username}\Dashboard\UserProfile.json");
         private static string cLastTrendingMovieFileCache = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\Dashboard\TrendingMovies.json");
         private static string cLastTrendingShowFileCache = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\Dashboard\TrendingShows.json");
-        
+
         private const string cTrakt = "Trakt";
         private const string cSettingsVersion = "SettingsVersion";
         private const string cUsername = "Username";
@@ -291,7 +291,7 @@ namespace TraktPlugin
         private const string cHideWatchedRelatedShows = "HideWatchedRelatedShows";
         private const string cUserLogins = "UserLogins";
         private const string cWebRequestTimeout = "WebRequestTimeout";
-        private const string cHideSpoilersOnShouts = "HideSpoilersOnShouts";        
+        private const string cHideSpoilersOnShouts = "HideSpoilersOnShouts";
         private const string cSyncRatings = "SyncRatings";
         private const string cShowRateDialogOnWatched = "ShowRateDialogOnWatched";
         private const string cLastActivityLoad = "LastActivityLoad";
@@ -446,7 +446,7 @@ namespace TraktPlugin
             }
         }
         static string _userAccessToken = null;
-        
+
         /// <summary>
         /// Get Movie Plugin Count
         /// </summary>
@@ -517,7 +517,7 @@ namespace TraktPlugin
         /// MediaPortal Version
         /// </summary>
         public static Version MPVersion
-        { 
+        {
             get
             {
                 return Assembly.GetEntryAssembly().GetName().Version;
@@ -591,6 +591,7 @@ namespace TraktPlugin
 
                                 // new access token expires in 90 days
                                 TraktSettings.UserAccessTokenExpiry = DateTime.UtcNow.AddSeconds(refreshResponse.ExpiresIn).ToString();
+                                SaveSettings(false);
                             }
                             else
                             {
@@ -765,7 +766,7 @@ namespace TraktPlugin
                 CalendarHideTVShowsInWatchList = xmlreader.GetValueAsBool(cTrakt, cCalendarHideTVShowsInWatchList, false);
                 HideWatchedRelatedMovies = xmlreader.GetValueAsBool(cTrakt, cHideWatchedRelatedMovies, false);
                 HideWatchedRelatedShows = xmlreader.GetValueAsBool(cTrakt, cHideWatchedRelatedShows, false);
-                HideSpoilersOnShouts = xmlreader.GetValueAsBool(cTrakt, cHideSpoilersOnShouts, false);                
+                HideSpoilersOnShouts = xmlreader.GetValueAsBool(cTrakt, cHideSpoilersOnShouts, false);
                 SyncRatings = xmlreader.GetValueAsBool(cTrakt, cSyncRatings, true);
                 ShowRateDialogOnWatched = xmlreader.GetValueAsBool(cTrakt, cShowRateDialogOnWatched, true);
                 DashboardActivityPollInterval = GetValueAsIntAndValidate(cTrakt, cDashboardActivityPollInterval, 15000, 15000, 300000);
@@ -908,7 +909,7 @@ namespace TraktPlugin
             TraktAPI.TraktAPI.ClientId = ClientId;
             TraktAPI.TraktAPI.ClientSecret = ClientSecret;
             TraktAPI.TraktAPI.RedirectUri = RedirectUri;
-            
+
             TraktAPI.TraktAPI.UserAgent = UserAgent;
 
             TmdbAPI.TmdbAPI.UserAgent = UserAgent;
@@ -1209,7 +1210,7 @@ namespace TraktPlugin
                             xmlreader.RemoveEntry(cTrakt, "UseTrailersPlugin");
                             xmlreader.RemoveEntry(cTrakt, "DefaultTVShowTrailerSite");
                             xmlreader.RemoveEntry(cTrakt, "DefaultMovieTrailerSite");
-         
+
                             // Remove old activity settings
                             xmlreader.RemoveEntry(cTrakt, "ShowCommunityActivity");
                             xmlreader.RemoveEntry(cTrakt, "IncludeMeInFriendsActivity");
@@ -1310,7 +1311,7 @@ namespace TraktPlugin
                         case 7:
                             // upgrade last activity view
                             xmlreader.RemoveEntry(cTrakt, cActivityStreamView);
-                            
+
                             // remove last paused item processed - stored in last activities
                             xmlreader.RemoveEntry(cTrakt, "LastPausedItemProcessed");
 
@@ -1417,7 +1418,7 @@ namespace TraktPlugin
         #region Init
         public void Init()
         {
-            Thread hookThread = new Thread(delegate()
+            Thread hookThread = new Thread(delegate ()
             {
                 try
                 {

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PackageClass xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<PackageClass xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <Version>2.0</Version>
   <Groups>
     <Items>
@@ -1554,7 +1554,7 @@ Click Next to continue or Cancel to exit Setup.
     <Version>
       <Major>6</Major>
       <Minor>0</Minor>
-      <Build>5</Build>
+      <Build>6</Build>
       <Revision>0</Revision>
     </Version>
     <ExtensionDescription>Trakt actively keeps a record of what TV shows and movies you are watching. Based on your favorites, your friends, and the community, trakt recommends other TV shows and movies.
@@ -1562,11 +1562,11 @@ Click Next to continue or Cancel to exit Setup.
 
 
 Trakt will also synchronize your watched flags across multiple installations.</ExtensionDescription>
-    <VersionDescription>* Removed option to disable SSL, Will now use `https` for all API endpoints.
+    <VersionDescription>* Improved handling of expired tokens
 </VersionDescription>
     <DevelopmentStatus>Stable</DevelopmentStatus>
-    <OnlineLocation>https://github.com/Mediaportal-Plugin-Team/Trakt-for-Mediaportal/releases/download/v[Version]/TraktPlugin-v[Version].mpe1</OnlineLocation>
-    <ReleaseDate>2024-09-30T10:10:10</ReleaseDate>
+    <OnlineLocation>https://github.com/Mediaportal-Plugin-Team/Trakt-for-Mediaportal/releases/download/v6.0.6.0/TraktPlugin-v6.0.6.0.mpe1</OnlineLocation>
+    <ReleaseDate>2025-11-16T10:10:10</ReleaseDate>
     <Tags>trakt,tv shows,movies,mp-tvseries,movingpictures,my videos,my films</Tags>
     <PlatformCompatibility>AnyCPU</PlatformCompatibility>
     <Location>.\Release\TraktPlugin-v[Version].mpe1</Location>
@@ -2870,14 +2870,14 @@ Trakt will also synchronize your watched flags across multiple installations.</E
         <Param1 />
         <UpdateOption>OverwriteIfOlder</UpdateOption>
         <LocalFileName>..\TraktPlugin\Resources\Images\trakt.png</LocalFileName>
-        <ZipFileName>Installer{CopyFile}\{2786f4cf-001b-4f75-96bb-05488c42fd77}-trakt.png</ZipFileName>
+        <ZipFileName>Installer{CopyFile}\{2c387cf1-f9e9-482f-945c-901b4397939c}-trakt.png</ZipFileName>
         <DestinationFilename />
       </FileItem>
       <FileItem InstallType="CopyFile" SystemFile="true" Modified="true" Condition="None">
         <Param1 />
         <UpdateOption>OverwriteIfOlder</UpdateOption>
         <LocalFileName>..\TraktPlugin\Resources\Images\trakt-1024.png</LocalFileName>
-        <ZipFileName>Installer{CopyFile}\{203b7fdb-2b99-4436-b1e7-cd7bbd939d74}-trakt-1024.png</ZipFileName>
+        <ZipFileName>Installer{CopyFile}\{237ad436-334c-4358-8e6f-734335db222d}-trakt-1024.png</ZipFileName>
         <DestinationFilename />
       </FileItem>
     </Items>
