@@ -61,6 +61,10 @@ namespace TraktPlugin
 
         private static bool TraktAPI_TokenExpired()
         {
+            // If done immediately after a failed request it triggers a 429 with
+            // "name":"AUTHED_API_POST_LIMIT","period":1,"limit":1,"remaining":0,"until":"2025-11-16T11:53:56Z"}, retry-after: 0
+            // documented time is 1 second so for safety wait 2 seconds
+            Thread.Sleep(2000);
             var refreshResponse = TraktAPI.TraktAPI.RefreshAccessToken(TraktSettings.UserRefreshToken);
             if (refreshResponse != null && !string.IsNullOrEmpty(refreshResponse.AccessToken))
             {
