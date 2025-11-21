@@ -1554,7 +1554,7 @@ Click Next to continue or Cancel to exit Setup.
     <Version>
       <Major>6</Major>
       <Minor>0</Minor>
-      <Build>6</Build>
+      <Build>7</Build>
       <Revision>0</Revision>
     </Version>
     <ExtensionDescription>Trakt actively keeps a record of what TV shows and movies you are watching. Based on your favorites, your friends, and the community, trakt recommends other TV shows and movies.
@@ -1562,11 +1562,11 @@ Click Next to continue or Cancel to exit Setup.
 
 
 Trakt will also synchronize your watched flags across multiple installations.</ExtensionDescription>
-    <VersionDescription>* Improved handling of expired tokens
+    <VersionDescription>* Wait for network to be up before logging in
 </VersionDescription>
     <DevelopmentStatus>Stable</DevelopmentStatus>
     <OnlineLocation>https://github.com/Mediaportal-Plugin-Team/Trakt-for-Mediaportal/releases/download/v[Version]/TraktPlugin-v[Version].mpe1</OnlineLocation>
-    <ReleaseDate>2025-11-16T10:10:10</ReleaseDate>
+    <ReleaseDate>2025-11-21T10:10:10</ReleaseDate>
     <Tags>trakt,tv shows,movies,mp-tvseries,movingpictures,my videos,my films</Tags>
     <PlatformCompatibility>AnyCPU</PlatformCompatibility>
     <Location>.\Release\TraktPlugin-v[Version].mpe1</Location>
