@@ -1026,6 +1026,12 @@ namespace TraktPlugin
                         ConnectionChecked = true;
                         var checkStatus = new Thread(() =>
                         {
+                            var attempts = 6;
+                            while (attempts-- > 0 && !MediaPortal.Util.Win32API.IsConnectedToInternet())
+                            {
+                                Thread.Sleep(1000);
+                                attempts--;
+                            }
                             if (TraktSettings.AccountStatus == ConnectionState.Invalid)
                             {
                                 TraktSettings.AccountStatus = ConnectionState.Pending;
