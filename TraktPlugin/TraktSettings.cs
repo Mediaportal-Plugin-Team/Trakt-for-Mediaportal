@@ -222,8 +222,8 @@ namespace TraktPlugin
 
         #region Constants
         // trakt has 2 servers, live and staging
-        private const string ClientId = "49e6907e6221d3c7e866f9d4d890c6755590cf4aa92163e8490a17753b905e57";
-        private const string ClientSecret = "0547cb211deb6615e14e47901abf62c15002494ae691eeb1576dec2c2e629e10";
+        private const string ClientId = "SECRET_PLACEHOLDER_CLIENT_ID";
+        private const string ClientSecret = "SECRET_PLACEHOLDER_CLIENT_SECRET";
         private const string RedirectUri = "urn:ietf:wg:oauth:2.0:oob";
 
         public const string cGuid = "a9c3845a-8718-4712-85cc-26f56520bb9a";
