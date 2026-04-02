@@ -30,6 +30,18 @@ set REVISION=%REVISION: =%
 set /A REVISION=REVISION-1000
 "Tools\Tools\sed.exe" -i -r "s/(Assembly(File)?Version\(.[0-9]+\.[0-9]+\.[0-9]+\.)[0-9]+(.\))/\1%REVISION%\3/g" "TraktPlugin\Properties\AssemblyInfo.cs"
 
+:: Prepare Client ID
+IF DEFINED CLIENT_ID (
+  ECHO [INFO] Client ID found. Injecting...
+  "Tools\Tools\sed.exe" -i -r "s/SECRET_PLACEHOLDER_CLIENT_ID/%CLIENT_ID%/g" "TraktPlugin\TraktSettings.cs"
+)
+
+:: Prepare Client Token
+IF DEFINED CLIENT_SECRET (
+  ECHO [INFO] Client Token found. Injecting...
+  "Tools\Tools\sed.exe" -i -r "s/SECRET_PLACEHOLDER_CLIENT_SECRET/%CLIENT_SECRET%/g" "TraktPlugin\TraktSettings.cs"
+)
+
 :: Build
 "%MSBUILD_PATH%" /target:Rebuild /property:Configuration=RELEASE /property:Platform=%ARCH% /fl /flp:logfile=Trakt.log;verbosity=diagnostic TraktPlugin.sln
 
