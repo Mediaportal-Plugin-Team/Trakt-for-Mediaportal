@@ -26,6 +26,12 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Git Checkout / MPE / XPath
+        uses: actions/checkout@v6
+        with:
+          repository: Mediaportal-Plugin-Team/Mediaportal-Tools
+          path: Tools
+
       - name: Build
         run: |
           build.cmd < nul
