@@ -19,10 +19,10 @@ namespace TraktPlugin
 {
     public class TraktSettings
     {
-        private static Object lockObject = new object();
+        private static readonly Object lockObject = new object();
 
         #region Settings
-        static int SettingsVersion = 12;
+        static readonly int SettingsVersion = 13;
 
         public static int MovingPictures { get; set; }
         public static int TVSeries { get; set; }
@@ -1393,6 +1393,26 @@ namespace TraktPlugin
                             xmlreader.RemoveEntry(cTrakt, "DefaultCalendarStartDate");
                             xmlreader.RemoveEntry(cTrakt, "DefaultCalendarView");
                             break;
+                        case 12:
+                          // remove cached liked lists for each user (API model update)
+                          try
+                          {
+                            var di = new DirectoryInfo( Path.Combine( Config.GetFolder( Config.Dir.Config ), @"Trakt" ) );
+
+                            foreach ( FileInfo file in di.GetFiles( "Liked.json", SearchOption.AllDirectories ) )
+                            {
+                              file.Delete();
+                            }
+
+                            // clear the cached activity times to force a full sync of all activities including likes
+                            xmlreader.RemoveEntry( cTrakt, cLastSyncActivities );
+                          }
+                          catch ( Exception e )
+                          {
+                            TraktLogger.Error( "Failed to remove previously cached liked lists, Reason = '{0}'", e.Message );
+                          }
+                          currentSettingsVersion++;
+                          break;
                     }
                 }
             }

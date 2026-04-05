@@ -1621,7 +1621,7 @@ namespace TraktPlugin
                 if (LikedLists != null && pagedItems.IsAny())
                 {
                     // if the list id exists then we already have all liked lists
-                    listExists = LikedLists.Any(l => l.List.Ids.Trakt == pagedItems.Last().List.Ids.Trakt);
+                    listExists = LikedLists.Any(l => l.List.Id == pagedItems.Last().List.Id);
 
                     // add the latest page to our previous cached comments
                     pagedItems = pagedItems.Union(LikedLists);
@@ -1636,7 +1636,7 @@ namespace TraktPlugin
                         if (nextPage == null || !nextPage.Likes.IsAny()) break;
 
                         // if the list id exists then we already have all liked lists
-                        if (pagedItems.Any(c => c.List.Ids.Trakt == nextPage.Likes.Last().List.Ids.Trakt))
+                        if (pagedItems.Any(c => c.List.Id == nextPage.Likes.Last().List.Id))
                             listExists = true;
 
                         // add the latest page to our previous requested liked lists
