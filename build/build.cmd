@@ -24,18 +24,30 @@ IF NOT EXIST "%MSBUILD_PATH%" SET MSBUILD_PATH=%ProgramFiles%\Microsoft Visual S
 IF NOT EXIST "%MSBUILD_PATH%" SET MSBUILD_PATH=%ProgramFiles%\Microsoft Visual Studio\2022\Enterprise\MSBuild\Current\bin\MSBuild.exe
 IF NOT EXIST "%MSBUILD_PATH%" SET MSBUILD_PATH=%ProgramFiles%\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\bin\MSBuild.exe
 
-:: Prepare version
-for /f "tokens=*" %%a in ('git rev-list HEAD --count') do set REVISION=%%a 
-set REVISION=%REVISION: =%
-set /A REVISION=REVISION-1000
+REM Prepare version
+FOR /f "tokens=*" %%a in ('git rev-list HEAD --count') DO SET REVISION=%%a 
+SET REVISION=%REVISION: =%
+SET /A REVISION=REVISION-1000
 "Tools\Tools\sed.exe" -i -r "s/(Assembly(File)?Version\(.[0-9]+\.[0-9]+\.[0-9]+\.)[0-9]+(.\))/\1%REVISION%\3/g" "TraktPlugin\Properties\AssemblyInfo.cs"
 
-:: Build
+REM Prepare Client ID
+IF DEFINED CLIENT_ID (
+  ECHO [INFO] Client ID found...
+  "Tools\Tools\sed.exe" -i -r "s/SECRET_PLACEHOLDER_CLIENT_ID/%CLIENT_ID%/g" "TraktPlugin\TraktSettings.cs"
+)
+
+REM Prepare Client Token
+IF DEFINED CLIENT_SECRET (
+  ECHO [INFO] Client Token found...
+  "Tools\Tools\sed.exe" -i -r "s/SECRET_PLACEHOLDER_CLIENT_SECRET/%CLIENT_SECRET%/g" "TraktPlugin\TraktSettings.cs"
+)
+
+REM Build
 "%MSBUILD_PATH%" /target:Rebuild /property:Configuration=RELEASE /property:Platform=%ARCH% /fl /flp:logfile=Trakt.log;verbosity=diagnostic TraktPlugin.sln
 
-:: Revert version
+REM Revert version
 git checkout "TraktPlugin\Properties\AssemblyInfo.cs"
+git checkout "TraktPlugin\TraktSettings.cs"
 
 CD build
-
 PAUSE

@@ -47,12 +47,18 @@ jobs:
           build.cmd x86 < nul
         working-directory: ${{ github.workspace }}\build
         shell: cmd
+        env:
+          CLIENT_ID: ${{ secrets.CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
 
       - name: Build (x64)
         run: |
           build.cmd x64 < nul
         working-directory: ${{ github.workspace }}\build
         shell: cmd
+        env:
+          CLIENT_ID: ${{ secrets.CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
 
       - name: Upload Artifact / Plugin
         uses: actions/upload-artifact@v7
