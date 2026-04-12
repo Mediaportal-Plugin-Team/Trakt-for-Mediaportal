@@ -520,7 +520,7 @@ namespace TraktPlugin.GUI
                     break;
 
                 case ((int)ContextMenuItem.HideShow):
-                    TraktHelper.AddHiddenShow(calendarItem.Show, "calendar");
+                    TraktHelper.AddHiddenShow(calendarItem.Show, section: "dropped");
                     FilterHiddenShows = true;
                     LoadCalendar();
                     break;
@@ -917,8 +917,8 @@ namespace TraktPlugin.GUI
                 if (FilterHiddenShows && !string.IsNullOrEmpty(TraktSettings.UserAccessToken))
                 {
                     // for each hidden trakt show in the calendar, remove from our request
-                    // this only needs to be done if we have manually hidden a show whilst using a cached calendar
-                    episodesInDay.RemoveAll(e => e.Show.IsHidden("calendar"));
+                    // this only needs to be done if we have manually hidden show whilst using a cached calendar
+                    episodesInDay.RemoveAll( e => e.Show.IsHidden( "dropped" ) || e.Show.IsHidden( "calendar" ) );
                 }
 
                 if (episodesInDay.Count() > 0)
@@ -945,7 +945,7 @@ namespace TraktPlugin.GUI
                                 Id = calendarItem.Show.Ids.Tmdb,
                                 Season = calendarItem.Episode.Season,
                                 Episode = calendarItem.Episode.Number,
-                                AirDate = calendarItem.Episode.FirstAired == null ? null : calendarItem.Episode.FirstAired.FromISO8601().ToLocalTime().ToShortDateString()
+                                AirDate = calendarItem.Episode.FirstAired?.FromISO8601().ToLocalTime().ToShortDateString()
                             }
                         };
                         showImages.Add(images);

@@ -1859,7 +1859,7 @@ namespace TraktPlugin
                 var hiddenShows = TraktCache.GetHiddenShowsFromTrakt(true);
                 if (hiddenShows != null)
                 {
-                    foreach (var item in hiddenShows.Where(h => h.Section == "calendar").OrderByDescending(c => c.HiddenAt).Take(maxActivityItems))
+                    foreach ( var item in hiddenShows.Where( h => h.Section == "dropped" ).OrderByDescending(c => c.HiddenAt).Take(maxActivityItems))
                     {
                         var hiddenShowActivity = new TraktActivity.Activity
                         {

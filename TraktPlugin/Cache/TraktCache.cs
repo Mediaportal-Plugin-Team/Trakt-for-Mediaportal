@@ -997,7 +997,7 @@ namespace TraktPlugin
         static IEnumerable<TraktShowRated> _RatedShows = null;
 
         /// <summary>
-        /// Get the users hidden shows from Trakt (calendar, recommendations, watched progress and collected progress)
+        /// Get the users hidden shows from Trakt (calendar, dropped, recommendations, watched progress and collected progress)
         /// </summary>
         public static IEnumerable<TraktHiddenItem> GetHiddenShowsFromTrakt(bool ignoreLastSyncTime = false)
         {
@@ -1016,33 +1016,48 @@ namespace TraktPlugin
 
             // check the last time we have against the online time
             // if the times are the same try to load from cache
-            if (lastSyncActivities.Shows.HiddenAt == TraktSettings.LastSyncActivities.Shows.HiddenAt)
+            if ( lastSyncActivities.Shows.DroppedAt == TraktSettings.LastSyncActivities.Shows.DroppedAt &&
+                 lastSyncActivities.Shows.HiddenAt == TraktSettings.LastSyncActivities.Shows.HiddenAt )
             {
                 var cachedItems = HiddenShows;
                 if (cachedItems != null)
                     return cachedItems;
             }
 
-            TraktLogger.Info("Show hidden cache is out of date, requesting updated data. Local Date = '{0}', Online Date = '{1}'", TraktSettings.LastSyncActivities.Shows.HiddenAt ?? "<empty>", lastSyncActivities.Shows.HiddenAt ?? "<empty>");
+            TraktLogger.Info("Show hidden and dropped cache is out of date, requesting updated data. Local Date = '{0}', Online Date = '{1}'", TraktSettings.LastSyncActivities.Shows.DroppedAt ?? "<empty>", lastSyncActivities.Shows.DroppedAt ?? "<empty>");
 
-            // There are four sections of shows hidden data: calendar, recommendations, progress_watched and progress_collected 
+            // There are five sections of shows hidden data: calendar, dropped, recommendations, progress_watched and progress_collected 
             // each section is paged. we need to get all this information and return a list
+            // NB: show calendar now uses "dropped" section: https://github.com/trakt/trakt-api/discussions/513
             List<TraktHiddenItem> hiddenShows = new List<TraktHiddenItem>();
-            int pageCount = 0;
+            int pageCount;
             int currentPage = 0;
 
             #region Calendar
             do
             {
-                TraktLogger.Info("Getting current user hidden calendar shows from trakt. Page = {0}", ++currentPage);
-                var onlineItems = TraktAPI.TraktAPI.GetHiddenItems("calendar", "show", "min", currentPage, 100);
-                if (onlineItems == null)
-                    return null;
+              TraktLogger.Info( "Getting current user dropped shows from trakt. Page = {0}", ++currentPage );
+              var onlineItems = TraktAPI.TraktAPI.GetHiddenItems( "dropped", "show", "min", currentPage, 100 );
+              if ( onlineItems == null )
+                return null;
 
-                pageCount = onlineItems.TotalPages;
-                hiddenShows.AddRange(onlineItems.HiddenItems);
+              pageCount = onlineItems.TotalPages;
+              hiddenShows.AddRange( onlineItems.HiddenItems );
             }
-            while (currentPage < pageCount);
+            while ( currentPage < pageCount );
+
+            currentPage = 0;
+            do
+            {
+              TraktLogger.Info( "Getting current user hidden calendar shows from trakt. Page = {0}", ++currentPage );
+              var onlineItems = TraktAPI.TraktAPI.GetHiddenItems( "calendar", "show", "min", currentPage, 100 );
+              if ( onlineItems == null )
+                return null;
+
+              pageCount = onlineItems.TotalPages;
+              hiddenShows.AddRange( onlineItems.HiddenItems );
+            }
+            while ( currentPage < pageCount );
             #endregion
 
             #region Recommendations
@@ -1097,6 +1112,7 @@ namespace TraktPlugin
 
             // save new activity time for next time
             TraktSettings.LastSyncActivities.Shows.HiddenAt = lastSyncActivities.Shows.HiddenAt;
+            TraktSettings.LastSyncActivities.Shows.DroppedAt = lastSyncActivities.Shows.DroppedAt;
 
             return _HiddenShows;
         }

@@ -397,7 +397,7 @@ namespace TraktAPI
         /// <summary>
         /// Get hidden items for a section
         /// </summary>
-        /// <param name="section">Possible values: calendar, progress_watched, progress_collected, recommendations
+        /// <param name="section">Possible values: calendar, dropped, progress_watched, progress_collected, recommendations
         /// <param name="type">Narrow down by element type: movie, show, season</param>
         /// <param name="extendedInfoParams">Extended Info: min, full, images (comma separated)</param>
         public static TraktHiddenItems GetHiddenItems(string section, string type, string extendedInfoParams = "min", int page = 1, int maxItems = 10)
