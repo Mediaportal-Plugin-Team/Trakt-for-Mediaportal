@@ -221,18 +221,15 @@ namespace TraktPlugin
         #endregion
 
         #region Constants
-        // trakt has 2 servers, live and staging
-        private const string ClientId = "SECRET_PLACEHOLDER_CLIENT_ID";
-        private const string ClientSecret = "SECRET_PLACEHOLDER_CLIENT_SECRET";
         private const string RedirectUri = "urn:ietf:wg:oauth:2.0:oob";
 
         public const string cGuid = "a9c3845a-8718-4712-85cc-26f56520bb9a";
 
-        private static string cLastActivityFileCache = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\{username}\Dashboard\NetworkActivity.json");
-        private static string cLastStatisticsFileCache = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\{username}\Dashboard\UserStatistics.json");
-        private static string cLastUserProfileFileCache = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\{username}\Dashboard\UserProfile.json");
-        private static string cLastTrendingMovieFileCache = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\Dashboard\TrendingMovies.json");
-        private static string cLastTrendingShowFileCache = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\Dashboard\TrendingShows.json");
+        private static readonly string cLastActivityFileCache = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\{username}\Dashboard\NetworkActivity.json");
+        private static readonly string cLastStatisticsFileCache = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\{username}\Dashboard\UserStatistics.json");
+        private static readonly string cLastUserProfileFileCache = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\{username}\Dashboard\UserProfile.json");
+        private static readonly string cLastTrendingMovieFileCache = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\Dashboard\TrendingMovies.json");
+        private static readonly string cLastTrendingShowFileCache = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\Dashboard\TrendingShows.json");
 
         private const string cTrakt = "Trakt";
         private const string cSettingsVersion = "SettingsVersion";
@@ -906,12 +903,11 @@ namespace TraktPlugin
             }
 
             // initialise API settings
-            TraktAPI.TraktAPI.ClientId = ClientId;
-            TraktAPI.TraktAPI.ClientSecret = ClientSecret;
+            TraktAPI.TraktAPI.ClientId = TraktCredentials.ClientId;
+            TraktAPI.TraktAPI.ClientSecret = TraktCredentials.ClientSecret;
             TraktAPI.TraktAPI.RedirectUri = RedirectUri;
-
             TraktAPI.TraktAPI.UserAgent = UserAgent;
-
+            
             TmdbAPI.TmdbAPI.UserAgent = UserAgent;
 
             // initialise the last sync activities 
