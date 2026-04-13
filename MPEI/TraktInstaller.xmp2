@@ -1562,12 +1562,12 @@ Click Next to continue or Cancel to exit Setup.
 
 
 Trakt will also synchronize your watched flags across multiple installations.</ExtensionDescription>
-    <VersionDescription>* Fixed null reference exception when syncing liked lists 
+    <VersionDescription>* Use new dropped section in hidden API when hiding shows from calendar
 
 </VersionDescription>
     <DevelopmentStatus>Stable</DevelopmentStatus>
     <OnlineLocation>https://github.com/Mediaportal-Plugin-Team/Trakt-for-Mediaportal/releases/download/v[Version]/TraktPlugin-v[Version].mpe1</OnlineLocation>
-    <ReleaseDate>2026-04-05T10:10:10</ReleaseDate>
+    <ReleaseDate>2026-04-13T13:13:13</ReleaseDate>
     <Tags>trakt,tv shows,movies,mp-tvseries,movingpictures,my videos,my films</Tags>
     <PlatformCompatibility>AnyCPU</PlatformCompatibility>
     <Location>.\Release\TraktPlugin-v[Version].mpe1</Location>
