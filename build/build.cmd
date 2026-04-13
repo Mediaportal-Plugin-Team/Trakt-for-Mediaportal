@@ -33,13 +33,13 @@ SET /A REVISION=REVISION-1000
 REM Prepare Client ID
 IF DEFINED CLIENT_ID (
   ECHO [INFO] Client ID found...
-  "Tools\Tools\sed.exe" -i -r "s/SECRET_PLACEHOLDER_CLIENT_ID/%CLIENT_ID%/g" "TraktPlugin\TraktSettings.cs"
+  "Tools\Tools\sed.exe" -i -r "s/SECRET_PLACEHOLDER_CLIENT_ID/%CLIENT_ID%/g" "TraktPlugin\TraktCredentials.cs"
 )
 
 REM Prepare Client Token
 IF DEFINED CLIENT_SECRET (
   ECHO [INFO] Client Token found...
-  "Tools\Tools\sed.exe" -i -r "s/SECRET_PLACEHOLDER_CLIENT_SECRET/%CLIENT_SECRET%/g" "TraktPlugin\TraktSettings.cs"
+  "Tools\Tools\sed.exe" -i -r "s/SECRET_PLACEHOLDER_CLIENT_SECRET/%CLIENT_SECRET%/g" "TraktPlugin\TraktCredentials.cs"
 )
 
 REM Build

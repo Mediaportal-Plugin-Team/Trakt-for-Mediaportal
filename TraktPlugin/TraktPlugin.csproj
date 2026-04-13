@@ -300,6 +300,7 @@
     <Compile Include="TmdbAPI\TmdbAPI.cs" />
     <Compile Include="TmdbAPI\TmdbURIs.cs" />
     <Compile Include="Cache\TraktCache.cs" />
+    <Compile Include="TraktCredentials.cs" />
     <Compile Include="TraktDashboard.cs" />
     <Compile Include="TraktGenres.cs" />
     <Compile Include="TraktHandlers\ArgusRecordings.cs" />
