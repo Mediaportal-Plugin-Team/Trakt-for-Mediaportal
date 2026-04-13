@@ -78,6 +78,12 @@ namespace TraktAPI.DataStructures
 
             [DataMember(Name = "hidden_at")]
             public string HiddenAt { get; set; }
+
+            [DataMember( Name = "favorited_at" )]
+            public string FavoritedAt { get; set; }
+
+            [DataMember( Name = "dropped_at" )]
+            public string DroppedAt { get; set; }
         }
 
         [DataMember(Name = "seasons")]
