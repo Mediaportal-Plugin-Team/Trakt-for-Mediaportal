@@ -47,7 +47,7 @@ REM Build
 
 REM Revert version
 git checkout "TraktPlugin\Properties\AssemblyInfo.cs"
-git checkout "TraktPlugin\TraktSettings.cs"
+git checkout "TraktPlugin\TraktCredentials.cs"
 
 CD build
 PAUSE
