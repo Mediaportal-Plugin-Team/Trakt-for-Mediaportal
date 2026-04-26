@@ -6,7 +6,6 @@ using System.Net;
 using System.Text;
 using System.Threading;
 using System.Web;
-using System.Web.UI;
 using TraktAPI.DataStructures;
 using TraktAPI.Enums;
 using TraktAPI.Extensions;
@@ -195,16 +194,58 @@ namespace TraktAPI
 
         #region Collection
 
-        public static IEnumerable<TraktMovieCollected> GetCollectedMovies()
+        public static TraktMovieCollected GetCollectedMovies( int page = 1, int maxItems = 100 )
         {
-            var response = GetFromTrakt(TraktURIs.SyncCollectionMovies);
-            return response.FromJSONArray<TraktMovieCollected>();
+          var response = GetFromTrakt( string.Format( TraktURIs.SyncCollectionMovies, page, maxItems ), out WebHeaderCollection headers );
+          if ( response == null )
+            return null;
+
+          try
+          {
+            return new TraktMovieCollected
+            {
+              CurrentPage = page,
+              TotalItemsPerPage = maxItems,
+              TotalPages = int.Parse( headers[ "X-Pagination-Page-Count" ] ),
+              TotalItems = int.Parse( headers[ "X-Pagination-Item-Count" ] ),
+              Items = response.FromJSONArray<TraktMovieCollectedItem>()
+            };
+          }
+          catch
+          {
+            // most likely bad header response
+            return null;
+          }
         }
 
-        public static IEnumerable<TraktEpisodeCollected> GetCollectedEpisodes()
+        public static TraktEpisodeCollected GetCollectedEpisodes( int page = 1, int maxItems = 100 )
         {
-            var response = GetFromTrakt(TraktURIs.SyncCollectionEpisodes);
-            return response.FromJSONArray<TraktEpisodeCollected>();
+          var response = GetFromTrakt( string.Format( TraktURIs.SyncCollectionEpisodes, page, maxItems ), out WebHeaderCollection headers );
+          if ( response == null )
+            return null;
+
+          try
+          {
+            var episodeItems = response.FromJSONArray<TraktEpisodeCollectedItem>();
+
+            // as of 2026-04-26 the API is not returning the correct pagination headers for this endpoint
+            int.TryParse( headers[ "X-Pagination-Page-Count" ], out int pageCount );
+            int.TryParse( headers[ "X-Pagination-Item-Count" ], out int itemCount );
+
+            return new TraktEpisodeCollected
+            {
+              CurrentPage = page,
+              TotalItemsPerPage = maxItems,
+              TotalPages = pageCount,
+              TotalItems = itemCount,
+              Items = episodeItems
+            };
+          }
+          catch
+          {
+            // most likely bad header response
+            return null;
+          }
         }
 
         #endregion

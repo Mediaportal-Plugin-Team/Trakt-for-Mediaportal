@@ -16,11 +16,11 @@ namespace TraktAPI
         public const string SyncLastActivities = "https://api.trakt.tv/sync/last_activities";
         public const string SyncPausedMovies = "https://api.trakt.tv/sync/playback/movies";
         public const string SyncPausedEpisodes = "https://api.trakt.tv/sync/playback/episodes";
-        public const string SyncCollectionMovies = "https://api.trakt.tv/sync/collection/movies";
+        public const string SyncCollectionMovies = "https://api.trakt.tv/sync/collection/movies?page={0}&limit={1}";
         public const string SyncWatchedMovies = "https://api.trakt.tv/sync/watched/movies";
         public const string SyncRatedMovies = "https://api.trakt.tv/sync/ratings/movies";
 
-        public const string SyncCollectionEpisodes = "https://api.trakt.tv/sync/collection/shows";
+        public const string SyncCollectionEpisodes = "https://api.trakt.tv/sync/collection/shows?page={0}&limit={1}";
         public const string SyncWatchedEpisodes = "https://api.trakt.tv/sync/watched/shows";
         public const string SyncRatedEpisodes = "https://api.trakt.tv/sync/ratings/episodes";
         public const string SyncRatedSeasons = "https://api.trakt.tv/sync/ratings/seasons";

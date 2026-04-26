@@ -252,7 +252,7 @@ namespace TraktPlugin
         /// <summary>
         /// Get the users collected movies from Trakt
         /// </summary>
-        public static IEnumerable<TraktMovieCollected> GetCollectedMoviesFromTrakt(bool ignoreLastSyncTime = false)
+        public static IEnumerable<TraktMovieCollectedItem> GetCollectedMoviesFromTrakt(bool ignoreLastSyncTime = false)
         {
             // get from cache regardless of last sync time
             if (ignoreLastSyncTime)
@@ -278,26 +278,38 @@ namespace TraktPlugin
 
             TraktLogger.Info("Movie collection cache is out of date, requesting updated data. Local Date = '{0}', Online Date = '{1}'", TraktSettings.LastSyncActivities.Movies.Collection ?? "<empty>", lastSyncActivities.Movies.Collection ?? "<empty>");
 
-            // we get from online, local cache is not up to date
-            var onlineItems = TraktAPI.TraktAPI.GetCollectedMovies();
-            if (onlineItems == null)
-                return null;
-           
-            _CollectedMovies = onlineItems;
+            int maxItemsPerPage = 100;
+
+            // we get from online, local cache is not up to date (first page)
+            var onlineItems = TraktAPI.TraktAPI.GetCollectedMovies( page: 1, maxItems: maxItemsPerPage );
+            if ( onlineItems == null || onlineItems.Items == null )
+              return null;
+
+            _CollectedMovies = onlineItems.Items;
+
+            // get more pages if required
+            while ( onlineItems.CurrentPage < onlineItems.TotalPages )
+            {
+              onlineItems = TraktAPI.TraktAPI.GetCollectedMovies( page: onlineItems.CurrentPage + 1, maxItems: maxItemsPerPage );
+              if ( onlineItems == null || onlineItems.Items == null )
+                break;
+
+              _CollectedMovies = _CollectedMovies.Concat( onlineItems.Items );
+            }
 
             // save to local file cache
-            SaveFileCache(MoviesCollectedFile, _CollectedMovies.ToJSON());
+            SaveFileCache( MoviesCollectedFile, _CollectedMovies.ToList().ToJSON() );
 
             // save new activity time for next time
             TraktSettings.LastSyncActivities.Movies.Collection = lastSyncActivities.Movies.Collection;
-            
-            return onlineItems;
+
+            return _CollectedMovies;
         }
 
         /// <summary>
         /// returns the cached users collected movies on trakt.tv
         /// </summary>
-        static IEnumerable<TraktMovieCollected> CollectedMovies
+        static IEnumerable<TraktMovieCollectedItem> CollectedMovies
         {
             get
             {
@@ -305,12 +317,12 @@ namespace TraktPlugin
                 {
                     var persistedItems = LoadFileCache(MoviesCollectedFile, null);
                     if (persistedItems != null)
-                        _CollectedMovies = persistedItems.FromJSONArray<TraktMovieCollected>();
+                        _CollectedMovies = persistedItems.FromJSONArray<TraktMovieCollectedItem>();
                 }
                 return _CollectedMovies;
             }
         }
-        static IEnumerable<TraktMovieCollected> _CollectedMovies = null;
+        static IEnumerable<TraktMovieCollectedItem> _CollectedMovies = null;
 
         /// <summary>
         /// Get the users rated movies from Trakt
@@ -501,44 +513,58 @@ namespace TraktPlugin
 
             TraktLogger.Info("TV episode collection cache is out of date, requesting updated data. Local Date = '{0}', Online Date = '{1}'", TraktSettings.LastSyncActivities.Episodes.Collection ?? "<empty>", lastSyncActivities.Episodes.Collection ?? "<empty>");
 
-            // we get from online, local cache is not up to date
-            var onlineItems = TraktAPI.TraktAPI.GetCollectedEpisodes();
-            if (onlineItems == null)
-                return null;
+            int maxItemsPerPage = 100;
+
+            // we get from online, local cache is not up to date (first page)
+            TraktEpisodeCollected onlineItems = TraktAPI.TraktAPI.GetCollectedEpisodes( page: 1, maxItems: maxItemsPerPage );
+            if ( onlineItems == null || onlineItems.Items == null )
+              return null;
+
+            IEnumerable<TraktEpisodeCollectedItem>  _CollectedEpisodesTemp = onlineItems.Items;
+
+            // get more pages if required
+            while ( onlineItems.CurrentPage < onlineItems.TotalPages )
+            {
+              onlineItems = TraktAPI.TraktAPI.GetCollectedEpisodes( page: onlineItems.CurrentPage + 1, maxItems: maxItemsPerPage );
+              if ( onlineItems == null || onlineItems.Items == null )
+                break;
+
+              _CollectedEpisodesTemp = _CollectedEpisodesTemp.Concat( onlineItems.Items );
+            }
 
             // convert trakt structure to more flat heirarchy (more managable)
-            TraktLogger.Debug("Converting list of collected episodes from trakt to internal data structure");
+            TraktLogger.Debug( "Converting list of collected episodes from trakt to internal data structure" );
             var episodesCollected = new List<EpisodeCollected>();
-            foreach (var show in onlineItems)
+            foreach ( var show in _CollectedEpisodesTemp )
             {
-                foreach (var season in show.Seasons)
+              foreach ( var season in show.Seasons )
+              {
+                foreach ( var episode in season.Episodes )
                 {
-                    foreach (var episode in season.Episodes)
-                    {
-                        episodesCollected.Add(new EpisodeCollected
-                        {
-                            ShowId = show.Show.Ids.Trakt,
-                            ShowTvdbId = show.Show.Ids.Tvdb,
-                            ShowImdbId = show.Show.Ids.Imdb,
-                            ShowTmdbId = show.Show.Ids.Tmdb,
-                            ShowTitle = show.Show.Title,
-                            ShowYear = show.Show.Year,
-                            Number = episode.Number,
-                            Season = season.Number,
-                            CollectedAt = episode.CollectedAt
-                        });
-                    }
+                  episodesCollected.Add( new EpisodeCollected
+                  {
+                    ShowId = show.Show.Ids.Trakt,
+                    ShowTvdbId = show.Show.Ids.Tvdb,
+                    ShowImdbId = show.Show.Ids.Imdb,
+                    ShowTmdbId = show.Show.Ids.Tmdb,
+                    ShowTitle = show.Show.Title,
+                    ShowYear = show.Show.Year,
+                    Number = episode.Number,
+                    Season = season.Number,
+                    CollectedAt = episode.CollectedAt
+                  } );
                 }
+              }
             }
 
             _CollectedEpisodes = episodesCollected;
 
             // save to local file cache
-            SaveFileCache(EpisodesCollectedFile, _CollectedEpisodes.ToJSON());
+            SaveFileCache( EpisodesCollectedFile, _CollectedEpisodes.ToJSON() );
 
             // save new activity time for next time
             TraktSettings.LastSyncActivities.Episodes.Collection = lastSyncActivities.Episodes.Collection;
-            
+
             return _CollectedEpisodes;
         }
 
@@ -1169,10 +1195,10 @@ namespace TraktPlugin
 
                 TraktLogger.Info("Movie watchlist cache is out of date, requesting updated data. Local Date = '{0}', Online Date = '{1}'", TraktSettings.LastSyncActivities.Movies.Watchlist ?? "<empty>", lastSyncActivities.Movies.Watchlist ?? "<empty>");
 
-                int maxItems = 100;
+                int maxItemsPerPage = 100;
 
                 // we get from online, local cache is not up to date (first page)
-                var onlineItems = TraktAPI.TraktAPI.GetWatchListMovies( page: 1, maxItems: maxItems );
+                var onlineItems = TraktAPI.TraktAPI.GetWatchListMovies( page: 1, maxItems: maxItemsPerPage );
                 if ( onlineItems == null || onlineItems.Items == null )
                   return null;
 
@@ -1183,10 +1209,10 @@ namespace TraktPlugin
                 {
                   // Note: API returns total pages for all watchlist types not just this one (movies)
                   // so we need to check returned items against our expected max items per page
-                  if ( onlineItems.Items.Count() < ( maxItems * onlineItems.CurrentPage ) )
+                  if ( onlineItems.Items.Count() < ( maxItemsPerPage * onlineItems.CurrentPage ) )
                     break;
 
-                  onlineItems = TraktAPI.TraktAPI.GetWatchListMovies( page: onlineItems.CurrentPage + 1, maxItems: maxItems );
+                  onlineItems = TraktAPI.TraktAPI.GetWatchListMovies( page: onlineItems.CurrentPage + 1, maxItems: maxItemsPerPage );
                   if ( onlineItems == null || onlineItems.Items == null )
                     break;
 
@@ -1299,10 +1325,10 @@ namespace TraktPlugin
 
                 TraktLogger.Info("TV show watchlist cache is out of date, requesting updated data. Local Date = '{0}', Online Date = '{1}'", TraktSettings.LastSyncActivities.Shows.Watchlist ?? "<empty>", lastSyncActivities.Shows.Watchlist ?? "<empty>");
 
-                int maxItems = 100;
+                int maxItemsPerPage = 100;
 
                 // we get from online, local cache is not up to date (first page)
-                var onlineItems = TraktAPI.TraktAPI.GetWatchListShows( page: 1, maxItems: maxItems );
+                var onlineItems = TraktAPI.TraktAPI.GetWatchListShows( page: 1, maxItems: maxItemsPerPage );
                 if (onlineItems == null || onlineItems.Items == null)
                     return null;
 
@@ -1313,10 +1339,10 @@ namespace TraktPlugin
                 {
                   // Note: API returns total pages for all watchlist types not just this one (shows)
                   // so we need to check returned items against our expected max items per page
-                  if (onlineItems.Items.Count() < ( maxItems * onlineItems.CurrentPage ) )
+                  if (onlineItems.Items.Count() < ( maxItemsPerPage * onlineItems.CurrentPage ) )
                     break;
 
-                  onlineItems = TraktAPI.TraktAPI.GetWatchListShows( page: onlineItems.CurrentPage + 1, maxItems: maxItems );
+                  onlineItems = TraktAPI.TraktAPI.GetWatchListShows( page: onlineItems.CurrentPage + 1, maxItems: maxItemsPerPage );
                   if ( onlineItems == null || onlineItems.Items == null )
                     break;
 
@@ -1386,10 +1412,10 @@ namespace TraktPlugin
 
                 TraktLogger.Info("TV seasons watchlist cache is out of date, requesting updated data. Local Date = '{0}', Online Date = '{1}'", TraktSettings.LastSyncActivities.Seasons.Watchlist ?? "<empty>", lastSyncActivities.Seasons.Watchlist ?? "<empty>");
 
-                int maxItems = 100;
+                int maxItemsPerPage = 100;
 
                 // we get from online, local cache is not up to date (first page)
-                var onlineItems = TraktAPI.TraktAPI.GetWatchListSeasons( page: 1, maxItems: maxItems );
+                var onlineItems = TraktAPI.TraktAPI.GetWatchListSeasons( page: 1, maxItems: maxItemsPerPage );
                 if ( onlineItems == null || onlineItems.Items == null )
                   return null;
 
@@ -1400,10 +1426,10 @@ namespace TraktPlugin
                 {
                   // Note: API returns total pages for all watchlist types not just this one (seasons)
                   // so we need to check returned items against our expected max items per page
-                  if ( onlineItems.Items.Count() < ( maxItems * onlineItems.CurrentPage ) )
+                  if ( onlineItems.Items.Count() < ( maxItemsPerPage * onlineItems.CurrentPage ) )
                     break;
 
-                  onlineItems = TraktAPI.TraktAPI.GetWatchListSeasons( page: onlineItems.CurrentPage + 1, maxItems: maxItems );
+                  onlineItems = TraktAPI.TraktAPI.GetWatchListSeasons( page: onlineItems.CurrentPage + 1, maxItems: maxItemsPerPage );
                   if ( onlineItems == null || onlineItems.Items == null )
                     break;
 
@@ -1473,10 +1499,10 @@ namespace TraktPlugin
 
                 TraktLogger.Info("TV episode watchlist cache is out of date, requesting updated data. Local Date = '{0}', Online Date = '{1}'", TraktSettings.LastSyncActivities.Episodes.Watchlist ?? "<empty>", lastSyncActivities.Episodes.Watchlist ?? "<empty>");
 
-                int maxItems = 100;
+                int maxItemsPerPage = 100;
 
                 // we get from online, local cache is not up to date (first page)
-                var onlineItems = TraktAPI.TraktAPI.GetWatchListEpisodes( page: 1, maxItems: maxItems );
+                var onlineItems = TraktAPI.TraktAPI.GetWatchListEpisodes( page: 1, maxItems: maxItemsPerPage );
                 if ( onlineItems == null || onlineItems.Items == null )
                   return null;
 
@@ -1487,10 +1513,10 @@ namespace TraktPlugin
                 {
                   // Note: API returns total pages for all watchlist types not just this one (shows)
                   // so we need to check returned items against our expected max items per page
-                  if ( onlineItems.Items.Count() < ( maxItems * onlineItems.CurrentPage ) )
+                  if ( onlineItems.Items.Count() < ( maxItemsPerPage * onlineItems.CurrentPage ) )
                     break;
 
-                  onlineItems = TraktAPI.TraktAPI.GetWatchListEpisodes( page: onlineItems.CurrentPage + 1, maxItems: maxItems );
+                  onlineItems = TraktAPI.TraktAPI.GetWatchListEpisodes( page: onlineItems.CurrentPage + 1, maxItems: maxItemsPerPage );
                   if ( onlineItems == null || onlineItems.Items == null )
                     break;
 
@@ -3421,11 +3447,11 @@ namespace TraktPlugin
 
         internal static void AddMoviesToCollection(List<TraktSyncMovieCollected> movies)
         {
-            var collectedMovies = (_CollectedMovies ?? new List<TraktMovieCollected>()).ToList();
+            var collectedMovies = (_CollectedMovies ?? new List<TraktMovieCollectedItem>()).ToList();
 
             collectedMovies.AddRange(
                 from movie in movies
-                select new TraktMovieCollected
+                select new TraktMovieCollectedItem
                 {
                     CollectedAt = movie.CollectedAt ?? DateTime.UtcNow.ToISO8601(),
                     Movie = new TraktMovie
@@ -3441,9 +3467,9 @@ namespace TraktPlugin
 
         internal static void AddMovieToCollection(TraktMovie movie)
         {
-            var collectedMovies = (_CollectedMovies ?? new List<TraktMovieCollected>()).ToList();
+            var collectedMovies = (_CollectedMovies ?? new List<TraktMovieCollectedItem>()).ToList();
 
-            collectedMovies.Add(new TraktMovieCollected
+            collectedMovies.Add(new TraktMovieCollectedItem
             {
                 CollectedAt = DateTime.UtcNow.ToISO8601(),
                 Movie = new TraktMovieSummary
@@ -4474,35 +4500,35 @@ namespace TraktPlugin
         /// </summary>
         internal static void Save()
         {
-            SaveFileCache(MoviesWatchlistedFile, _WatchListMovies.ToJSON());
-            SaveFileCache(MoviesCollectedFile, _CollectedMovies.ToJSON());
-            SaveFileCache(MoviesWatchedFile, _WatchedMovies.ToJSON());
-            SaveFileCache(MoviesRatedFile, _RatedMovies.ToJSON());
-            SaveFileCache(MoviesPausedFile, _PausedMovies.ToJSON());
-            SaveFileCache(MoviesCommentedFile, _CommentedMovies.ToJSON());
-            SaveFileCache(MoviesHiddenFile, _HiddenMovies.ToJSON());
+            SaveFileCache(MoviesWatchlistedFile, _WatchListMovies.ToList().ToJSON());
+            SaveFileCache(MoviesCollectedFile, _CollectedMovies.ToList().ToJSON());
+            SaveFileCache(MoviesWatchedFile, _WatchedMovies.ToList().ToJSON());
+            SaveFileCache(MoviesRatedFile, _RatedMovies.ToList().ToJSON());
+            SaveFileCache(MoviesPausedFile, _PausedMovies.ToList().ToJSON());
+            SaveFileCache(MoviesCommentedFile, _CommentedMovies.ToList().ToJSON());
+            SaveFileCache(MoviesHiddenFile, _HiddenMovies.ToList().ToJSON());
 
-            SaveFileCache(EpisodesWatchlistedFile, _WatchListEpisodes.ToJSON());
-            SaveFileCache(EpisodesCollectedFile, _CollectedEpisodes.ToJSON());
-            SaveFileCache(EpisodesWatchedFile, _WatchedEpisodes.ToJSON());
-            SaveFileCache(EpisodesRatedFile, _RatedEpisodes.ToJSON());
-            SaveFileCache(EpisodesPausedFile, _PausedEpisodes.ToJSON());
-            SaveFileCache(EpisodesCommentedFile, _CommentedEpisodes.ToJSON());
+            SaveFileCache(EpisodesWatchlistedFile, _WatchListEpisodes.ToList().ToJSON());
+            SaveFileCache(EpisodesCollectedFile, _CollectedEpisodes.ToList().ToJSON());
+            SaveFileCache(EpisodesWatchedFile, _WatchedEpisodes.ToList().ToJSON());
+            SaveFileCache(EpisodesRatedFile, _RatedEpisodes.ToList().ToJSON());
+            SaveFileCache(EpisodesPausedFile, _PausedEpisodes.ToList().ToJSON());
+            SaveFileCache(EpisodesCommentedFile, _CommentedEpisodes.ToList().ToJSON());
 
-            SaveFileCache(ShowsWatchlistedFile, _WatchListShows.ToJSON());
-            SaveFileCache(ShowsRatedFile, _RatedShows.ToJSON());
-            SaveFileCache(ShowsCommentedFile, _CommentedShows.ToJSON());
-            SaveFileCache(ShowsHiddenFile, _HiddenShows.ToJSON());
+            SaveFileCache(ShowsWatchlistedFile, _WatchListShows.ToList().ToJSON());
+            SaveFileCache(ShowsRatedFile, _RatedShows.ToList().ToJSON());
+            SaveFileCache(ShowsCommentedFile, _CommentedShows.ToList().ToJSON());
+            SaveFileCache(ShowsHiddenFile, _HiddenShows.ToList().ToJSON());
 
-            SaveFileCache(SeasonsWatchlistedFile, _WatchListSeasons.ToJSON());
-            SaveFileCache(SeasonsRatedFile, _RatedSeasons.ToJSON());
-            SaveFileCache(SeasonsCommentedFile, _CommentedSeasons.ToJSON());
-            SaveFileCache(SeasonsHiddenFile, _HiddenSeasons.ToJSON());
+            SaveFileCache(SeasonsWatchlistedFile, _WatchListSeasons.ToList().ToJSON());
+            SaveFileCache(SeasonsRatedFile, _RatedSeasons.ToList().ToJSON());
+            SaveFileCache(SeasonsCommentedFile, _CommentedSeasons.ToList().ToJSON());
+            SaveFileCache(SeasonsHiddenFile, _HiddenSeasons.ToList().ToJSON());
 
-            SaveFileCache(CustomListCommentedFile, _CommentedLists.ToJSON());
-            SaveFileCache(CustomListLikedFile, _LikedLists.ToJSON());
+            SaveFileCache(CustomListCommentedFile, _CommentedLists.ToList().ToJSON());
+            SaveFileCache(CustomListLikedFile, _LikedLists.ToList().ToJSON());
 
-            SaveFileCache(CommentsLikedFile, _LikedComments.ToJSON());
+            SaveFileCache(CommentsLikedFile, _LikedComments.ToList().ToJSON());
         }
 
         #endregion

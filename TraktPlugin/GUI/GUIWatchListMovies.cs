@@ -86,8 +86,8 @@ namespace TraktPlugin.GUI
             {
               string username = CurrentUser == TraktSettings.Username ? "me" : CurrentUser;
 
-              int maxItems = 100;
-              TraktMovieWatchlist watchlist = TraktAPI.TraktAPI.GetWatchListMovies( username, "full", page: 1, maxItems: maxItems );
+              int maxItemsPerPage = 100;
+              TraktMovieWatchlist watchlist = TraktAPI.TraktAPI.GetWatchListMovies( username, "full", page: 1, maxItems: maxItemsPerPage );
 
               if ( watchlist == null || watchlist.Items == null )
               {
@@ -102,10 +102,10 @@ namespace TraktPlugin.GUI
               {
                 // Note: API returns total pages for all watchlist types not just this one (movies)
                 // so we need to check returned items against our expected max items per page
-                if ( _WatchListMovies.Count() < ( maxItems * watchlist.CurrentPage ) )
+                if ( _WatchListMovies.Count() < ( maxItemsPerPage * watchlist.CurrentPage ) )
                   break;
 
-                watchlist = TraktAPI.TraktAPI.GetWatchListMovies( username, "full", page: watchlist.CurrentPage + 1, maxItems: maxItems );
+                watchlist = TraktAPI.TraktAPI.GetWatchListMovies( username, "full", page: watchlist.CurrentPage + 1, maxItems: maxItemsPerPage );
                 if ( watchlist == null || watchlist.Items == null )
                   break;
 
