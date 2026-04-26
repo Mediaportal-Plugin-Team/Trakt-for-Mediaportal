@@ -142,7 +142,7 @@ namespace TraktPlugin.GUI
     #endregion
 
     #region Show Sorter
-    public class GUIListItemShowSorter : IComparer<TraktShowTrending>, IComparer<TraktShowSummary>, IComparer<TraktShowWatchList>, IComparer<TraktPersonShowCast>, IComparer<TraktPersonShowJob>, IComparer<TraktShowAnticipated>
+    public class GUIListItemShowSorter : IComparer<TraktShowTrending>, IComparer<TraktShowSummary>, IComparer<TraktShowWatchListItem>, IComparer<TraktPersonShowCast>, IComparer<TraktPersonShowJob>, IComparer<TraktShowAnticipated>
     {
         private readonly SortingFields mSortField;
         private readonly SortingDirections mSortDirection;
@@ -225,7 +225,7 @@ namespace TraktPlugin.GUI
             return Compare(showX.Show as TraktShowSummary, showY.Show as TraktShowSummary);
         }
 
-        public int Compare(TraktShowWatchList showX, TraktShowWatchList showY)
+        public int Compare(TraktShowWatchListItem showX, TraktShowWatchListItem showY)
         {
             if (mSortField == SortingFields.WatchListInserted)
             {

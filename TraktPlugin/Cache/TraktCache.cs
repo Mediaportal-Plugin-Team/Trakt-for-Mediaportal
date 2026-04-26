@@ -1253,7 +1253,7 @@ namespace TraktPlugin
         /// <summary>
         /// Get the users watchlisted shows from Trakt
         /// </summary>
-        public static IEnumerable<TraktShowWatchList> GetWatchlistedShowsFromTrakt(bool ignoreLastSyncTime = false)
+        public static IEnumerable<TraktShowWatchListItem> GetWatchlistedShowsFromTrakt(bool ignoreLastSyncTime = false)
         {
             lock (syncLists)
             {
@@ -1281,12 +1281,29 @@ namespace TraktPlugin
 
                 TraktLogger.Info("TV show watchlist cache is out of date, requesting updated data. Local Date = '{0}', Online Date = '{1}'", TraktSettings.LastSyncActivities.Shows.Watchlist ?? "<empty>", lastSyncActivities.Shows.Watchlist ?? "<empty>");
 
-                // we get from online, local cache is not up to date
-                var onlineItems = TraktAPI.TraktAPI.GetWatchListShows();
-                if (onlineItems == null)
+                int maxItems = 100;
+
+                // we get from online, local cache is not up to date (first page)
+                var onlineItems = TraktAPI.TraktAPI.GetWatchListShows( page: 1, maxItems: maxItems );
+                if (onlineItems == null || onlineItems.Items == null)
                     return null;
 
-                _WatchListShows = onlineItems;
+                _WatchListShows = onlineItems.Items;
+
+                // get more pages if required
+                while ( onlineItems.CurrentPage < onlineItems.TotalPages )
+                {
+                  // Note: API returns total pages for all watchlist types not just this one (shows)
+                  // so we need to check returned items against our expected max items per page
+                  if (onlineItems.Items.Count() < ( maxItems * onlineItems.CurrentPage ) )
+                    break;
+
+                  onlineItems = TraktAPI.TraktAPI.GetWatchListShows( page: onlineItems.CurrentPage + 1, maxItems: maxItems );
+                  if ( onlineItems == null || onlineItems.Items == null )
+                    break;
+
+                  _WatchListShows = _WatchListShows.Concat( onlineItems.Items );
+                }
 
                 // save to local file cache
                 SaveFileCache(ShowsWatchlistedFile, _WatchListShows.ToJSON());
@@ -1294,14 +1311,14 @@ namespace TraktPlugin
                 // save new activity time for next time
                 TraktSettings.LastSyncActivities.Shows.Watchlist = lastSyncActivities.Shows.Watchlist;
                 
-                return onlineItems;
+                return _WatchListShows;
             }
         }
 
         /// <summary>
         /// Returns the cached users watchlisted shows on trakt.tv
         /// </summary>
-        static IEnumerable<TraktShowWatchList> WatchListShows
+        static IEnumerable<TraktShowWatchListItem> WatchListShows
         {
             get
             {
@@ -1309,12 +1326,12 @@ namespace TraktPlugin
                 {
                     var persistedItems = LoadFileCache(ShowsWatchlistedFile, null);
                     if (persistedItems != null)
-                        _WatchListShows = persistedItems.FromJSONArray<TraktShowWatchList>();
+                        _WatchListShows = persistedItems.FromJSONArray<TraktShowWatchListItem>();
                 }
                 return _WatchListShows;
             }
         }
-        static IEnumerable<TraktShowWatchList> _WatchListShows = null;
+        static IEnumerable<TraktShowWatchListItem> _WatchListShows = null;
 
         #endregion
 
@@ -3490,9 +3507,9 @@ namespace TraktPlugin
 
         internal static void AddShowToWatchlist(TraktShow show)
         {
-            var watchlistShows = (_WatchListShows ?? new List<TraktShowWatchList>()).ToList();
+            var watchlistShows = (_WatchListShows ?? new List<TraktShowWatchListItem>()).ToList();
 
-            watchlistShows.Add(new TraktShowWatchList
+            watchlistShows.Add(new TraktShowWatchListItem
             {
                 ListedAt = DateTime.UtcNow.ToISO8601(),
                 Show = new TraktShowSummary

@@ -71,26 +71,55 @@ namespace TraktPlugin.GUI
 
         private GUIFacadeControl.Layout CurrentLayout { get; set; }
         static int PreviousSelectedIndex { get; set; }
-        private ImageSwapper backdrop;
+        private readonly ImageSwapper backdrop;
         static DateTime LastRequest = new DateTime();
-        static Dictionary<string, IEnumerable<TraktShowWatchList>> userWatchList = new Dictionary<string, IEnumerable<TraktShowWatchList>>();
+        static readonly Dictionary<string, IEnumerable<TraktShowWatchListItem>> userWatchList = new Dictionary<string, IEnumerable<TraktShowWatchListItem>>();
 
-        static IEnumerable<TraktShowWatchList> WatchListShows
+        static IEnumerable<TraktShowWatchListItem> WatchListShows
         {
-            get
+          get
+          {
+            if ( !userWatchList.Keys.Contains( CurrentUser ) || LastRequest < DateTime.UtcNow.Subtract( new TimeSpan( 0, TraktSettings.WebRequestCacheMinutes, 0 ) ) )
             {
-                if (!userWatchList.Keys.Contains(CurrentUser) || LastRequest < DateTime.UtcNow.Subtract(new TimeSpan(0, TraktSettings.WebRequestCacheMinutes, 0)))
-                {
-                    _WatchListShows = TraktAPI.TraktAPI.GetWatchListShows(CurrentUser == TraktSettings.Username ? "me" : CurrentUser, "full");
-                    if (userWatchList.Keys.Contains(CurrentUser)) userWatchList.Remove(CurrentUser);
-                    userWatchList.Add(CurrentUser, _WatchListShows);
-                    LastRequest = DateTime.UtcNow;
-                    PreviousSelectedIndex = 0;
-                }
-                return userWatchList[CurrentUser];
+              string username = CurrentUser == TraktSettings.Username ? "me" : CurrentUser;
+
+              int maxItems = 100;
+              TraktShowWatchlist watchlist = TraktAPI.TraktAPI.GetWatchListShows( username, "full", page: 1, maxItems: maxItems );
+
+              if ( watchlist == null || watchlist.Items == null )
+              {
+                userWatchList.Remove( CurrentUser );
+                return null;
+              }
+
+              _WatchListShows = watchlist.Items;
+
+              // get next page(s) if required
+              while ( watchlist.CurrentPage < watchlist.TotalPages )
+              {
+                // Note: API returns total pages for all watchlist types not just this one (shows)
+                // so we need to check returned items against our expected max items per page
+                if ( watchlist.Items.Count() < ( maxItems * watchlist.CurrentPage ) )
+                  break;
+
+                watchlist = TraktAPI.TraktAPI.GetWatchListShows( username, "full", page: watchlist.CurrentPage + 1, maxItems: maxItems );
+                if ( watchlist == null || watchlist.Items == null )
+                  break;
+
+                _WatchListShows = _WatchListShows.Concat( watchlist.Items );
+              }
+
+              if ( userWatchList.Keys.Contains( CurrentUser ) )
+                userWatchList.Remove( CurrentUser );
+
+              userWatchList.Add( CurrentUser, _WatchListShows );
+              LastRequest = DateTime.UtcNow;
+              PreviousSelectedIndex = 0;
             }
+            return userWatchList[ CurrentUser ];
+          }
         }
-        static IEnumerable<TraktShowWatchList> _WatchListShows = null;        
+        static IEnumerable<TraktShowWatchListItem> _WatchListShows = null;        
 
         #endregion
 
@@ -164,7 +193,7 @@ namespace TraktPlugin.GUI
                             var selectedItem = this.Facade.SelectedListItem;
                             if (selectedItem == null) return;
 
-                            var selectedWatchlistItem = selectedItem.TVTag as TraktShowWatchList;
+                            var selectedWatchlistItem = selectedItem.TVTag as TraktShowWatchListItem;
                             if (selectedWatchlistItem == null) return;
 
                             GUIWindowManager.ActivateWindow((int)TraktGUIWindows.ShowSeasons, selectedWatchlistItem.Show.ToJSON());
@@ -222,7 +251,7 @@ namespace TraktPlugin.GUI
             var selectedItem = this.Facade.SelectedListItem as GUIShowListItem;
             if (selectedItem == null) return;
 
-            var selectedWatchlistItem = selectedItem.TVTag as TraktShowWatchList;
+            var selectedWatchlistItem = selectedItem.TVTag as TraktShowWatchListItem;
             if (selectedWatchlistItem == null) return;
 
             var dlg = (IDialogbox)GUIWindowManager.GetWindow((int)GUIWindow.Window.WINDOW_DIALOG_MENU);
@@ -332,9 +361,9 @@ namespace TraktPlugin.GUI
                     if (_WatchListShows.Count() >= 1)
                     {
                         // remove from list
-                        var showsToExcept = new List<TraktShowWatchList>();
+                        var showsToExcept = new List<TraktShowWatchListItem>();
                         showsToExcept.Add(selectedWatchlistItem);
-                        _WatchListShows = WatchListShows.Except(showsToExcept);
+                        _WatchListShows = WatchListShows?.Except(showsToExcept);
                         userWatchList[CurrentUser] = _WatchListShows;
                         LoadWatchListShows();
                     }
@@ -419,7 +448,7 @@ namespace TraktPlugin.GUI
             var selectedItem = this.Facade.SelectedListItem;
             if (selectedItem == null) return;
 
-            var selectedWatchlistItem = selectedItem.TVTag as TraktShowWatchList;
+            var selectedWatchlistItem = selectedItem.TVTag as TraktShowWatchListItem;
             GUICommon.CheckAndPlayFirstUnwatchedEpisode(selectedWatchlistItem.Show, jumpTo);
         }
 
@@ -435,13 +464,13 @@ namespace TraktPlugin.GUI
             {
                 if (success)
                 {
-                    IEnumerable<TraktShowWatchList> shows = result as IEnumerable<TraktShowWatchList>;
+                    IEnumerable<TraktShowWatchListItem> shows = result as IEnumerable<TraktShowWatchListItem>;
                     SendWatchListShowsToFacade(shows);
                 }
             }, Translation.GettingWatchListMovies, true);
         }
 
-        private void SendWatchListShowsToFacade(IEnumerable<TraktShowWatchList> showWatchlist)
+        private void SendWatchListShowsToFacade(IEnumerable<TraktShowWatchListItem> showWatchlist)
         {
             // clear facade
             GUIControl.ClearControl(GetID, Facade.GetID);
@@ -557,7 +586,7 @@ namespace TraktPlugin.GUI
             GUICommon.ClearShowProperties();
         }
 
-        private void PublishWatchlistSkinProperties(TraktShowWatchList item)
+        private void PublishWatchlistSkinProperties(TraktShowWatchListItem item)
         {
             GUICommon.SetProperty("#Trakt.Show.WatchList.Inserted", item.ListedAt.FromISO8601().ToShortDateString());
             GUICommon.SetShowProperties(item.Show);
@@ -567,7 +596,7 @@ namespace TraktPlugin.GUI
         {
             PreviousSelectedIndex = Facade.SelectedListItemIndex;
 
-            var listItem = item.TVTag as TraktShowWatchList;
+            var listItem = item.TVTag as TraktShowWatchListItem;
             PublishWatchlistSkinProperties(listItem);
             GUIImageHandler.LoadFanart(backdrop, TmdbCache.GetShowBackdropFilename((item as GUIShowListItem).Images.ShowImages));
         }
