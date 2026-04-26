@@ -1,9 +1,10 @@
-﻿using System;
+﻿using MediaPortal.Configuration;
+using Newtonsoft.Json;
+using System;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading;
-using MediaPortal.Configuration;
 using TraktAPI.DataStructures;
 using TraktAPI.Extensions;
 
@@ -11,10 +12,10 @@ namespace TraktPlugin
 {
     static class TraktLogger
     {
-        private static Object lockObject = new object();
-        private static string latencyFilename = Config.GetFile(Config.Dir.Log, "TraktPlugin-Latencies.csv");
-        private static string logFilename = Config.GetFile(Config.Dir.Log,"TraktPlugin.log");
-        private static string logFilePattern = Config.GetFile(Config.Dir.Log, "TraktPlugin.{0}.log");
+        private static readonly Object lockObject = new object();
+        private static readonly string latencyFilename = Config.GetFile(Config.Dir.Log, "TraktPlugin-Latencies.csv");
+        private static readonly string logFilename = Config.GetFile(Config.Dir.Log,"TraktPlugin.log");
+        private static readonly string logFilePattern = Config.GetFile(Config.Dir.Log, "TraktPlugin.{0}.log");
 
         internal delegate void OnLogReceivedDelegate(string message, bool error);
         internal static event OnLogReceivedDelegate OnLogReceived;
@@ -195,18 +196,17 @@ namespace TraktPlugin
             }
         }
 
-        private static void TraktAPI_OnDataReceived(string response, HttpWebResponse webResponse)
+        private static void TraktAPI_OnDataReceived( string response, HttpWebResponse webResponse )
         {
-            if (TraktSettings.LogLevel >= 3)
-            {
-                string headers = string.Empty;
-                foreach(string key in webResponse.Headers.AllKeys)
-                {
-                    headers += string.Format("{0}: {1}, ", key, webResponse.Headers[key]);
-                }
+          if ( TraktSettings.LogLevel >= 3 )
+          {
+            var headerDict = webResponse.Headers.AllKeys.ToDictionary(
+              key => key,
+              key => webResponse.Headers[ key ] );
 
-                TraktLogger.Debug("Response: {0}, Headers: {{{1}}}", response ?? "null", headers.TrimEnd(new char[] {',',' '}));
-            }
+            TraktLogger.Debug( "Response: {0}", response ?? "null" );
+            TraktLogger.Debug( "Headers: {0}", JsonConvert.SerializeObject( headerDict ) );
+          }
         }
 
         private static void TraktAPI_OnDataError(string error)
@@ -250,16 +250,15 @@ namespace TraktPlugin
 
         private static void TmdbAPI_OnDataReceived(string response, HttpWebResponse webResponse)
         {
-            if (TraktSettings.LogLevel >= 3)
-            {
-                string headers = string.Empty;
-                foreach (string key in webResponse.Headers.AllKeys)
-                {
-                    headers += string.Format("{0}: {1}, ", key, webResponse.Headers[key]);
-                }
+          if ( TraktSettings.LogLevel >= 3 )
+          {
+            var headerDict = webResponse.Headers.AllKeys.ToDictionary(
+              key => key,
+              key => webResponse.Headers[ key ] );
 
-                TraktLogger.Debug("Response: {0}, Headers: {{{1}}}", response ?? "null", headers.TrimEnd(new char[] { ',', ' ' }));
-            }
+            TraktLogger.Debug( "Response: {0}", response ?? "null" );
+            TraktLogger.Debug( "Headers: {0}", JsonConvert.SerializeObject( headerDict ) );
+          }
         }
 
         private static void TmdbAPI_OnDataError(string error)
