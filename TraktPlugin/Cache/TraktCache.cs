@@ -1632,7 +1632,7 @@ namespace TraktPlugin
                         // persist cache to disk
                         if (listUpdated)
                         {
-                            SaveFileCache(filename, userListItems.ToJSON());
+                            SaveFileCache(filename, userListItems.ToList().ToJSON());
                         }
 
                         // add list to the cache
