@@ -1194,7 +1194,7 @@ namespace TraktPlugin
                 }
 
                 // save to local file cache
-                SaveFileCache( MoviesWatchlistedFile, _WatchListMovies.ToJSON() );
+                SaveFileCache( MoviesWatchlistedFile, _WatchListMovies.ToList().ToJSON() );
 
                 // save new activity time for next time
                 TraktSettings.LastSyncActivities.Movies.Watchlist = lastSyncActivities.Movies.Watchlist;
@@ -1324,7 +1324,7 @@ namespace TraktPlugin
                 }
 
                 // save to local file cache
-                SaveFileCache(ShowsWatchlistedFile, _WatchListShows.ToJSON());
+                SaveFileCache(ShowsWatchlistedFile, _WatchListShows.ToList().ToJSON());
 
                 // save new activity time for next time
                 TraktSettings.LastSyncActivities.Shows.Watchlist = lastSyncActivities.Shows.Watchlist;
