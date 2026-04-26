@@ -1,8 +1,14 @@
-﻿using System.Runtime.Serialization;
+﻿using System.Collections.Generic;
+using System.Runtime.Serialization;
 
 namespace TraktAPI.DataStructures
-{
-    [DataContract]
+{  
+  public class TraktListItems : TraktPagination
+  {
+    public IEnumerable<TraktListItem> Items { get; set; }
+  }
+
+  [DataContract]
     public class TraktListItem
     {
         [DataMember(Name = "rank")]

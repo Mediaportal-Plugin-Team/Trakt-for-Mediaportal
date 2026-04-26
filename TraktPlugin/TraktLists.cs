@@ -113,22 +113,37 @@ namespace TraktPlugin
             UserListItemLastRequestTime.TryGetValue(key, out DateTime lLastRequest);
 
             // use the username:id to cache items in a users list
-            if (!UserListItems.Keys.Contains(key) || lLastRequest < DateTime.UtcNow.Subtract(new TimeSpan(0, TraktSettings.WebRequestCacheMinutes, 0)))
+            if ( !UserListItems.Keys.Contains( key ) || lLastRequest < DateTime.UtcNow.Subtract( new TimeSpan( 0, TraktSettings.WebRequestCacheMinutes, 0 ) ) )
             {
-                // get list items               
-                var listItems = TraktAPI.TraktAPI.GetUserListItems(username == TraktSettings.Username ? "me" : username, id.ToString(), "full");
-                if (listItems == null) return null;
+              username = ( username == TraktSettings.Username ) ? "me" : username;
 
-                // remove any cached items for user
-                if (UserListItems.Keys.Contains(key))
-                    UserListItems.Remove(key);
+              // get the first page
+              TraktListItems page = TraktAPI.TraktAPI.GetUserListItems( username, id.ToString(), "full" );
+              if ( page == null || page.Items == null )
+                return null;
 
-                if (UserListItemLastRequestTime.Keys.Contains(key))
-                    UserListItemLastRequestTime.Remove(key);
+              var userListItems = page.Items;
 
-                // add to list items cache
-                UserListItems.Add(key, listItems);
-                UserListItemLastRequestTime.Add(key, DateTime.UtcNow);
+              // get more pages if needed
+              while ( page.CurrentPage < page.TotalPages )
+              {
+                page = TraktAPI.TraktAPI.GetUserListItems( username, id.ToString(), "full", page: page.CurrentPage + 1 );
+                if ( page == null || page.Items == null )
+                  break;
+
+                userListItems = userListItems.Concat( page.Items );
+              }
+
+              // remove any cached items for user
+              if ( UserListItems.Keys.Contains( key ) )
+                UserListItems.Remove( key );
+
+              if ( UserListItemLastRequestTime.Keys.Contains( key ) )
+                UserListItemLastRequestTime.Remove( key );
+
+              // add to list items cache
+              UserListItems.Add( key, userListItems );
+              UserListItemLastRequestTime.Add( key, DateTime.UtcNow );
             }
             return UserListItems[key];
         }

@@ -36,7 +36,7 @@ namespace TraktAPI
         public const string SyncWatchlistRemove = "https://api.trakt.tv/sync/watchlist/remove";
 
         public const string UserLists = "https://api.trakt.tv/users/{0}/lists";
-        public const string UserListItems = "https://api.trakt.tv/users/{0}/lists/{1}/items?extended={2}";       
+        public const string UserListItems = "https://api.trakt.tv/users/{0}/lists/{1}/items?extended={2}&page={3}&limit={4}";       
         public const string UserListAdd = "https://api.trakt.tv/users/{0}/lists";
         public const string UserListEdit = "https://api.trakt.tv/users/{0}/lists/{1}";
         public const string UserListItemsAdd = "https://api.trakt.tv/users/{0}/lists/{1}/items";

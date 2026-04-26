@@ -1,13 +1,13 @@
-﻿using System;
+﻿using MediaPortal.Configuration;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
-using MediaPortal.Configuration;
-using TraktPlugin.Extensions;
 using TraktAPI.DataStructures;
 using TraktAPI.Extensions;
+using TraktPlugin.Extensions;
 
 namespace TraktPlugin
 {
@@ -17,41 +17,41 @@ namespace TraktPlugin
     /// </summary>
     public static class TraktCache
     {
-        static Object syncLists = new object();
-        static Object syncLastActivities = new object();
+        static readonly Object syncLists = new object();
+        static readonly Object syncLastActivities = new object();
 
-        private static string MoviesWatchlistedFile = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\{username}\Library\Movies\Watchlisted.json");
-        private static string MoviesRecommendedFile = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\{username}\Library\Movies\Recommended.json");
-        private static string MoviesCollectedFile = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\{username}\Library\Movies\Collected.json");
-        private static string MoviesWatchedFile = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\{username}\Library\Movies\Watched.json");
-        private static string MoviesRatedFile = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\{username}\Library\Movies\Rated.json");
-        private static string MoviesCommentedFile = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\{username}\Library\Movies\Commented.json");
-        private static string MoviesPausedFile = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\{username}\Library\Movies\Paused.json");
-        private static string MoviesHiddenFile = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\{username}\Library\Movies\Hidden.json");
+        private static readonly string MoviesWatchlistedFile = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\{username}\Library\Movies\Watchlisted.json");
+        private static readonly string MoviesRecommendedFile = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\{username}\Library\Movies\Recommended.json");
+        private static readonly string MoviesCollectedFile = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\{username}\Library\Movies\Collected.json");
+        private static readonly string MoviesWatchedFile = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\{username}\Library\Movies\Watched.json");
+        private static readonly string MoviesRatedFile = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\{username}\Library\Movies\Rated.json");
+        private static readonly string MoviesCommentedFile = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\{username}\Library\Movies\Commented.json");
+        private static readonly string MoviesPausedFile = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\{username}\Library\Movies\Paused.json");
+        private static readonly string MoviesHiddenFile = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\{username}\Library\Movies\Hidden.json");
 
-        private static string EpisodesWatchlistedFile = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\{username}\Library\Episodes\Watchlisted.json");
-        private static string EpisodesCollectedFile = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\{username}\Library\Episodes\Collected.json");
-        private static string EpisodesWatchedFile = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\{username}\Library\Episodes\Watched.json");
-        private static string EpisodesRatedFile = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\{username}\Library\Episodes\Rated.json");
-        private static string EpisodesCommentedFile = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\{username}\Library\Episodes\Commented.json");
-        private static string EpisodesPausedFile = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\{username}\Library\Episodes\Paused.json");
+        private static readonly string EpisodesWatchlistedFile = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\{username}\Library\Episodes\Watchlisted.json");
+        private static readonly string EpisodesCollectedFile = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\{username}\Library\Episodes\Collected.json");
+        private static readonly string EpisodesWatchedFile = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\{username}\Library\Episodes\Watched.json");
+        private static readonly string EpisodesRatedFile = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\{username}\Library\Episodes\Rated.json");
+        private static readonly string EpisodesCommentedFile = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\{username}\Library\Episodes\Commented.json");
+        private static readonly string EpisodesPausedFile = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\{username}\Library\Episodes\Paused.json");
 
-        private static string ShowsWatchlistedFile = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\{username}\Library\Shows\Watchlisted.json");
-        private static string ShowsRatedFile = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\{username}\Library\Shows\Rated.json");
-        private static string ShowsCommentedFile = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\{username}\Library\Shows\Commented.json");
-        private static string ShowsHiddenFile = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\{username}\Library\Shows\Hidden.json");
+        private static readonly string ShowsWatchlistedFile = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\{username}\Library\Shows\Watchlisted.json");
+        private static readonly string ShowsRatedFile = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\{username}\Library\Shows\Rated.json");
+        private static readonly string ShowsCommentedFile = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\{username}\Library\Shows\Commented.json");
+        private static readonly string ShowsHiddenFile = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\{username}\Library\Shows\Hidden.json");
 
-        private static string SeasonsWatchlistedFile = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\{username}\Library\Seasons\Watchlisted.json");
-        private static string SeasonsRatedFile = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\{username}\Library\Seasons\Rated.json");
-        private static string SeasonsCommentedFile = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\{username}\Library\Seasons\Commented.json");
-        private static string SeasonsHiddenFile = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\{username}\Library\Seasons\Hidden.json");
+        private static readonly string SeasonsWatchlistedFile = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\{username}\Library\Seasons\Watchlisted.json");
+        private static readonly string SeasonsRatedFile = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\{username}\Library\Seasons\Rated.json");
+        private static readonly string SeasonsCommentedFile = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\{username}\Library\Seasons\Commented.json");
+        private static readonly string SeasonsHiddenFile = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\{username}\Library\Seasons\Hidden.json");
 
-        private static string CustomListsFile = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\{username}\Library\Lists\Menu.json");
-        private static string CustomListFile = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\{username}\Library\Lists\{listname}.json");
-        private static string CustomListCommentedFile = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\{username}\Library\Lists\Commented.json");
-        private static string CustomListLikedFile = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\{username}\Library\Lists\Liked.json");
+        private static readonly string CustomListsFile = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\{username}\Library\Lists\Menu.json");
+        private static readonly string CustomListFile = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\{username}\Library\Lists\{listname}.json");
+        private static readonly string CustomListCommentedFile = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\{username}\Library\Lists\Commented.json");
+        private static readonly string CustomListLikedFile = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\{username}\Library\Lists\Liked.json");
 
-        private static string CommentsLikedFile = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\{username}\Library\Comments\Liked.json");
+        private static readonly string CommentsLikedFile = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\{username}\Library\Comments\Liked.json");
 
         private static DateTime MovieRecommendationsAge;
         private static DateTime CustomListAge;
@@ -1548,7 +1548,7 @@ namespace TraktPlugin
                         // load from cache
                         TraktLogger.Info("Getting list details for custom list from local cache. Name = '{0}', ID = '{1}', Slug = '{2}'", list.Name, list.Ids.Trakt, list.Ids.Slug);
                         string filename = CustomListFile.Replace("{listname}", list.Ids.Slug);
-                        var userList = LoadFileCache(filename, null).FromJSONArray<TraktListItem>();
+                        var userListItems = LoadFileCache(filename, null).FromJSONArray<TraktListItem>();
 
                         // check if we have got this list before
                         ListActivity listActivityCache = null;
@@ -1558,14 +1558,26 @@ namespace TraktPlugin
                         }
 
                         // check if we need to get update from online
-                        if (userList == null || listActivityCache == null || listActivityCache.UpdatedAt != list.UpdatedAt)
+                        if ( userListItems == null || listActivityCache == null || listActivityCache.UpdatedAt != list.UpdatedAt )
                         {
-                            TraktLogger.Info("Getting list details for custom list from trakt.tv, local cache is out of date. Name = '{0}', Total Items = '{1}', ID = '{2}', Slug = '{3}', Last Updated = '{4}'", list.Name, list.ItemCount, list.Ids.Trakt, list.Ids.Slug, list.UpdatedAt);
-                            userList = TraktAPI.TraktAPI.GetUserListItems("me", list.Ids.Trakt.ToString());
-                            listUpdated = true;
-                        }
+                          TraktLogger.Info( "Getting list details for custom list from trakt.tv, local cache is out of date. Name = '{0}', Total Items = '{1}', ID = '{2}', Slug = '{3}', Last Updated = '{4}'", list.Name, list.ItemCount, list.Ids.Trakt, list.Ids.Slug, list.UpdatedAt );
+                          TraktListItems page = TraktAPI.TraktAPI.GetUserListItems( "me", list.Ids.Trakt.ToString() );
+                          if ( page == null || page.Items == null )
+                            continue;
 
-                        if (userList == null)
+                          userListItems = page.Items;
+                          while ( page.CurrentPage < page.TotalPages )
+                          {
+                            page = TraktAPI.TraktAPI.GetUserListItems( "me", list.Ids.Trakt.ToString(), page: page.CurrentPage + 1 );
+                            if ( page == null || page.Items == null )
+                              break;
+
+                            userListItems = userListItems.Concat( page.Items );
+                          }
+                        }
+                        listUpdated = true;
+                        
+                        if ( userListItems == null)
                             continue;
 
                         // update cache update time
@@ -1585,11 +1597,11 @@ namespace TraktPlugin
                         // persist cache to disk
                         if (listUpdated)
                         {
-                            SaveFileCache(filename, userList.ToJSON());
+                            SaveFileCache(filename, userListItems.ToJSON());
                         }
 
                         // add list to the cache
-                        _CustomListsAndItems.Add(list, userList.ToList());
+                        _CustomListsAndItems.Add(list, userListItems.ToList());
                     }
                     CustomListAge = DateTime.Now;
                     TraktSettings.LastListActivities = lastActivities;

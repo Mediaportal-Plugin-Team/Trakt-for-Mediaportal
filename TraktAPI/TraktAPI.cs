@@ -578,10 +578,28 @@ namespace TraktAPI
             return response.FromJSONArray<TraktListDetail>();
         }
 
-        public static IEnumerable<TraktListItem> GetUserListItems(string username, string listId, string extendedInfoParams = "min")
+        public static TraktListItems GetUserListItems( string username, string listId, string extendedInfoParams = "min", int page = 1, int maxItems = 100 )
         {
-            var response = GetFromTrakt(string.Format(TraktURIs.UserListItems, username, listId, extendedInfoParams));
-            return response.FromJSONArray<TraktListItem>();
+          var response = GetFromTrakt( string.Format( TraktURIs.UserListItems, username, listId, extendedInfoParams, page, maxItems ), out WebHeaderCollection headers );
+          if ( response == null )
+            return null;
+
+          try
+          {
+            return new TraktListItems
+            {
+              CurrentPage = page,
+              TotalItemsPerPage = maxItems,
+              TotalPages = int.Parse( headers[ "X-Pagination-Page-Count" ] ),
+              TotalItems = int.Parse( headers[ "X-Pagination-Item-Count" ] ),
+              Items = response.FromJSONArray<TraktListItem>()
+            };
+          }
+          catch
+          {
+            // most likely bad header response
+            return null;
+          }
         }
 
         public static TraktListDetail CreateCustomList(TraktList list, string username = "me")

@@ -374,11 +374,21 @@ namespace TraktPlugin.GUI
                 }
                 
                 // get items from other list
-                var userListItems = TraktAPI.TraktAPI.GetUserListItems(copyParams.Source.User.Ids.Slug, copyParams.Source.Ids.Trakt.ToString(), "min");
-                if (userListItems == null)
+                TraktListItems page = TraktAPI.TraktAPI.GetUserListItems(copyParams.Source.User.Ids.Slug, copyParams.Source.Ids.Trakt.ToString(), "min");
+                if ( page == null || page.Items == null )
                 {
                     TraktLogger.Error("Failed to get user list items. List Name = '{0}', ID = '{1}'", copyParams.Destination.Name, copyParams.Source.Ids.Trakt);
                     return;
+                }
+
+                var userListItems = page.Items;
+                while ( page.CurrentPage < page.TotalPages )
+                {
+                  page = TraktAPI.TraktAPI.GetUserListItems( copyParams.Source.User.Ids.Slug, copyParams.Source.Ids.Trakt.ToString(), "min", page.CurrentPage + 1 );
+                  if ( page == null || page.Items == null )
+                    break;
+
+                  userListItems = userListItems.Concat( page.Items );
                 }
 
                 // copy items to new list
