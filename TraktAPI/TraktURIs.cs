@@ -45,8 +45,8 @@ namespace TraktAPI
         public const string UserListComments = "https://api.trakt.tv/users/{0}/lists/{1}/comments/{2}?page={3}&limit={4}";
         public const string UserWatchlistMovies = "https://api.trakt.tv/users/{0}/watchlist/movies?extended={1}&page={2}&limit={3}";
         public const string UserWatchlistShows = "https://api.trakt.tv/users/{0}/watchlist/shows?extended={1}&page={2}&limit={3}";
-        public const string UserWatchlistSeasons = "https://api.trakt.tv/users/{0}/watchlist/seasons?extended={1}";
-        public const string UserWatchlistEpisodes = "https://api.trakt.tv/users/{0}/watchlist/episodes?extended={1}";
+        public const string UserWatchlistSeasons = "https://api.trakt.tv/users/{0}/watchlist/seasons?extended={1}&page={2}&limit={3}";
+        public const string UserWatchlistEpisodes = "https://api.trakt.tv/users/{0}/watchlist/episodes?extended={1}&page={2}&limit={3}";
         public const string UserProfile = "https://api.trakt.tv/users/{0}?extended=full,images";
         public const string UserFollowerRequests = "https://api.trakt.tv/users/requests?extended=full,images";
         public const string UserStats = "https://api.trakt.tv/users/{0}/stats";
