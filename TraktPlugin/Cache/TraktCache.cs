@@ -1445,7 +1445,7 @@ namespace TraktPlugin
         /// <summary>
         /// Get the users watchlisted episodes from Trakt
         /// </summary>
-        public static IEnumerable<TraktEpisodeWatchList> GetWatchlistedEpisodesFromTrakt(bool ignoreLastSyncTime = false)
+        public static IEnumerable<TraktEpisodeWatchListItem> GetWatchlistedEpisodesFromTrakt(bool ignoreLastSyncTime = false)
         {
             lock (syncLists)
             {
@@ -1473,27 +1473,44 @@ namespace TraktPlugin
 
                 TraktLogger.Info("TV episode watchlist cache is out of date, requesting updated data. Local Date = '{0}', Online Date = '{1}'", TraktSettings.LastSyncActivities.Episodes.Watchlist ?? "<empty>", lastSyncActivities.Episodes.Watchlist ?? "<empty>");
 
-                // we get from online, local cache is not up to date
-                var onlineItems = TraktAPI.TraktAPI.GetWatchListEpisodes();
-                if (onlineItems == null)
-                    return null;
+                int maxItems = 100;
 
-                _WatchListEpisodes = onlineItems;
+                // we get from online, local cache is not up to date (first page)
+                var onlineItems = TraktAPI.TraktAPI.GetWatchListEpisodes( page: 1, maxItems: maxItems );
+                if ( onlineItems == null || onlineItems.Items == null )
+                  return null;
+
+                _WatchListEpisodes = onlineItems.Items;
+
+                // get more pages if required
+                while ( onlineItems.CurrentPage < onlineItems.TotalPages )
+                {
+                  // Note: API returns total pages for all watchlist types not just this one (shows)
+                  // so we need to check returned items against our expected max items per page
+                  if ( onlineItems.Items.Count() < ( maxItems * onlineItems.CurrentPage ) )
+                    break;
+
+                  onlineItems = TraktAPI.TraktAPI.GetWatchListEpisodes( page: onlineItems.CurrentPage + 1, maxItems: maxItems );
+                  if ( onlineItems == null || onlineItems.Items == null )
+                    break;
+
+                  _WatchListEpisodes = _WatchListEpisodes.Concat( onlineItems.Items );
+                }
 
                 // save to local file cache
-                SaveFileCache(EpisodesWatchlistedFile, _WatchListEpisodes.ToJSON());
+                SaveFileCache( EpisodesWatchlistedFile, _WatchListEpisodes.ToList().ToJSON() );
 
                 // save new activity time for next time
                 TraktSettings.LastSyncActivities.Episodes.Watchlist = lastSyncActivities.Episodes.Watchlist;
-                
-                return onlineItems;
+
+                return _WatchListEpisodes;
             }
         }
 
         /// <summary>
         /// Returns the cached users watchlisted episodes on trakt.tv
         /// </summary>
-        static IEnumerable<TraktEpisodeWatchList> WatchListEpisodes
+        static IEnumerable<TraktEpisodeWatchListItem> WatchListEpisodes
         {
             get
             {
@@ -1501,12 +1518,12 @@ namespace TraktPlugin
                 {
                     var persistedItems = LoadFileCache(EpisodesWatchlistedFile, null);
                     if (persistedItems != null)
-                        _WatchListEpisodes = persistedItems.FromJSONArray<TraktEpisodeWatchList>();
+                        _WatchListEpisodes = persistedItems.FromJSONArray<TraktEpisodeWatchListItem>();
                 }
                 return _WatchListEpisodes;
             }
         }
-        static IEnumerable<TraktEpisodeWatchList> _WatchListEpisodes = null;
+        static IEnumerable<TraktEpisodeWatchListItem> _WatchListEpisodes = null;
 
         #endregion
 
@@ -3766,9 +3783,9 @@ namespace TraktPlugin
 
         internal static void AddEpisodeToWatchlist(TraktShowSummary show, TraktEpisodeSummary episode)
         {
-            var watchlistEpisodes = (_WatchListEpisodes ?? new List<TraktEpisodeWatchList>()).ToList();
+            var watchlistEpisodes = (_WatchListEpisodes ?? new List<TraktEpisodeWatchListItem>()).ToList();
 
-            watchlistEpisodes.Add(new TraktEpisodeWatchList
+            watchlistEpisodes.Add(new TraktEpisodeWatchListItem
             {
                 ListedAt = DateTime.UtcNow.ToISO8601(),
                 Show = show,
