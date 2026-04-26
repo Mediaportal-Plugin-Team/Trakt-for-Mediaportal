@@ -1,17 +1,23 @@
-﻿using System.Runtime.Serialization;
+﻿using System.Collections.Generic;
+using System.Runtime.Serialization;
 
 namespace TraktAPI.DataStructures
 {
-    [DataContract]
-    public class TraktSeasonWatchList
-    {
-        [DataMember(Name = "listed_at")]
-        public string ListedAt { get; set; }
+  public class TraktSeasonWatchList : TraktPagination
+  {
+    public IEnumerable<TraktSeasonWatchListItem> Items { get; set; }
+  }
 
-        [DataMember(Name = "show")]
-        public TraktShowSummary Show { get; set; }
+  [DataContract]
+  public class TraktSeasonWatchListItem
+  {
+    [DataMember( Name = "listed_at" )]
+    public string ListedAt { get; set; }
 
-        [DataMember(Name = "season")]
-        public TraktSeasonSummary Season { get; set; }
-    }
+    [DataMember( Name = "show" )]
+    public TraktShowSummary Show { get; set; }
+
+    [DataMember( Name = "season" )]
+    public TraktSeasonSummary Season { get; set; }
+  }
 }

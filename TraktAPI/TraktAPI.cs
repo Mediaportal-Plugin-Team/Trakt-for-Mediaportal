@@ -194,16 +194,58 @@ namespace TraktAPI
 
         #region Collection
 
-        public static IEnumerable<TraktMovieCollected> GetCollectedMovies()
+        public static TraktMovieCollected GetCollectedMovies( int page = 1, int maxItems = 100 )
         {
-            var response = GetFromTrakt(TraktURIs.SyncCollectionMovies);
-            return response.FromJSONArray<TraktMovieCollected>();
+          var response = GetFromTrakt( string.Format( TraktURIs.SyncCollectionMovies, page, maxItems ), out WebHeaderCollection headers );
+          if ( response == null )
+            return null;
+
+          try
+          {
+            return new TraktMovieCollected
+            {
+              CurrentPage = page,
+              TotalItemsPerPage = maxItems,
+              TotalPages = int.Parse( headers[ "X-Pagination-Page-Count" ] ),
+              TotalItems = int.Parse( headers[ "X-Pagination-Item-Count" ] ),
+              Items = response.FromJSONArray<TraktMovieCollectedItem>()
+            };
+          }
+          catch
+          {
+            // most likely bad header response
+            return null;
+          }
         }
 
-        public static IEnumerable<TraktEpisodeCollected> GetCollectedEpisodes()
+        public static TraktEpisodeCollected GetCollectedEpisodes( int page = 1, int maxItems = 100 )
         {
-            var response = GetFromTrakt(TraktURIs.SyncCollectionEpisodes);
-            return response.FromJSONArray<TraktEpisodeCollected>();
+          var response = GetFromTrakt( string.Format( TraktURIs.SyncCollectionEpisodes, page, maxItems ), out WebHeaderCollection headers );
+          if ( response == null )
+            return null;
+
+          try
+          {
+            var episodeItems = response.FromJSONArray<TraktEpisodeCollectedItem>();
+
+            // as of 2026-04-26 the API is not returning the correct pagination headers for this endpoint
+            int.TryParse( headers[ "X-Pagination-Page-Count" ], out int pageCount );
+            int.TryParse( headers[ "X-Pagination-Item-Count" ], out int itemCount );
+
+            return new TraktEpisodeCollected
+            {
+              CurrentPage = page,
+              TotalItemsPerPage = maxItems,
+              TotalPages = pageCount,
+              TotalItems = itemCount,
+              Items = episodeItems
+            };
+          }
+          catch
+          {
+            // most likely bad header response
+            return null;
+          }
         }
 
         #endregion
@@ -578,10 +620,28 @@ namespace TraktAPI
             return response.FromJSONArray<TraktListDetail>();
         }
 
-        public static IEnumerable<TraktListItem> GetUserListItems(string username, string listId, string extendedInfoParams = "min")
+        public static TraktListItems GetUserListItems( string username, string listId, string extendedInfoParams = "min", int page = 1, int maxItems = 100 )
         {
-            var response = GetFromTrakt(string.Format(TraktURIs.UserListItems, username, listId, extendedInfoParams));
-            return response.FromJSONArray<TraktListItem>();
+          var response = GetFromTrakt( string.Format( TraktURIs.UserListItems, username, listId, extendedInfoParams, page, maxItems ), out WebHeaderCollection headers );
+          if ( response == null )
+            return null;
+
+          try
+          {
+            return new TraktListItems
+            {
+              CurrentPage = page,
+              TotalItemsPerPage = maxItems,
+              TotalPages = int.Parse( headers[ "X-Pagination-Page-Count" ] ),
+              TotalItems = int.Parse( headers[ "X-Pagination-Item-Count" ] ),
+              Items = response.FromJSONArray<TraktListItem>()
+            };
+          }
+          catch
+          {
+            // most likely bad header response
+            return null;
+          }
         }
 
         public static TraktListDetail CreateCustomList(TraktList list, string username = "me")
@@ -634,28 +694,100 @@ namespace TraktAPI
 
         #region Watchlists
 
-        public static IEnumerable<TraktMovieWatchList> GetWatchListMovies(string username = "me", string extendedInfoParams = "min")
+        public static TraktMovieWatchlist GetWatchListMovies( string username = "me", string extendedInfoParams = "min", int page = 1, int maxItems = 100 )
         {
-            var response = GetFromTrakt(string.Format(TraktURIs.UserWatchlistMovies, username, extendedInfoParams));
-            return response.FromJSONArray<TraktMovieWatchList>();
+          var response = GetFromTrakt( string.Format( TraktURIs.UserWatchlistMovies, username, extendedInfoParams, page, maxItems ), out WebHeaderCollection headers );
+          if ( response == null )
+            return null;
+
+          try
+          {
+            return new TraktMovieWatchlist
+            {
+              CurrentPage = page,
+              TotalItemsPerPage = maxItems,
+              TotalPages = int.Parse( headers[ "X-Pagination-Page-Count" ] ),
+              TotalItems = int.Parse( headers[ "X-Pagination-Item-Count" ] ),
+              Items = response.FromJSONArray<TraktMovieWatchListItem>()
+            };
+          }
+          catch
+          {
+            // most likely bad header response
+            return null;
+          }
         }
 
-        public static IEnumerable<TraktShowWatchList> GetWatchListShows(string username = "me", string extendedInfoParams = "min")
+        public static TraktShowWatchlist GetWatchListShows( string username = "me", string extendedInfoParams = "min", int page = 1, int maxItems = 100 )
         {
-            var response = GetFromTrakt(string.Format(TraktURIs.UserWatchlistShows, username, extendedInfoParams));
-            return response.FromJSONArray<TraktShowWatchList>();
+          var response = GetFromTrakt( string.Format( TraktURIs.UserWatchlistShows, username, extendedInfoParams, page, maxItems ), out WebHeaderCollection headers );
+          if ( response == null )
+            return null;
+
+          try
+          {
+            return new TraktShowWatchlist
+            {
+              CurrentPage = page,
+              TotalItemsPerPage = maxItems,
+              TotalPages = int.Parse( headers[ "X-Pagination-Page-Count" ] ),
+              TotalItems = int.Parse( headers[ "X-Pagination-Item-Count" ] ),
+              Items = response.FromJSONArray<TraktShowWatchListItem>()
+            };
+          }
+          catch
+          {
+            // most likely bad header response
+            return null;
+          }
         }
 
-        public static IEnumerable<TraktSeasonWatchList> GetWatchListSeasons(string username = "me", string extendedInfoParams = "min")
+        public static TraktSeasonWatchList GetWatchListSeasons( string username = "me", string extendedInfoParams = "min", int page = 1, int maxItems = 10 )
         {
-            var response = GetFromTrakt(string.Format(TraktURIs.UserWatchlistSeasons, username, extendedInfoParams));
-            return response.FromJSONArray<TraktSeasonWatchList>();
+          var response = GetFromTrakt( string.Format( TraktURIs.UserWatchlistSeasons, username, extendedInfoParams, page, maxItems ), out WebHeaderCollection headers );
+          if ( response == null )
+            return null;
+
+          try
+          {
+            return new TraktSeasonWatchList
+            {
+              CurrentPage = page,
+              TotalItemsPerPage = maxItems,
+              TotalPages = int.Parse( headers[ "X-Pagination-Page-Count" ] ),
+              TotalItems = int.Parse( headers[ "X-Pagination-Item-Count" ] ),
+              Items = response.FromJSONArray<TraktSeasonWatchListItem>()
+            };
+          }
+          catch
+          {
+            // most likely bad header response
+            return null;
+          }
         }
 
-        public static IEnumerable<TraktEpisodeWatchList> GetWatchListEpisodes(string username = "me", string extendedInfoParams = "min")
+        public static TraktEpisodeWatchList GetWatchListEpisodes( string username = "me", string extendedInfoParams = "min", int page = 1, int maxItems = 10 )
         {
-            var response = GetFromTrakt(string.Format(TraktURIs.UserWatchlistEpisodes, username, extendedInfoParams));
-            return response.FromJSONArray<TraktEpisodeWatchList>();
+          var response = GetFromTrakt( string.Format( TraktURIs.UserWatchlistEpisodes, username, extendedInfoParams, page, maxItems ), out WebHeaderCollection headers );
+          if ( response == null )
+            return null;
+
+          try
+          {
+            return new TraktEpisodeWatchList
+            {
+              CurrentPage = page,
+              TotalItemsPerPage = maxItems,
+              TotalPages = int.Parse( headers[ "X-Pagination-Page-Count" ] ),
+              TotalItems = int.Parse( headers[ "X-Pagination-Item-Count" ] ),
+              Items = response.FromJSONArray<TraktEpisodeWatchListItem>()
+            };
+          }
+          catch
+          {
+            // most likely bad header response
+            return null;
+          }
         }
 
         #endregion

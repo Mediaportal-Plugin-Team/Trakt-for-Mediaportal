@@ -18,7 +18,7 @@ namespace TraktPlugin.GUI
     #endregion
 
     #region Movie Sorter
-    public class GUIListItemMovieSorter : IComparer<TraktMovieTrending>, IComparer<TraktMovieSummary>, IComparer<TraktMovieWatchList>, IComparer<TraktPersonMovieCast>, IComparer<TraktPersonMovieJob>, IComparer<TraktMovieAnticipated>
+    public class GUIListItemMovieSorter : IComparer<TraktMovieTrending>, IComparer<TraktMovieSummary>, IComparer<TraktMovieWatchListItem>, IComparer<TraktPersonMovieCast>, IComparer<TraktPersonMovieJob>, IComparer<TraktMovieAnticipated>
     {
         private readonly SortingFields mSortField;
         private readonly SortingDirections mSortDirection;
@@ -101,7 +101,7 @@ namespace TraktPlugin.GUI
             return Compare(movieX.Movie, movieY.Movie);
         }
 
-        public int Compare(TraktMovieWatchList movieX, TraktMovieWatchList movieY)
+        public int Compare(TraktMovieWatchListItem movieX, TraktMovieWatchListItem movieY)
         {
             if (mSortField == SortingFields.WatchListInserted)
             {
@@ -142,7 +142,7 @@ namespace TraktPlugin.GUI
     #endregion
 
     #region Show Sorter
-    public class GUIListItemShowSorter : IComparer<TraktShowTrending>, IComparer<TraktShowSummary>, IComparer<TraktShowWatchList>, IComparer<TraktPersonShowCast>, IComparer<TraktPersonShowJob>, IComparer<TraktShowAnticipated>
+    public class GUIListItemShowSorter : IComparer<TraktShowTrending>, IComparer<TraktShowSummary>, IComparer<TraktShowWatchListItem>, IComparer<TraktPersonShowCast>, IComparer<TraktPersonShowJob>, IComparer<TraktShowAnticipated>
     {
         private readonly SortingFields mSortField;
         private readonly SortingDirections mSortDirection;
@@ -225,7 +225,7 @@ namespace TraktPlugin.GUI
             return Compare(showX.Show as TraktShowSummary, showY.Show as TraktShowSummary);
         }
 
-        public int Compare(TraktShowWatchList showX, TraktShowWatchList showY)
+        public int Compare(TraktShowWatchListItem showX, TraktShowWatchListItem showY)
         {
             if (mSortField == SortingFields.WatchListInserted)
             {

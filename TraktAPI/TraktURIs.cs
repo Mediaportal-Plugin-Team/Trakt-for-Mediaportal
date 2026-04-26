@@ -16,11 +16,11 @@ namespace TraktAPI
         public const string SyncLastActivities = "https://api.trakt.tv/sync/last_activities";
         public const string SyncPausedMovies = "https://api.trakt.tv/sync/playback/movies";
         public const string SyncPausedEpisodes = "https://api.trakt.tv/sync/playback/episodes";
-        public const string SyncCollectionMovies = "https://api.trakt.tv/sync/collection/movies";
+        public const string SyncCollectionMovies = "https://api.trakt.tv/sync/collection/movies?page={0}&limit={1}";
         public const string SyncWatchedMovies = "https://api.trakt.tv/sync/watched/movies";
         public const string SyncRatedMovies = "https://api.trakt.tv/sync/ratings/movies";
 
-        public const string SyncCollectionEpisodes = "https://api.trakt.tv/sync/collection/shows";
+        public const string SyncCollectionEpisodes = "https://api.trakt.tv/sync/collection/shows?page={0}&limit={1}";
         public const string SyncWatchedEpisodes = "https://api.trakt.tv/sync/watched/shows";
         public const string SyncRatedEpisodes = "https://api.trakt.tv/sync/ratings/episodes";
         public const string SyncRatedSeasons = "https://api.trakt.tv/sync/ratings/seasons";
@@ -36,17 +36,17 @@ namespace TraktAPI
         public const string SyncWatchlistRemove = "https://api.trakt.tv/sync/watchlist/remove";
 
         public const string UserLists = "https://api.trakt.tv/users/{0}/lists";
-        public const string UserListItems = "https://api.trakt.tv/users/{0}/lists/{1}/items?extended={2}";       
+        public const string UserListItems = "https://api.trakt.tv/users/{0}/lists/{1}/items?extended={2}&page={3}&limit={4}";       
         public const string UserListAdd = "https://api.trakt.tv/users/{0}/lists";
         public const string UserListEdit = "https://api.trakt.tv/users/{0}/lists/{1}";
         public const string UserListItemsAdd = "https://api.trakt.tv/users/{0}/lists/{1}/items";
         public const string UserListItemsRemove = "https://api.trakt.tv/users/{0}/lists/{1}/items/remove";
         public const string UserListLike = "https://api.trakt.tv/users/{0}/lists/{1}/like";
         public const string UserListComments = "https://api.trakt.tv/users/{0}/lists/{1}/comments/{2}?page={3}&limit={4}";
-        public const string UserWatchlistMovies = "https://api.trakt.tv/users/{0}/watchlist/movies?extended={1}";
-        public const string UserWatchlistShows = "https://api.trakt.tv/users/{0}/watchlist/shows?extended={1}";
-        public const string UserWatchlistSeasons = "https://api.trakt.tv/users/{0}/watchlist/seasons?extended={1}";
-        public const string UserWatchlistEpisodes = "https://api.trakt.tv/users/{0}/watchlist/episodes?extended={1}";
+        public const string UserWatchlistMovies = "https://api.trakt.tv/users/{0}/watchlist/movies?extended={1}&page={2}&limit={3}";
+        public const string UserWatchlistShows = "https://api.trakt.tv/users/{0}/watchlist/shows?extended={1}&page={2}&limit={3}";
+        public const string UserWatchlistSeasons = "https://api.trakt.tv/users/{0}/watchlist/seasons?extended={1}&page={2}&limit={3}";
+        public const string UserWatchlistEpisodes = "https://api.trakt.tv/users/{0}/watchlist/episodes?extended={1}&page={2}&limit={3}";
         public const string UserProfile = "https://api.trakt.tv/users/{0}?extended=full,images";
         public const string UserFollowerRequests = "https://api.trakt.tv/users/requests?extended=full,images";
         public const string UserStats = "https://api.trakt.tv/users/{0}/stats";

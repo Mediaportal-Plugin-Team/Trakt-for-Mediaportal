@@ -1,15 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Runtime.Serialization;
 
 namespace TraktAPI.DataStructures
 {
-    [DataContract]
-    public class TraktEpisodeWatchList : TraktEpisodeSummaryEx
-    {
-        [DataMember(Name = "listed_at")]
-        public string ListedAt { get; set; }
-    }
+  public class TraktEpisodeWatchList : TraktPagination
+  {
+    public IEnumerable<TraktEpisodeWatchListItem> Items { get; set; }
+  }
+
+  [DataContract]
+  public class TraktEpisodeWatchListItem : TraktEpisodeSummaryEx
+  {
+    [DataMember( Name = "listed_at" )]
+    public string ListedAt { get; set; }
+  }
 }
