@@ -18,7 +18,7 @@ namespace TraktPlugin.GUI
     #endregion
 
     #region Movie Sorter
-    public class GUIListItemMovieSorter : IComparer<TraktMovieTrending>, IComparer<TraktMovieSummary>, IComparer<TraktMovieWatchList>, IComparer<TraktPersonMovieCast>, IComparer<TraktPersonMovieJob>, IComparer<TraktMovieAnticipated>
+    public class GUIListItemMovieSorter : IComparer<TraktMovieTrending>, IComparer<TraktMovieSummary>, IComparer<TraktMovieWatchListItem>, IComparer<TraktPersonMovieCast>, IComparer<TraktPersonMovieJob>, IComparer<TraktMovieAnticipated>
     {
         private readonly SortingFields mSortField;
         private readonly SortingDirections mSortDirection;
@@ -101,7 +101,7 @@ namespace TraktPlugin.GUI
             return Compare(movieX.Movie, movieY.Movie);
         }
 
-        public int Compare(TraktMovieWatchList movieX, TraktMovieWatchList movieY)
+        public int Compare(TraktMovieWatchListItem movieX, TraktMovieWatchListItem movieY)
         {
             if (mSortField == SortingFields.WatchListInserted)
             {

@@ -1,12 +1,12 @@
-﻿using System;
+﻿using MediaPortal.GUI.Library;
+using MediaPortal.Util;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using MediaPortal.GUI.Library;
-using MediaPortal.Util;
-using TraktPlugin.Cache;
-using TraktPlugin.TmdbAPI.DataStructures;
 using TraktAPI.DataStructures;
 using TraktAPI.Extensions;
+using TraktPlugin.Cache;
+using TraktPlugin.TmdbAPI.DataStructures;
 using Action = MediaPortal.GUI.Library.Action;
 
 namespace TraktPlugin.GUI
@@ -74,26 +74,55 @@ namespace TraktPlugin.GUI
 
         private GUIFacadeControl.Layout CurrentLayout { get; set; }
         static int PreviousSelectedIndex { get; set; }
-        private ImageSwapper backdrop;
+        private readonly ImageSwapper backdrop;
         static DateTime LastRequest = new DateTime();
-        static Dictionary<string, IEnumerable<TraktMovieWatchList>> userWatchList = new Dictionary<string, IEnumerable<TraktMovieWatchList>>();
+        static readonly Dictionary<string, IEnumerable<TraktMovieWatchListItem>> userWatchList = new Dictionary<string, IEnumerable<TraktMovieWatchListItem>>();
 
-        static IEnumerable<TraktMovieWatchList> WatchListMovies
+        static IEnumerable<TraktMovieWatchListItem> WatchListMovies
         {
-            get
+          get
+          {
+            if ( !userWatchList.Keys.Contains( CurrentUser ) || LastRequest < DateTime.UtcNow.Subtract( new TimeSpan( 0, TraktSettings.WebRequestCacheMinutes, 0 ) ) )
             {
-                if (!userWatchList.Keys.Contains(CurrentUser) || LastRequest < DateTime.UtcNow.Subtract(new TimeSpan(0, TraktSettings.WebRequestCacheMinutes, 0)))
-                {
-                    _WatchListMovies = TraktAPI.TraktAPI.GetWatchListMovies(CurrentUser == TraktSettings.Username ? "me" : CurrentUser, "full");
-                    if (userWatchList.Keys.Contains(CurrentUser)) userWatchList.Remove(CurrentUser);
-                    userWatchList.Add(CurrentUser, _WatchListMovies);
-                    LastRequest = DateTime.UtcNow;
-                    PreviousSelectedIndex = 0;
-                }
-                return userWatchList[CurrentUser];
+              string username = CurrentUser == TraktSettings.Username ? "me" : CurrentUser;
+
+              int maxItems = 100;
+              TraktMovieWatchlist watchlist = TraktAPI.TraktAPI.GetWatchListMovies( username, "full", page: 1, maxItems: maxItems );
+
+              if ( watchlist == null || watchlist.Items == null )
+              {
+                userWatchList.Remove( CurrentUser );
+                return null;
+              }
+
+              _WatchListMovies = watchlist.Items;
+
+              // get next page(s) if required
+              while ( watchlist.CurrentPage < watchlist.TotalPages )
+              {
+                // Note: API returns total pages for all watchlist types not just this one (movies)
+                // so we need to check returned items against our expected max items per page
+                if ( _WatchListMovies.Count() < ( maxItems * watchlist.CurrentPage ) )
+                  break;
+
+                watchlist = TraktAPI.TraktAPI.GetWatchListMovies( username, "full", page: watchlist.CurrentPage + 1, maxItems: maxItems );
+                if ( watchlist == null || watchlist.Items == null )
+                  break;
+
+                _WatchListMovies = _WatchListMovies.Concat( watchlist.Items );
+              }
+
+              if ( userWatchList.Keys.Contains( CurrentUser ) )
+                userWatchList.Remove( CurrentUser );
+
+              userWatchList.Add( CurrentUser, _WatchListMovies );
+              LastRequest = DateTime.UtcNow;
+              PreviousSelectedIndex = 0;
             }
+            return userWatchList[ CurrentUser ];
+          }
         }
-        static IEnumerable<TraktMovieWatchList> _WatchListMovies = null;
+        static IEnumerable<TraktMovieWatchListItem> _WatchListMovies = null;
 
         #endregion
 
@@ -212,7 +241,7 @@ namespace TraktPlugin.GUI
             var selectedItem = this.Facade.SelectedListItem as GUIMovieListItem;
             if (selectedItem == null) return;
 
-            var selectedWatchlistItem = selectedItem.TVTag as TraktMovieWatchList;
+            var selectedWatchlistItem = selectedItem.TVTag as TraktMovieWatchListItem;
             if (selectedWatchlistItem == null) return;
 
             var dlg = (IDialogbox)GUIWindowManager.GetWindow((int)GUIWindow.Window.WINDOW_DIALOG_MENU);
@@ -353,9 +382,9 @@ namespace TraktPlugin.GUI
                         if (_WatchListMovies.Count() >= 1)
                         {
                             // remove from list
-                            var moviesToExcept = new List<TraktMovieWatchList>();
+                            var moviesToExcept = new List<TraktMovieWatchListItem>();
                             moviesToExcept.Add(selectedWatchlistItem);
-                            _WatchListMovies = WatchListMovies.Except(moviesToExcept);
+                            _WatchListMovies = WatchListMovies?.Except(moviesToExcept);
                             userWatchList[CurrentUser] = _WatchListMovies;
                             LoadWatchListMovies();
                         }
@@ -393,9 +422,9 @@ namespace TraktPlugin.GUI
                     if (_WatchListMovies.Count() >= 1)
                     {
                         // remove from list
-                        var moviesToExcept = new List<TraktMovieWatchList>();
+                        var moviesToExcept = new List<TraktMovieWatchListItem>();
                         moviesToExcept.Add(selectedWatchlistItem);
-                        _WatchListMovies = WatchListMovies.Except(moviesToExcept);
+                        _WatchListMovies = WatchListMovies?.Except(moviesToExcept);
                         userWatchList[CurrentUser] = _WatchListMovies;
                         LoadWatchListMovies();
                     }
@@ -494,7 +523,7 @@ namespace TraktPlugin.GUI
             var selectedItem = this.Facade.SelectedListItem;
             if (selectedItem == null) return;
 
-            var selectedWatchlistItem = selectedItem.TVTag as TraktMovieWatchList;
+            var selectedWatchlistItem = selectedItem.TVTag as TraktMovieWatchListItem;
             GUICommon.CheckAndPlayMovie(jumpTo, selectedWatchlistItem.Movie);
         }
 
@@ -510,13 +539,13 @@ namespace TraktPlugin.GUI
             {
                 if (success)
                 {
-                    var movies = result as IEnumerable<TraktMovieWatchList>;
+                    var movies = result as IEnumerable<TraktMovieWatchListItem>;
                     SendWatchListMoviesToFacade(movies);
                 }
             }, Translation.GettingWatchListMovies, true);
         }
 
-        private void SendWatchListMoviesToFacade(IEnumerable<TraktMovieWatchList> movieWatchlist)
+        private void SendWatchListMoviesToFacade(IEnumerable<TraktMovieWatchListItem> movieWatchlist)
         {
             // clear facade
             GUIControl.ClearControl(GetID, Facade.GetID);
@@ -633,7 +662,7 @@ namespace TraktPlugin.GUI
             GUICommon.ClearMovieProperties();
         }
 
-        private void PublishWatchlistSkinProperties(TraktMovieWatchList item)
+        private void PublishWatchlistSkinProperties(TraktMovieWatchListItem item)
         {
             GUICommon.SetProperty("#Trakt.Movie.WatchList.Inserted", item.ListedAt.FromISO8601().ToShortDateString());
             GUICommon.SetMovieProperties(item.Movie);
@@ -643,7 +672,7 @@ namespace TraktPlugin.GUI
         {
             PreviousSelectedIndex = Facade.SelectedListItemIndex;
 
-            var watchlistItem = item.TVTag as TraktMovieWatchList;
+            var watchlistItem = item.TVTag as TraktMovieWatchListItem;
             PublishWatchlistSkinProperties(watchlistItem);
             
             string fanart = TmdbCache.GetMovieBackdropFilename((item as GUIMovieListItem).Images.MovieImages);

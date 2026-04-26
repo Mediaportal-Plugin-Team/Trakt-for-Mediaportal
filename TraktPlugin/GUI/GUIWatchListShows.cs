@@ -99,7 +99,7 @@ namespace TraktPlugin.GUI
               {
                 // Note: API returns total pages for all watchlist types not just this one (shows)
                 // so we need to check returned items against our expected max items per page
-                if ( watchlist.Items.Count() < ( maxItems * watchlist.CurrentPage ) )
+                if ( _WatchListShows.Count() < ( maxItems * watchlist.CurrentPage ) )
                   break;
 
                 watchlist = TraktAPI.TraktAPI.GetWatchListShows( username, "full", page: watchlist.CurrentPage + 1, maxItems: maxItems );

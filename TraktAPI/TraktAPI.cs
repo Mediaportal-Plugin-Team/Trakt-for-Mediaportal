@@ -6,6 +6,7 @@ using System.Net;
 using System.Text;
 using System.Threading;
 using System.Web;
+using System.Web.UI;
 using TraktAPI.DataStructures;
 using TraktAPI.Enums;
 using TraktAPI.Extensions;
@@ -652,13 +653,31 @@ namespace TraktAPI
 
         #region Watchlists
 
-        public static IEnumerable<TraktMovieWatchList> GetWatchListMovies(string username = "me", string extendedInfoParams = "min")
+        public static TraktMovieWatchlist GetWatchListMovies( string username = "me", string extendedInfoParams = "min", int page = 1, int maxItems = 100 )
         {
-            var response = GetFromTrakt(string.Format(TraktURIs.UserWatchlistMovies, username, extendedInfoParams));
-            return response.FromJSONArray<TraktMovieWatchList>();
+          var response = GetFromTrakt( string.Format( TraktURIs.UserWatchlistMovies, username, extendedInfoParams, page, maxItems ), out WebHeaderCollection headers );
+          if ( response == null )
+            return null;
+
+          try
+          {
+            return new TraktMovieWatchlist
+            {
+              CurrentPage = page,
+              TotalItemsPerPage = maxItems,
+              TotalPages = int.Parse( headers[ "X-Pagination-Page-Count" ] ),
+              TotalItems = int.Parse( headers[ "X-Pagination-Item-Count" ] ),
+              Items = response.FromJSONArray<TraktMovieWatchListItem>()
+            };
+          }
+          catch
+          {
+            // most likely bad header response
+            return null;
+          }
         }
 
-        public static TraktShowWatchlist GetWatchListShows(string username = "me", string extendedInfoParams = "min", int page = 1, int maxItems = 100 )
+        public static TraktShowWatchlist GetWatchListShows( string username = "me", string extendedInfoParams = "min", int page = 1, int maxItems = 100 )
         {
           var response = GetFromTrakt( string.Format( TraktURIs.UserWatchlistShows, username, extendedInfoParams, page, maxItems ), out WebHeaderCollection headers );
           if ( response == null )

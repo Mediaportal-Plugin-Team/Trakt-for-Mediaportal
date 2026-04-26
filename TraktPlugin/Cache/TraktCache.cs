@@ -1141,7 +1141,7 @@ namespace TraktPlugin
 
         #region Movies
 
-        public static IEnumerable<TraktMovieWatchList> GetWatchlistedMoviesFromTrakt(bool ignoreLastSyncTime = false)
+        public static IEnumerable<TraktMovieWatchListItem> GetWatchlistedMoviesFromTrakt(bool ignoreLastSyncTime = false)
         {
             lock (syncLists)
             {
@@ -1169,23 +1169,41 @@ namespace TraktPlugin
 
                 TraktLogger.Info("Movie watchlist cache is out of date, requesting updated data. Local Date = '{0}', Online Date = '{1}'", TraktSettings.LastSyncActivities.Movies.Watchlist ?? "<empty>", lastSyncActivities.Movies.Watchlist ?? "<empty>");
 
-                // we get from online, local cache is not up to date
-                var onlineItems = TraktAPI.TraktAPI.GetWatchListMovies();
-                if (onlineItems != null)
+                int maxItems = 100;
+
+                // we get from online, local cache is not up to date (first page)
+                var onlineItems = TraktAPI.TraktAPI.GetWatchListMovies( page: 1, maxItems: maxItems );
+                if ( onlineItems == null || onlineItems.Items == null )
+                  return null;
+
+                _WatchListMovies = onlineItems.Items;
+
+                // get more pages if required
+                while ( onlineItems.CurrentPage < onlineItems.TotalPages )
                 {
-                    _WatchListMovies = onlineItems;
+                  // Note: API returns total pages for all watchlist types not just this one (movies)
+                  // so we need to check returned items against our expected max items per page
+                  if ( onlineItems.Items.Count() < ( maxItems * onlineItems.CurrentPage ) )
+                    break;
 
-                    // save to local file cache
-                    SaveFileCache(MoviesWatchlistedFile, _WatchListMovies.ToJSON());
+                  onlineItems = TraktAPI.TraktAPI.GetWatchListMovies( page: onlineItems.CurrentPage + 1, maxItems: maxItems );
+                  if ( onlineItems == null || onlineItems.Items == null )
+                    break;
 
-                    // save new activity time for next time
-                    TraktSettings.LastSyncActivities.Movies.Watchlist = lastSyncActivities.Movies.Watchlist;
+                  _WatchListMovies = _WatchListMovies.Concat( onlineItems.Items );
                 }
-                return onlineItems;
+
+                // save to local file cache
+                SaveFileCache( MoviesWatchlistedFile, _WatchListMovies.ToJSON() );
+
+                // save new activity time for next time
+                TraktSettings.LastSyncActivities.Movies.Watchlist = lastSyncActivities.Movies.Watchlist;
+
+                return _WatchListMovies;
             }
         }
 
-        static IEnumerable<TraktMovieWatchList> WatchListMovies
+        static IEnumerable<TraktMovieWatchListItem> WatchListMovies
         {
             get
             {
@@ -1193,12 +1211,12 @@ namespace TraktPlugin
                 {
                     var persistedItems = LoadFileCache(MoviesWatchlistedFile, null);
                     if (persistedItems != null)
-                        _WatchListMovies = persistedItems.FromJSONArray<TraktMovieWatchList>();
+                        _WatchListMovies = persistedItems.FromJSONArray<TraktMovieWatchListItem>();
                 }
                 return _WatchListMovies;
             }
         }
-        static IEnumerable<TraktMovieWatchList> _WatchListMovies = null;
+        static IEnumerable<TraktMovieWatchListItem> _WatchListMovies = null;
 
         public static IEnumerable<TraktMovie> GetRecommendedMoviesFromTrakt()
         {
@@ -3351,9 +3369,9 @@ namespace TraktPlugin
 
         internal static void AddMovieToWatchlist(TraktMovie movie)
         {
-            var watchlistMovies = (_WatchListMovies ?? new List<TraktMovieWatchList>()).ToList();
+            var watchlistMovies = (_WatchListMovies ?? new List<TraktMovieWatchListItem>()).ToList();
 
-            watchlistMovies.Add(new TraktMovieWatchList
+            watchlistMovies.Add(new TraktMovieWatchListItem
             {
                 ListedAt = DateTime.UtcNow.ToISO8601(),
                 Movie = new TraktMovieSummary
