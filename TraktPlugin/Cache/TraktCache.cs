@@ -189,7 +189,7 @@ namespace TraktPlugin
         /// <summary>
         /// Get the users watched movies from Trakt
         /// </summary>
-        public static IEnumerable<TraktMovieWatched> GetWatchedMoviesFromTrakt(bool ignoreLastSyncTime = false)
+        public static IEnumerable<TraktMovieWatchedItem> GetWatchedMoviesFromTrakt(bool ignoreLastSyncTime = false)
         {
             // get from cache regardless of last sync time
             if (ignoreLastSyncTime)
@@ -216,25 +216,34 @@ namespace TraktPlugin
             TraktLogger.Info("Movie watched history cache is out of date, requesting updated data. Local Date = '{0}', Online Date = '{1}'", TraktSettings.LastSyncActivities.Movies.Watched ?? "<empty>", lastSyncActivities.Movies.Watched ?? "<empty>");
 
             // we get from online, local cache is not up to date
-            var onlineItems = TraktAPI.TraktAPI.GetWatchedMovies();
-            if (onlineItems == null)
-                return null;
+            var onlineItems = TraktAPI.TraktAPI.GetWatchedMovies( page: 1, maxItems: 250 );
+            if ( onlineItems == null || onlineItems.Items == null )
+              return null;
 
-            _WatchedMovies = onlineItems;
+            _WatchedMovies = onlineItems.Items;
+
+            for ( int page = 2; page <= onlineItems.TotalPages; page++ )
+            {
+              onlineItems = TraktAPI.TraktAPI.GetWatchedMovies( page: page, maxItems: 250 );
+              if ( onlineItems == null || onlineItems.Items == null )
+                break;
+
+              _WatchedMovies = _WatchedMovies.Concat( onlineItems.Items );
+            }
 
             // save to local file cache
-            SaveFileCache(MoviesWatchedFile, _WatchedMovies.ToJSON());
+            SaveFileCache( MoviesWatchedFile, _WatchedMovies.ToList().ToJSON() );
 
             // save new activity time for next time
             TraktSettings.LastSyncActivities.Movies.Watched = lastSyncActivities.Movies.Watched;
-            
-            return onlineItems;
+
+            return _WatchedMovies;
         }
 
         /// <summary>
         /// returns the cached users watched movies on trakt.tv
         /// </summary>
-        static IEnumerable<TraktMovieWatched> WatchedMovies
+        static IEnumerable<TraktMovieWatchedItem> WatchedMovies
         {
             get
             {
@@ -242,12 +251,12 @@ namespace TraktPlugin
                 {
                     var persistedItems = LoadFileCache(MoviesWatchedFile, null);
                     if (persistedItems != null)
-                        _WatchedMovies = persistedItems.FromJSONArray<TraktMovieWatched>();
+                        _WatchedMovies = persistedItems.FromJSONArray<TraktMovieWatchedItem>();
                 }
                 return _WatchedMovies;
             }
         }
-        static IEnumerable<TraktMovieWatched> _WatchedMovies = null;
+        static IEnumerable<TraktMovieWatchedItem> _WatchedMovies = null;
 
         /// <summary>
         /// Get the users collected movies from Trakt
@@ -616,14 +625,23 @@ namespace TraktPlugin
             TraktLogger.Info("TV episode watched history cache is out of date, requesting updated data. Local Date = '{0}', Online Date = '{1}'", TraktSettings.LastSyncActivities.Episodes.Watched ?? "<empty>", lastSyncActivities.Episodes.Watched ?? "<empty>");
 
             // we get from online, local cache is not up to date
-            var onlineItems = TraktAPI.TraktAPI.GetWatchedEpisodes();
-            if (onlineItems == null)
+            TraktEpisodesWatched onlineItems = TraktAPI.TraktAPI.GetWatchedEpisodes(page: 1, maxItems: 250);
+            if (onlineItems == null || onlineItems.Items == null)
                 return null;
             
+            for (int page = 2; page <= onlineItems.TotalPages; page++)
+            {
+                TraktEpisodesWatched nextOnlineItems = TraktAPI.TraktAPI.GetWatchedEpisodes(page: page, maxItems: 250);
+                if (nextOnlineItems == null || nextOnlineItems.Items == null)
+                    break;
+
+                onlineItems.Items = onlineItems.Items.Concat(nextOnlineItems.Items);
+            }
+
             // convert trakt structure to more flat heirarchy (more managable)
             TraktLogger.Debug("Converting list of watched episodes from trakt to internal data structure");
             var episodesWatched = new List<EpisodeWatched>();
-            foreach (var show in onlineItems)
+            foreach (var show in onlineItems.Items)
             {
                 foreach(var season in show.Seasons)
                 {
@@ -3372,11 +3390,11 @@ namespace TraktPlugin
 
         internal static void AddMoviesToWatchHistory(List<TraktSyncMovieWatched> movies)
         {
-            var watchedMovies = (_WatchedMovies ?? new List<TraktMovieWatched>()).ToList();
+            var watchedMovies = (_WatchedMovies ?? new List<TraktMovieWatchedItem>()).ToList();
 
             watchedMovies.AddRange(
                 from movie in movies
-                select new TraktMovieWatched
+                select new TraktMovieWatchedItem
                 {
                     LastWatchedAt = movie.WatchedAt ?? DateTime.UtcNow.ToISO8601(),
                     Movie = new TraktMovie
@@ -3393,7 +3411,7 @@ namespace TraktPlugin
 
         internal static void AddMovieToWatchHistory(TraktMovie movie)
         {
-            var watchedMovies = (_WatchedMovies ?? new List<TraktMovieWatched>()).ToList();
+            var watchedMovies = (_WatchedMovies ?? new List<TraktMovieWatchedItem>()).ToList();
 
             var existingWatchedMovie = watchedMovies.FirstOrDefault(m => ((m.Movie.Ids.Trakt == movie.Ids.Trakt) && movie.Ids.Trakt != null) ||
                                                                          ((m.Movie.Ids.Imdb == movie.Ids.Imdb) && movie.Ids.Imdb.ToNullIfEmpty() != null) ||
@@ -3407,7 +3425,7 @@ namespace TraktPlugin
             }
             else
             {
-                watchedMovies.Add(new TraktMovieWatched
+                watchedMovies.Add(new TraktMovieWatchedItem
                 {
                     LastWatchedAt = DateTime.UtcNow.ToISO8601(),
                     Movie = new TraktMovie

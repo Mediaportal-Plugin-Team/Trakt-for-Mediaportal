@@ -6,6 +6,7 @@ using System.Net;
 using System.Text;
 using System.Threading;
 using System.Web;
+using System.Web.UI;
 using TraktAPI.DataStructures;
 using TraktAPI.Enums;
 using TraktAPI.Extensions;
@@ -252,16 +253,62 @@ namespace TraktAPI
 
         #region Watched History
 
-        public static IEnumerable<TraktMovieWatched> GetWatchedMovies()
+        public static TraktMoviesWatched GetWatchedMovies( int page = 1, int maxItems = 100 )
         {
-            var response = GetFromTrakt(TraktURIs.SyncWatchedMovies);
-            return response.FromJSONArray<TraktMovieWatched>();
+          var response = GetFromTrakt( string.Format( TraktURIs.SyncWatchedMovies, page, maxItems ), out WebHeaderCollection headers );
+          if ( response == null )
+            return null;
+
+          try
+          {
+            var movieItems = response.FromJSONArray<TraktMovieWatchedItem>();
+
+            int.TryParse( headers[ "X-Pagination-Page-Count" ], out int pageCount );
+            int.TryParse( headers[ "X-Pagination-Item-Count" ], out int itemCount );
+
+            return new TraktMoviesWatched
+            {
+              CurrentPage = page,
+              TotalItemsPerPage = maxItems,
+              TotalPages = pageCount,
+              TotalItems = itemCount,
+              Items = movieItems
+            };
+          }
+          catch
+          {
+            // most likely bad header response
+            return null;
+          }
         }
 
-        public static IEnumerable<TraktEpisodeWatched> GetWatchedEpisodes()
+        public static TraktEpisodesWatched GetWatchedEpisodes( int page = 1, int maxItems = 100 )
         {
-            var response = GetFromTrakt(TraktURIs.SyncWatchedEpisodes);
-            return response.FromJSONArray<TraktEpisodeWatched>();
+          var response = GetFromTrakt( string.Format( TraktURIs.SyncWatchedEpisodes, page, maxItems ), out WebHeaderCollection headers );
+          if ( response == null )
+            return null;
+
+          try
+          {
+            var episodeItems = response.FromJSONArray<TraktEpisodeWatchedItem>();
+
+            int.TryParse( headers[ "X-Pagination-Page-Count" ], out int pageCount );
+            int.TryParse( headers[ "X-Pagination-Item-Count" ], out int itemCount );
+
+            return new TraktEpisodesWatched
+            {
+              CurrentPage = page,
+              TotalItemsPerPage = maxItems,
+              TotalPages = pageCount,
+              TotalItems = itemCount,
+              Items = episodeItems
+            };
+          }
+          catch
+          {
+            // most likely bad header response
+            return null;
+          }      
         }
 
         #endregion
