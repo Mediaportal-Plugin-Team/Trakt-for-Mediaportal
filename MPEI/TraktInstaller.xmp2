@@ -1562,7 +1562,7 @@ Click Next to continue or Cancel to exit Setup.
 
 
 Trakt will also synchronize your watched flags across multiple installations.</ExtensionDescription>
-    <VersionDescription>* Updated API requests to use pagination where now required
+    <VersionDescription>* Support for pagination on Watched and Ratings sync
 
 </VersionDescription>
     <DevelopmentStatus>Stable</DevelopmentStatus>

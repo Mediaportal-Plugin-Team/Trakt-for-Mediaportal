@@ -1,21 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Runtime.Serialization;
 
 namespace TraktAPI.DataStructures
 {
-    [DataContract]
-    public class TraktMovieWatched
-    {
-        [DataMember(Name = "plays")]
-        public int Plays { get; set; }
+  public class TraktMoviesWatched : TraktPagination
+  {
+    public IEnumerable<TraktMovieWatchedItem> Items { get; set; }
+  }
 
-        [DataMember(Name = "last_watched_at")]
-        public string LastWatchedAt { get; set; }
+  [DataContract]
+  public class TraktMovieWatchedItem
+  {
+    [DataMember( Name = "plays" )]
+    public int Plays { get; set; }
 
-        [DataMember(Name = "movie")]
-        public TraktMovie Movie { get; set; }
-    }
+    [DataMember( Name = "last_watched_at" )]
+    public string LastWatchedAt { get; set; }
+
+    [DataMember( Name = "movie" )]
+    public TraktMovie Movie { get; set; }
+  }
 }

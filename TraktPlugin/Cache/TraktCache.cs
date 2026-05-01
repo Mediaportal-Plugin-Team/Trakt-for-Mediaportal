@@ -189,7 +189,7 @@ namespace TraktPlugin
         /// <summary>
         /// Get the users watched movies from Trakt
         /// </summary>
-        public static IEnumerable<TraktMovieWatched> GetWatchedMoviesFromTrakt(bool ignoreLastSyncTime = false)
+        public static IEnumerable<TraktMovieWatchedItem> GetWatchedMoviesFromTrakt(bool ignoreLastSyncTime = false)
         {
             // get from cache regardless of last sync time
             if (ignoreLastSyncTime)
@@ -216,25 +216,34 @@ namespace TraktPlugin
             TraktLogger.Info("Movie watched history cache is out of date, requesting updated data. Local Date = '{0}', Online Date = '{1}'", TraktSettings.LastSyncActivities.Movies.Watched ?? "<empty>", lastSyncActivities.Movies.Watched ?? "<empty>");
 
             // we get from online, local cache is not up to date
-            var onlineItems = TraktAPI.TraktAPI.GetWatchedMovies();
-            if (onlineItems == null)
-                return null;
+            var onlineItems = TraktAPI.TraktAPI.GetWatchedMovies( page: 1, maxItems: 250 );
+            if ( onlineItems == null || onlineItems.Items == null )
+              return null;
 
-            _WatchedMovies = onlineItems;
+            _WatchedMovies = onlineItems.Items;
+
+            for ( int page = 2; page <= onlineItems.TotalPages; page++ )
+            {
+              onlineItems = TraktAPI.TraktAPI.GetWatchedMovies( page: page, maxItems: 250 );
+              if ( onlineItems == null || onlineItems.Items == null )
+                break;
+
+              _WatchedMovies = _WatchedMovies.Concat( onlineItems.Items );
+            }
 
             // save to local file cache
-            SaveFileCache(MoviesWatchedFile, _WatchedMovies.ToJSON());
+            SaveFileCache( MoviesWatchedFile, _WatchedMovies.ToList().ToJSON() );
 
             // save new activity time for next time
             TraktSettings.LastSyncActivities.Movies.Watched = lastSyncActivities.Movies.Watched;
-            
-            return onlineItems;
+
+            return _WatchedMovies;
         }
 
         /// <summary>
         /// returns the cached users watched movies on trakt.tv
         /// </summary>
-        static IEnumerable<TraktMovieWatched> WatchedMovies
+        static IEnumerable<TraktMovieWatchedItem> WatchedMovies
         {
             get
             {
@@ -242,12 +251,12 @@ namespace TraktPlugin
                 {
                     var persistedItems = LoadFileCache(MoviesWatchedFile, null);
                     if (persistedItems != null)
-                        _WatchedMovies = persistedItems.FromJSONArray<TraktMovieWatched>();
+                        _WatchedMovies = persistedItems.FromJSONArray<TraktMovieWatchedItem>();
                 }
                 return _WatchedMovies;
             }
         }
-        static IEnumerable<TraktMovieWatched> _WatchedMovies = null;
+        static IEnumerable<TraktMovieWatchedItem> _WatchedMovies = null;
 
         /// <summary>
         /// Get the users collected movies from Trakt
@@ -327,7 +336,7 @@ namespace TraktPlugin
         /// <summary>
         /// Get the users rated movies from Trakt
         /// </summary>
-        public static IEnumerable<TraktMovieRated> GetRatedMoviesFromTrakt(bool ignoreLastSyncTime = false)
+        public static IEnumerable<TraktMovieRatedItem> GetRatedMoviesFromTrakt(bool ignoreLastSyncTime = false)
         {
             // get from cache regardless of last sync time
             if (ignoreLastSyncTime)
@@ -354,25 +363,34 @@ namespace TraktPlugin
             TraktLogger.Info("Movie ratings cache is out of date, requesting updated data. Local Date = '{0}', Online Date = '{1}'", TraktSettings.LastSyncActivities.Movies.Rating ?? "<empty>", lastSyncActivities.Movies.Rating ?? "<empty>");
 
             // we get from online, local cache is not up to date
-            var onlineItems = TraktAPI.TraktAPI.GetRatedMovies();
-            if (onlineItems == null)
+            var onlineItems = TraktAPI.TraktAPI.GetRatedMovies(page: 1, maxItems: 500);
+            if (onlineItems == null || onlineItems.Items == null)
                 return null;
 
-            _RatedMovies = onlineItems;
+            _RatedMovies = onlineItems.Items;
+
+            for (int page = 2; page <= onlineItems.TotalPages; page++)
+            {
+                onlineItems = TraktAPI.TraktAPI.GetRatedMovies(page, maxItems: 500);
+                if (onlineItems == null || onlineItems.Items == null)
+                    break;
+
+                _RatedMovies = _RatedMovies.Concat(onlineItems.Items);
+            }
 
             // save to local file cache
-            SaveFileCache(MoviesRatedFile, _RatedMovies.ToJSON());
+            SaveFileCache(MoviesRatedFile, _RatedMovies.ToList().ToJSON());
 
             // save new activity time for next time
             TraktSettings.LastSyncActivities.Movies.Rating = lastSyncActivities.Movies.Rating;
             
-            return onlineItems;
+            return _RatedMovies;
         }
 
         /// <summary>
         /// returns the cached users rated movies on trakt.tv
         /// </summary>
-        static IEnumerable<TraktMovieRated> RatedMovies
+        static IEnumerable<TraktMovieRatedItem> RatedMovies
         {
             get
             {
@@ -380,12 +398,12 @@ namespace TraktPlugin
                 {
                     var persistedItems = LoadFileCache(MoviesRatedFile, null);
                     if (persistedItems != null)
-                        _RatedMovies = persistedItems.FromJSONArray<TraktMovieRated>();
+                        _RatedMovies = persistedItems.FromJSONArray<TraktMovieRatedItem>();
                 }
                 return _RatedMovies;
             }
         }
-        static IEnumerable<TraktMovieRated> _RatedMovies = null;
+        static IEnumerable<TraktMovieRatedItem> _RatedMovies = null;
 
         /// <summary>
         /// Get the users hidden movies from Trakt (calendar and recommendations)
@@ -616,14 +634,23 @@ namespace TraktPlugin
             TraktLogger.Info("TV episode watched history cache is out of date, requesting updated data. Local Date = '{0}', Online Date = '{1}'", TraktSettings.LastSyncActivities.Episodes.Watched ?? "<empty>", lastSyncActivities.Episodes.Watched ?? "<empty>");
 
             // we get from online, local cache is not up to date
-            var onlineItems = TraktAPI.TraktAPI.GetWatchedEpisodes();
-            if (onlineItems == null)
+            TraktEpisodesWatched onlineItems = TraktAPI.TraktAPI.GetWatchedEpisodes(page: 1, maxItems: 250);
+            if (onlineItems == null || onlineItems.Items == null)
                 return null;
             
+            for (int page = 2; page <= onlineItems.TotalPages; page++)
+            {
+                TraktEpisodesWatched nextOnlineItems = TraktAPI.TraktAPI.GetWatchedEpisodes(page: page, maxItems: 250);
+                if (nextOnlineItems == null || nextOnlineItems.Items == null)
+                    break;
+
+                onlineItems.Items = onlineItems.Items.Concat(nextOnlineItems.Items);
+            }
+
             // convert trakt structure to more flat heirarchy (more managable)
             TraktLogger.Debug("Converting list of watched episodes from trakt to internal data structure");
             var episodesWatched = new List<EpisodeWatched>();
-            foreach (var show in onlineItems)
+            foreach (var show in onlineItems.Items)
             {
                 foreach(var season in show.Seasons)
                 {
@@ -735,7 +762,7 @@ namespace TraktPlugin
         /// <summary>
         /// Get the users rated episodes from Trakt
         /// </summary>
-        public static IEnumerable<TraktEpisodeRated> GetRatedEpisodesFromTrakt(bool ignoreLastSyncTime = false)
+        public static IEnumerable<TraktEpisodeRatedItem> GetRatedEpisodesFromTrakt(bool ignoreLastSyncTime = false)
         {
             // get from cache regardless of last sync time
             if (ignoreLastSyncTime)
@@ -762,25 +789,34 @@ namespace TraktPlugin
             TraktLogger.Info("TV episode ratings cache is out of date, requesting updated data. Local Date = '{0}', Online Date = '{1}'", TraktSettings.LastSyncActivities.Episodes.Rating ?? "<empty>", lastSyncActivities.Episodes.Rating ?? "<empty>");
 
             // we get from online, local cache is not up to date
-            var onlineItems = TraktAPI.TraktAPI.GetRatedEpisodes();
-            if (onlineItems != null)
+            var onlineItems = TraktAPI.TraktAPI.GetRatedEpisodes(page: 1, maxItems: 1000);
+            if (onlineItems == null || onlineItems.Items == null)
+                return null;
+
+            _RatedEpisodes = onlineItems.Items;
+
+            for (int page = 2; page <= onlineItems.TotalPages; page++)
             {
-                _RatedEpisodes = onlineItems;
+                onlineItems = TraktAPI.TraktAPI.GetRatedEpisodes(page, maxItems: 1000);
+                if (onlineItems == null || onlineItems.Items == null)
+                    break;
 
-                // save to local file cache
-                SaveFileCache(EpisodesRatedFile, _RatedEpisodes.ToJSON());
-
-                // save new activity time for next time
-                TraktSettings.LastSyncActivities.Episodes.Rating = lastSyncActivities.Episodes.Rating;
+                _RatedEpisodes = _RatedEpisodes.Concat(onlineItems.Items);
             }
 
-            return onlineItems;
+            // save to local file cache
+            SaveFileCache(EpisodesRatedFile, _RatedEpisodes.ToList().ToJSON());
+
+            // save new activity time for next time
+            TraktSettings.LastSyncActivities.Episodes.Rating = lastSyncActivities.Episodes.Rating;
+           
+            return _RatedEpisodes;
         }
 
         /// <summary>
         /// returns the cached users rated episodes on trakt.tv
         /// </summary>
-        static IEnumerable<TraktEpisodeRated> RatedEpisodes
+        static IEnumerable<TraktEpisodeRatedItem> RatedEpisodes
         {
             get
             {
@@ -788,12 +824,12 @@ namespace TraktPlugin
                 {
                     var persistedItems = LoadFileCache(EpisodesRatedFile, null);
                     if (persistedItems != null)
-                        _RatedEpisodes = persistedItems.FromJSONArray<TraktEpisodeRated>();
+                        _RatedEpisodes = persistedItems.FromJSONArray<TraktEpisodeRatedItem>();
                 }
                 return _RatedEpisodes;
             }
         }
-        static IEnumerable<TraktEpisodeRated> _RatedEpisodes = null;
+        static IEnumerable<TraktEpisodeRatedItem> _RatedEpisodes = null;
 
         #endregion
 
@@ -802,7 +838,7 @@ namespace TraktPlugin
         /// <summary>
         /// Get the users rated seasons from Trakt
         /// </summary>
-        public static IEnumerable<TraktSeasonRated> GetRatedSeasonsFromTrakt(bool ignoreLastSyncTime = false)
+        public static IEnumerable<TraktSeasonRatedItem> GetRatedSeasonsFromTrakt(bool ignoreLastSyncTime = false)
         {
             // get from cache regardless of last sync time
             if (ignoreLastSyncTime)
@@ -829,25 +865,34 @@ namespace TraktPlugin
             TraktLogger.Info("TV season ratings cache is out of date, requesting updated data. Local Date = '{0}', Online Date = '{1}'", TraktSettings.LastSyncActivities.Seasons.Rating ?? "<empty>", lastSyncActivities.Seasons.Rating ?? "<empty>");
 
             // we get from online, local cache is not up to date
-            var onlineItems = TraktAPI.TraktAPI.GetRatedSeasons();
-            if (onlineItems != null)
+            var onlineItems = TraktAPI.TraktAPI.GetRatedSeasons(page: 1, maxItems: 250);
+            if (onlineItems == null || onlineItems.Items == null)
+                return null;
+
+            _RatedSeasons = onlineItems.Items;
+
+            for (int page = 2; page <= onlineItems.TotalPages; page++)
             {
-                _RatedSeasons = onlineItems;
+                onlineItems = TraktAPI.TraktAPI.GetRatedSeasons(page, maxItems: 250);
+                if (onlineItems == null || onlineItems.Items == null)
+                    break;
 
-                // save to local file cache
-                SaveFileCache(SeasonsRatedFile, _RatedSeasons.ToJSON());
-
-                // save new activity time for next time
-                TraktSettings.LastSyncActivities.Seasons.Rating = lastSyncActivities.Seasons.Rating;
+                _RatedSeasons = _RatedSeasons.Concat(onlineItems.Items);
             }
 
-            return onlineItems;
+            // save to local file cache
+            SaveFileCache(SeasonsRatedFile, _RatedSeasons.ToList().ToJSON());
+
+            // save new activity time for next time
+            TraktSettings.LastSyncActivities.Seasons.Rating = lastSyncActivities.Seasons.Rating;
+
+            return _RatedSeasons;
         }
 
         /// <summary>
         /// returns the cached users rated seasons on trakt.tv
         /// </summary>
-        static IEnumerable<TraktSeasonRated> RatedSeasons
+        static IEnumerable<TraktSeasonRatedItem> RatedSeasons
         {
             get
             {
@@ -855,12 +900,12 @@ namespace TraktPlugin
                 {
                     var persistedItems = LoadFileCache(SeasonsRatedFile, null);
                     if (persistedItems != null)
-                        _RatedSeasons = persistedItems.FromJSONArray<TraktSeasonRated>();
+                        _RatedSeasons = persistedItems.FromJSONArray<TraktSeasonRatedItem>();
                 }
                 return _RatedSeasons;
             }
         }
-        static IEnumerable<TraktSeasonRated> _RatedSeasons = null;
+        static IEnumerable<TraktSeasonRatedItem> _RatedSeasons = null;
 
         /// <summary>
         /// Get the users hidden seasons from Trakt (calendar, recommendations, watched progress and collected progress)
@@ -962,7 +1007,7 @@ namespace TraktPlugin
         /// <summary>
         /// Get the users rated shows from Trakt
         /// </summary>
-        public static IEnumerable<TraktShowRated> GetRatedShowsFromTrakt(bool ignoreLastSyncTime = false)
+        public static IEnumerable<TraktShowRatedItem> GetRatedShowsFromTrakt(bool ignoreLastSyncTime = false)
         {
             // get from cache regardless of last sync time
             if (ignoreLastSyncTime)
@@ -989,25 +1034,34 @@ namespace TraktPlugin
             TraktLogger.Info("TV show ratings cache is out of date, requesting updated data. Local Date = '{0}', Online Date = '{1}'", TraktSettings.LastSyncActivities.Shows.Rating ?? "<empty>", lastSyncActivities.Shows.Rating ?? "<empty>");
 
             // we get from online, local cache is not up to date
-            var onlineItems = TraktAPI.TraktAPI.GetRatedShows();
-            if (onlineItems != null)
+            var onlineItems = TraktAPI.TraktAPI.GetRatedShows(page: 1, maxItems: 250);
+            if (onlineItems == null || onlineItems.Items == null)
+                return null;
+
+            _RatedShows = onlineItems.Items;
+
+            for (int page = 2; page <= onlineItems.TotalPages; page++)
             {
-                _RatedShows = onlineItems;
-
-                // save to local file cache
-                SaveFileCache(ShowsRatedFile, _RatedShows.ToJSON());
-
-                // save new activity time for next time
-                TraktSettings.LastSyncActivities.Shows.Rating = lastSyncActivities.Shows.Rating;
+                onlineItems = TraktAPI.TraktAPI.GetRatedShows(page, maxItems: 250);
+                if (onlineItems == null || onlineItems.Items == null)
+                    break;
+            
+                _RatedShows = _RatedShows.Concat(onlineItems.Items);
             }
 
-            return onlineItems;
+            // save to local file cache
+            SaveFileCache(ShowsRatedFile, _RatedShows.ToList().ToJSON());
+
+            // save new activity time for next time
+            TraktSettings.LastSyncActivities.Shows.Rating = lastSyncActivities.Shows.Rating;
+      
+            return _RatedShows;
         }
 
         /// <summary>
         /// returns the cached users rated shows on trakt.tv
         /// </summary>
-        static IEnumerable<TraktShowRated> RatedShows
+        static IEnumerable<TraktShowRatedItem> RatedShows
         {
             get
             {
@@ -1015,12 +1069,12 @@ namespace TraktPlugin
                 {
                     var persistedItems = LoadFileCache(ShowsRatedFile, null);
                     if (persistedItems != null)
-                        _RatedShows = persistedItems.FromJSONArray<TraktShowRated>();
+                        _RatedShows = persistedItems.FromJSONArray<TraktShowRatedItem>();
                 }
                 return _RatedShows;
             }
         }
-        static IEnumerable<TraktShowRated> _RatedShows = null;
+        static IEnumerable<TraktShowRatedItem> _RatedShows = null;
 
         /// <summary>
         /// Get the users hidden shows from Trakt (calendar, dropped, recommendations, watched progress and collected progress)
@@ -3372,11 +3426,11 @@ namespace TraktPlugin
 
         internal static void AddMoviesToWatchHistory(List<TraktSyncMovieWatched> movies)
         {
-            var watchedMovies = (_WatchedMovies ?? new List<TraktMovieWatched>()).ToList();
+            var watchedMovies = (_WatchedMovies ?? new List<TraktMovieWatchedItem>()).ToList();
 
             watchedMovies.AddRange(
                 from movie in movies
-                select new TraktMovieWatched
+                select new TraktMovieWatchedItem
                 {
                     LastWatchedAt = movie.WatchedAt ?? DateTime.UtcNow.ToISO8601(),
                     Movie = new TraktMovie
@@ -3393,7 +3447,7 @@ namespace TraktPlugin
 
         internal static void AddMovieToWatchHistory(TraktMovie movie)
         {
-            var watchedMovies = (_WatchedMovies ?? new List<TraktMovieWatched>()).ToList();
+            var watchedMovies = (_WatchedMovies ?? new List<TraktMovieWatchedItem>()).ToList();
 
             var existingWatchedMovie = watchedMovies.FirstOrDefault(m => ((m.Movie.Ids.Trakt == movie.Ids.Trakt) && movie.Ids.Trakt != null) ||
                                                                          ((m.Movie.Ids.Imdb == movie.Ids.Imdb) && movie.Ids.Imdb.ToNullIfEmpty() != null) ||
@@ -3407,7 +3461,7 @@ namespace TraktPlugin
             }
             else
             {
-                watchedMovies.Add(new TraktMovieWatched
+                watchedMovies.Add(new TraktMovieWatchedItem
                 {
                     LastWatchedAt = DateTime.UtcNow.ToISO8601(),
                     Movie = new TraktMovie
@@ -3485,11 +3539,11 @@ namespace TraktPlugin
 
         internal static void AddMoviesToRatings(List<TraktSyncMovieRated> movies)
         {
-            var ratedMovies = (_RatedMovies ?? new List<TraktMovieRated>()).ToList();
+            var ratedMovies = (_RatedMovies ?? new List<TraktMovieRatedItem>()).ToList();
 
             ratedMovies.AddRange(
                 from movie in movies
-                select new TraktMovieRated
+                select new TraktMovieRatedItem
                 {
                     RatedAt = movie.RatedAt ?? DateTime.UtcNow.ToISO8601(),
                     Rating = movie.Rating,
@@ -3506,9 +3560,9 @@ namespace TraktPlugin
 
         internal static void AddMovieToRatings(TraktMovie movie, int rating)
         {
-            var ratedMovies = (_RatedMovies ?? new List<TraktMovieRated>()).ToList();
+            var ratedMovies = (_RatedMovies ?? new List<TraktMovieRatedItem>()).ToList();
 
-            ratedMovies.Add(new TraktMovieRated
+            ratedMovies.Add(new TraktMovieRatedItem
             {
                 RatedAt = DateTime.UtcNow.ToISO8601(),
                 Rating = rating,
@@ -3608,11 +3662,11 @@ namespace TraktPlugin
 
         internal static void AddShowsToRatings(List<TraktSyncShowRated> shows)
         {
-            var ratedShows = (_RatedShows ?? new List<TraktShowRated>()).ToList();
+            var ratedShows = (_RatedShows ?? new List<TraktShowRatedItem>()).ToList();
 
             ratedShows.AddRange(
                 from show in shows
-                select new TraktShowRated
+                select new TraktShowRatedItem
                 {
                     RatedAt = show.RatedAt ?? DateTime.UtcNow.ToISO8601(),
                     Rating = show.Rating,
@@ -3629,9 +3683,9 @@ namespace TraktPlugin
 
         internal static void AddShowToRatings(TraktShow show, int rating)
         {
-            var ratedShows = (_RatedShows ?? new List<TraktShowRated>()).ToList();
+            var ratedShows = (_RatedShows ?? new List<TraktShowRatedItem>()).ToList();
 
-            ratedShows.Add(new TraktShowRated
+            ratedShows.Add(new TraktShowRatedItem
             {
                 RatedAt = DateTime.UtcNow.ToISO8601(),
                 Rating = rating,
@@ -3694,9 +3748,9 @@ namespace TraktPlugin
 
         internal static void AddSeasonToRatings(TraktShow show, TraktSeason season, int rating)
         {
-            var ratedSeasons = (_RatedSeasons ?? new List<TraktSeasonRated>()).ToList();
+            var ratedSeasons = (_RatedSeasons ?? new List<TraktSeasonRatedItem>()).ToList();
 
-            ratedSeasons.Add(new TraktSeasonRated
+            ratedSeasons.Add(new TraktSeasonRatedItem
             {
                 RatedAt = DateTime.UtcNow.ToISO8601(),
                 Rating = rating,
@@ -3872,14 +3926,14 @@ namespace TraktPlugin
 
         internal static void AddEpisodesToRatings(TraktSyncShowRatedEx show)
         {
-            var ratedEpisodes = (_RatedEpisodes ?? new List<TraktEpisodeRated>()).ToList();
-            var episodesToAdd = new List<TraktEpisodeRated>();
+            var ratedEpisodes = (_RatedEpisodes ?? new List<TraktEpisodeRatedItem>()).ToList();
+            var episodesToAdd = new List<TraktEpisodeRatedItem>();
 
             foreach (var season in show.Seasons)
             {
                 foreach (var episode in season.Episodes)
                 {
-                    episodesToAdd.Add(new TraktEpisodeRated
+                    episodesToAdd.Add(new TraktEpisodeRatedItem
                     {
                         RatedAt = episode.RatedAt ?? DateTime.UtcNow.ToISO8601(),
                         Rating = episode.Rating,
@@ -3906,9 +3960,9 @@ namespace TraktPlugin
 
         internal static void AddEpisodeToRatings(TraktShow show, TraktEpisode episode, int rating)
         {
-            var ratedEpisodes = (_RatedEpisodes ?? new List<TraktEpisodeRated>()).ToList();
+            var ratedEpisodes = (_RatedEpisodes ?? new List<TraktEpisodeRatedItem>()).ToList();
 
-            ratedEpisodes.Add(new TraktEpisodeRated
+            ratedEpisodes.Add(new TraktEpisodeRatedItem
             {
                 RatedAt = DateTime.UtcNow.ToISO8601(),
                 Rating = rating,

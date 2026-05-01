@@ -1,24 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Runtime.Serialization;
 
 namespace TraktAPI.DataStructures
 {
-    [DataContract]
-    public class TraktEpisodeRated
-    {
-        [DataMember(Name = "rating")]
-        public int Rating { get; set; }
+  public class TraktEpisodesRated : TraktPagination
+  {
+    public IEnumerable<TraktEpisodeRatedItem> Items { get; set; }
+  }
 
-        [DataMember(Name = "rated_at")]
-        public string RatedAt { get; set; }
+  [DataContract]
+  public class TraktEpisodeRatedItem
+  {
+    [DataMember( Name = "rating" )]
+    public int Rating { get; set; }
 
-        [DataMember(Name = "episode")]
-        public TraktEpisode Episode { get; set; }
+    [DataMember( Name = "rated_at" )]
+    public string RatedAt { get; set; }
 
-        [DataMember(Name = "show")]
-        public TraktShow Show { get; set; }
-    }
+    [DataMember( Name = "episode" )]
+    public TraktEpisode Episode { get; set; }
+
+    [DataMember( Name = "show" )]
+    public TraktShow Show { get; set; }
+  }
 }

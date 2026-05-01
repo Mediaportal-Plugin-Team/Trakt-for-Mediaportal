@@ -78,7 +78,7 @@ namespace TraktPlugin.TraktHandlers
             #region Get online data from cache
 
             #region Get unwatched / watched movies from trakt.tv
-            IEnumerable<TraktMovieWatched> traktWatchedMovies = null;
+            IEnumerable<TraktMovieWatchedItem> traktWatchedMovies = null;
 
             var traktUnWatchedMovies = TraktCache.GetUnWatchedMoviesFromTrakt();
             if (traktUnWatchedMovies == null)
