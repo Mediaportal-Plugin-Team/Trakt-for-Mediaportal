@@ -18,13 +18,13 @@ namespace TraktAPI
         public const string SyncPausedEpisodes = "https://api.trakt.tv/sync/playback/episodes";
         public const string SyncCollectionMovies = "https://api.trakt.tv/sync/collection/movies?page={0}&limit={1}";
         public const string SyncWatchedMovies = "https://api.trakt.tv/sync/watched/movies?page={0}&limit={1}";
-        public const string SyncRatedMovies = "https://api.trakt.tv/sync/ratings/movies";
+        public const string SyncRatedMovies = "https://api.trakt.tv/sync/ratings/movies?page={0}&limit={1}";
 
         public const string SyncCollectionEpisodes = "https://api.trakt.tv/sync/collection/shows?page={0}&limit={1}";
         public const string SyncWatchedEpisodes = "https://api.trakt.tv/sync/watched/shows?page={0}&limit={1}";
-        public const string SyncRatedEpisodes = "https://api.trakt.tv/sync/ratings/episodes";
-        public const string SyncRatedSeasons = "https://api.trakt.tv/sync/ratings/seasons";
-        public const string SyncRatedShows = "https://api.trakt.tv/sync/ratings/shows";
+        public const string SyncRatedEpisodes = "https://api.trakt.tv/sync/ratings/episodes?page={0}&limit={1}";
+        public const string SyncRatedSeasons = "https://api.trakt.tv/sync/ratings/seasons?page={0}&limit={1}";
+        public const string SyncRatedShows = "https://api.trakt.tv/sync/ratings/shows?page={0}&limit={1}";
 
         public const string SyncCollectionAdd = "https://api.trakt.tv/sync/collection";
         public const string SyncCollectionRemove = "https://api.trakt.tv/sync/collection/remove";

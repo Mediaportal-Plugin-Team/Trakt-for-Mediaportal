@@ -1429,7 +1429,7 @@ namespace TraktPlugin.TraktHandlers
         /// Returns a list of episodes for ratings sync (uses episode ids)
         /// This may not be ideal as it depends on trakt knowing the episode tvdb ids since there is no show data to fallback on.
         /// </summary>        
-        private List<TraktSyncEpisodeRated> GetRatedEpisodesForSync(List<DBEpisode> localRatedEpisodes, List<TraktEpisodeRated> traktRatedEpisodes)
+        private List<TraktSyncEpisodeRated> GetRatedEpisodesForSync(List<DBEpisode> localRatedEpisodes, List<TraktEpisodeRatedItem> traktRatedEpisodes)
         {
             TraktLogger.Info("Finding local episodes to add to trakt.tv ratings");
 
@@ -1456,7 +1456,7 @@ namespace TraktPlugin.TraktHandlers
         /// <summary>
         /// Returns a list of shows for rating sync as show objects with season / episode hierarchy
         /// </summary>
-        private TraktSyncShowsRatedEx GetRatedEpisodesForSyncEx(List<DBEpisode> localRatedEpisodes, List<TraktEpisodeRated> traktEpisodesRated)
+        private TraktSyncShowsRatedEx GetRatedEpisodesForSyncEx(List<DBEpisode> localRatedEpisodes, List<TraktEpisodeRatedItem> traktEpisodesRated)
         {
             TraktLogger.Info("Finding local episodes to add to trakt.tv ratings");
 
@@ -1865,7 +1865,7 @@ namespace TraktPlugin.TraktHandlers
 
         #region Helpers
 
-        private string CreateLookupKey(TraktEpisodeRated item)
+        private string CreateLookupKey(TraktEpisodeRatedItem item)
         {
             string show = null;
 
