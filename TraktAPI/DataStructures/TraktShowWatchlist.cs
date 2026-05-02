@@ -16,5 +16,8 @@ namespace TraktAPI.DataStructures
 
     [DataMember( Name = "show" )]
     public TraktShowSummary Show { get; set; }
+
+    [DataMember( Name = "notes" )]
+    public string Notes { get; set; }
   }
 }

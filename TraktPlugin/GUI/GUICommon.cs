@@ -600,7 +600,6 @@ namespace TraktPlugin.GUI
                     Trakt = show.Ids.Trakt,
                     Imdb = show.Ids.Imdb.ToNullIfEmpty(),
                     Tmdb = show.Ids.Tmdb,
-                    TvRage = show.Ids.TvRage,
                     Tvdb = show.Ids.Tvdb
                 },
                 Title = show.Title,
@@ -835,7 +834,6 @@ namespace TraktPlugin.GUI
                         Imdb = objShow.Ids.Imdb.ToNullIfEmpty(),
                         Tmdb = objShow.Ids.Tmdb,
                         Tvdb = objShow.Ids.Tvdb,
-                        TvRage = objShow.Ids.TvRage
                     },
                     Title = show.Title,
                     Year = show.Year
@@ -875,7 +873,6 @@ namespace TraktPlugin.GUI
                         Imdb = objShow.Ids.Imdb.ToNullIfEmpty(),
                         Tmdb = objShow.Ids.Tmdb,
                         Tvdb = objShow.Ids.Tvdb,
-                        TvRage = objShow.Ids.TvRage
                     },
                     Title = show.Title,
                     Year = show.Year,
@@ -922,7 +919,6 @@ namespace TraktPlugin.GUI
                         Imdb = objShow.Ids.Imdb.ToNullIfEmpty(),
                         Tmdb = objShow.Ids.Tmdb,
                         Tvdb = objShow.Ids.Tvdb,
-                        TvRage = objShow.Ids.TvRage
                     },
                     Title = show.Title,
                     Year = show.Year
@@ -962,7 +958,6 @@ namespace TraktPlugin.GUI
                         Imdb = objShow.Ids.Imdb.ToNullIfEmpty(),
                         Tmdb = objShow.Ids.Tmdb,
                         Tvdb = objShow.Ids.Tvdb,
-                        TvRage = objShow.Ids.TvRage
                     },
                     Title = show.Title,
                     Year = show.Year,
@@ -1450,7 +1445,6 @@ namespace TraktPlugin.GUI
         {
             GUIUtils.SetProperty("#Trakt.Season.TmdbId", string.Empty);
             GUIUtils.SetProperty("#Trakt.Season.TvdbId", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Season.TvRageId", string.Empty);
             GUIUtils.SetProperty("#Trakt.Season.Number", string.Empty);
             GUIUtils.SetProperty("#Trakt.Season.Overview", string.Empty);
             GUIUtils.SetProperty("#Trakt.Season.Title", string.Empty);
@@ -1476,7 +1470,6 @@ namespace TraktPlugin.GUI
         {
             SetProperty("#Trakt.Season.TmdbId", season.Ids.Tmdb);
             SetProperty("#Trakt.Season.TvdbId", season.Ids.Tvdb);
-            SetProperty("#Trakt.Season.TvRageId", season.Ids.TvRage);
             SetProperty("#Trakt.Season.Number", season.Number);            
             SetProperty("#Trakt.Season.Url", string.Format("http://trakt.tv/shows/{0}/seasons/{1}", show.Ids.Slug, season.Number));
             //SetProperty("#Trakt.Season.PosterImageFilename", season.Images == null ? string.Empty : season.Images.Poster.LocalImageFilename(ArtworkType.SeasonPoster));
@@ -1504,7 +1497,6 @@ namespace TraktPlugin.GUI
             GUIUtils.SetProperty("#Trakt.Show.ImdbId", string.Empty);
             GUIUtils.SetProperty("#Trakt.Show.TvdbId", string.Empty);
             GUIUtils.SetProperty("#Trakt.Show.TmdbId", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Show.TvRageId", string.Empty);
             GUIUtils.SetProperty("#Trakt.Show.Title", string.Empty);
             GUIUtils.SetProperty("#Trakt.Show.Language", string.Empty);
             GUIUtils.SetProperty("#Trakt.Show.Url", string.Empty);
@@ -1548,7 +1540,6 @@ namespace TraktPlugin.GUI
             SetProperty("#Trakt.Show.ImdbId", show.Ids.Imdb);
             SetProperty("#Trakt.Show.TvdbId", show.Ids.Tvdb);
             SetProperty("#Trakt.Show.TmdbId", show.Ids.Tmdb);
-            SetProperty("#Trakt.Show.TvRageId", show.Ids.TvRage);
             SetProperty("#Trakt.Show.Title", show.Title.RemapHighOrderChars());
             SetProperty("#Trakt.Show.Language", Translation.GetLanguageFromISOCode(show.Language));
             SetProperty("#Trakt.Show.Url", string.Format("http://trakt.tv/shows/{0}", show.Ids.Slug));
@@ -2336,7 +2327,6 @@ namespace TraktPlugin.GUI
                 MediaType = MediaItemType.Show,
                 IMDb = show.Ids.Imdb.ToNullIfEmpty(),
                 TVDb = show.Ids.Tvdb.ToString(),
-                TVRage = show.Ids.TvRage.ToString(),
                 TMDb = show.Ids.Tmdb.ToString(),
                 Plot = show.Overview,
                 Poster = TmdbCache.GetShowPosterFilename(showImages),
@@ -2397,7 +2387,6 @@ namespace TraktPlugin.GUI
                 IMDb = show.Ids.Imdb.ToNullIfEmpty(),
                 TMDb = show.Ids.Tmdb.ToString(),
                 TVDb = show.Ids.Tvdb.ToString(),
-                TVRage = show.Ids.TvRage.ToString(),
                 Plot = show.Overview,
                 Poster = TmdbCache.GetShowPosterFilename(showImages),
                 Title = show.Title,
@@ -2419,7 +2408,6 @@ namespace TraktPlugin.GUI
                 IMDb = show.Ids.Imdb.ToNullIfEmpty(),
                 TMDb = show.Ids.Tmdb.ToString(),
                 TVDb = show.Ids.Tvdb.ToString(),
-                TVRage = show.Ids.TvRage.ToString(),
                 Plot = show.Overview,
                 Poster = TmdbCache.GetShowPosterFilename(showImages),
                 Title = show.Title,
