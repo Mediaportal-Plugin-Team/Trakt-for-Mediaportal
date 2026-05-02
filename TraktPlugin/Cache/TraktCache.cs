@@ -306,6 +306,9 @@ namespace TraktPlugin
               _CollectedMovies = _CollectedMovies.Concat( onlineItems.Items );
             }
 
+            // cleanse any bad entries (WTF trakt.tv?)
+            _CollectedMovies = _CollectedMovies.Where(cm => cm?.Movie?.Ids?.Trakt > 0);
+
             // save to local file cache
             SaveFileCache( MoviesCollectedFile, _CollectedMovies.ToList().ToJSON() );
 
