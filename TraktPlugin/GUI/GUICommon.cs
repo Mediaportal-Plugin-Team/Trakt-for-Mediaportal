@@ -754,7 +754,6 @@ namespace TraktPlugin.GUI
                     Imdb = episode.Ids.Imdb.ToNullIfEmpty(),
                     Tmdb = episode.Ids.Tmdb,
                     Tvdb = episode.Ids.Tvdb,
-                    TvRage = episode.Ids.TvRage
                 },
                 Title = episode.Title,
                 Season = episode.Season,
