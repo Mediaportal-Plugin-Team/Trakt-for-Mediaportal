@@ -366,7 +366,7 @@ namespace TraktPlugin
             TraktLogger.Info("Movie ratings cache is out of date, requesting updated data. Local Date = '{0}', Online Date = '{1}'", TraktSettings.LastSyncActivities.Movies.Rating ?? "<empty>", lastSyncActivities.Movies.Rating ?? "<empty>");
 
             // we get from online, local cache is not up to date
-            var onlineItems = TraktAPI.TraktAPI.GetRatedMovies(page: 1, maxItems: 500);
+            var onlineItems = TraktAPI.TraktAPI.GetRatedMovies(page: 1, maxItems: 250);
             if (onlineItems == null || onlineItems.Items == null)
                 return null;
 
@@ -374,7 +374,7 @@ namespace TraktPlugin
 
             for (int page = 2; page <= onlineItems.TotalPages; page++)
             {
-                onlineItems = TraktAPI.TraktAPI.GetRatedMovies(page, maxItems: 500);
+                onlineItems = TraktAPI.TraktAPI.GetRatedMovies(page, maxItems: 250);
                 if (onlineItems == null || onlineItems.Items == null)
                     break;
 
@@ -792,7 +792,7 @@ namespace TraktPlugin
             TraktLogger.Info("TV episode ratings cache is out of date, requesting updated data. Local Date = '{0}', Online Date = '{1}'", TraktSettings.LastSyncActivities.Episodes.Rating ?? "<empty>", lastSyncActivities.Episodes.Rating ?? "<empty>");
 
             // we get from online, local cache is not up to date
-            var onlineItems = TraktAPI.TraktAPI.GetRatedEpisodes(page: 1, maxItems: 1000);
+            var onlineItems = TraktAPI.TraktAPI.GetRatedEpisodes(page: 1, maxItems: 250);
             if (onlineItems == null || onlineItems.Items == null)
                 return null;
 
@@ -800,7 +800,7 @@ namespace TraktPlugin
 
             for (int page = 2; page <= onlineItems.TotalPages; page++)
             {
-                onlineItems = TraktAPI.TraktAPI.GetRatedEpisodes(page, maxItems: 1000);
+                onlineItems = TraktAPI.TraktAPI.GetRatedEpisodes(page, maxItems: 250);
                 if (onlineItems == null || onlineItems.Items == null)
                     break;
 
