@@ -17,6 +17,9 @@ namespace TraktAPI.DataStructures
         [DataMember(Name = "listed_at")]
         public string ListedAt { get; set; }
 
+        [DataMember( Name = "notes" )]
+        public string Notes { get; set; }
+
         [DataMember(Name = "type")]
         public string Type { get; set; }
 
