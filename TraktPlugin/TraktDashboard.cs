@@ -812,7 +812,6 @@ namespace TraktPlugin
                 GUICommon.SetProperty(string.Format("#Trakt.Show.{0}.ImdbId", i), trendingItem.Show.Ids.Imdb);
                 GUICommon.SetProperty(string.Format("#Trakt.Show.{0}.TmdbId", i), trendingItem.Show.Ids.Tmdb);
                 GUICommon.SetProperty(string.Format("#Trakt.Show.{0}.TvdbId", i), trendingItem.Show.Ids.Tvdb);
-                GUICommon.SetProperty(string.Format("#Trakt.Show.{0}.TvRageId", i), trendingItem.Show.Ids.TvRage);
                 GUICommon.SetProperty(string.Format("#Trakt.Show.{0}.Title", i), trendingItem.Show.Title);
                 GUICommon.SetProperty(string.Format("#Trakt.Show.{0}.Url", i), string.Format("http://trakt.tv/shows/{0}", trendingItem.Show.Ids.Slug));
                 GUICommon.SetProperty(string.Format("#Trakt.Show.{0}.AirDay", i), trendingItem.Show.Airs.Day);
@@ -855,7 +854,6 @@ namespace TraktPlugin
                 GUIUtils.SetProperty(string.Format("#Trakt.Show.{0}.ImdbId", i), string.Empty);
                 GUIUtils.SetProperty(string.Format("#Trakt.Show.{0}.TvdbId", i), string.Empty);
                 GUIUtils.SetProperty(string.Format("#Trakt.Show.{0}.TmdbId", i), string.Empty);
-                GUIUtils.SetProperty(string.Format("#Trakt.Show.{0}.TvRageId", i), string.Empty);
                 GUIUtils.SetProperty(string.Format("#Trakt.Show.{0}.Title", i), string.Empty);
                 GUIUtils.SetProperty(string.Format("#Trakt.Show.{0}.Url", i), string.Empty);
                 GUIUtils.SetProperty(string.Format("#Trakt.Show.{0}.AirDay", i), string.Empty);

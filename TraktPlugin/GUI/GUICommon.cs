@@ -600,7 +600,6 @@ namespace TraktPlugin.GUI
                     Trakt = show.Ids.Trakt,
                     Imdb = show.Ids.Imdb.ToNullIfEmpty(),
                     Tmdb = show.Ids.Tmdb,
-                    TvRage = show.Ids.TvRage,
                     Tvdb = show.Ids.Tvdb
                 },
                 Title = show.Title,
@@ -755,7 +754,6 @@ namespace TraktPlugin.GUI
                     Imdb = episode.Ids.Imdb.ToNullIfEmpty(),
                     Tmdb = episode.Ids.Tmdb,
                     Tvdb = episode.Ids.Tvdb,
-                    TvRage = episode.Ids.TvRage
                 },
                 Title = episode.Title,
                 Season = episode.Season,
@@ -835,7 +833,6 @@ namespace TraktPlugin.GUI
                         Imdb = objShow.Ids.Imdb.ToNullIfEmpty(),
                         Tmdb = objShow.Ids.Tmdb,
                         Tvdb = objShow.Ids.Tvdb,
-                        TvRage = objShow.Ids.TvRage
                     },
                     Title = show.Title,
                     Year = show.Year
@@ -875,7 +872,6 @@ namespace TraktPlugin.GUI
                         Imdb = objShow.Ids.Imdb.ToNullIfEmpty(),
                         Tmdb = objShow.Ids.Tmdb,
                         Tvdb = objShow.Ids.Tvdb,
-                        TvRage = objShow.Ids.TvRage
                     },
                     Title = show.Title,
                     Year = show.Year,
@@ -922,7 +918,6 @@ namespace TraktPlugin.GUI
                         Imdb = objShow.Ids.Imdb.ToNullIfEmpty(),
                         Tmdb = objShow.Ids.Tmdb,
                         Tvdb = objShow.Ids.Tvdb,
-                        TvRage = objShow.Ids.TvRage
                     },
                     Title = show.Title,
                     Year = show.Year
@@ -962,7 +957,6 @@ namespace TraktPlugin.GUI
                         Imdb = objShow.Ids.Imdb.ToNullIfEmpty(),
                         Tmdb = objShow.Ids.Tmdb,
                         Tvdb = objShow.Ids.Tvdb,
-                        TvRage = objShow.Ids.TvRage
                     },
                     Title = show.Title,
                     Year = show.Year,
@@ -1388,274 +1382,291 @@ namespace TraktPlugin.GUI
 
         internal static void ClearMovieProperties()
         {
-            GUIUtils.SetProperty("#Trakt.Movie.Id", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Movie.Tmdb", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Movie.Slug", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Movie.Imdb", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Movie.Certification", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Movie.Language", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Movie.Overview", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Movie.Released", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Movie.Runtime", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Movie.Tagline", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Movie.Title", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Movie.Trailer", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Movie.Url", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Movie.Year", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Movie.Genres", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Movie.PosterImageFilename", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Movie.FanartImageFilename", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Movie.InCollection", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Movie.InWatchList", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Movie.Plays", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Movie.Watched", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Movie.Rating", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Movie.Ratings.Icon", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Movie.Ratings.Percentage", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Movie.Ratings.Votes", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Movie.CommentCount", string.Empty);
+          GUIUtils.SetProperty( "#Trakt.Movie.Id", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Movie.Tmdb", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Movie.Slug", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Movie.Imdb", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Movie.Certification", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Movie.Language", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Movie.Overview", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Movie.Released", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Movie.Runtime", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Movie.Tagline", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Movie.Title", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Movie.Trailer", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Movie.Url", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Movie.Year", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Movie.Genres", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Movie.PosterImageFilename", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Movie.FanartImageFilename", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Movie.InCollection", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Movie.InWatchList", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Movie.Plays", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Movie.Watched", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Movie.Rating", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Movie.Ratings.Icon", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Movie.Ratings.Percentage", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Movie.Ratings.Votes", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Movie.CommentCount", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Movie.Country", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Movie.SubGenres", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Movie.AfterCredits", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Movie.DuringCredits", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Movie.OriginalTitle", string.Empty );
         }
 
-        internal static void SetMovieProperties(TraktMovieSummary movie)
+        internal static void SetMovieProperties( TraktMovieSummary movie )
         {
-            if (movie == null) return;
+          if ( movie == null )
+            return;
 
-            SetProperty("#Trakt.Movie.Id", movie.Ids.Trakt);
-            SetProperty("#Trakt.Movie.ImdbId", movie.Ids.Imdb);
-            SetProperty("#Trakt.Movie.TmdbId", movie.Ids.Tmdb);
-            SetProperty("#Trakt.Movie.Slug", movie.Ids.Slug);
-            SetProperty("#Trakt.Movie.Certification", movie.Certification);
-            SetProperty("#Trakt.Movie.Overview", movie.Overview.ToNullIfEmpty() == null ? Translation.NoMovieSummary : movie.Overview.RemapHighOrderChars());
-            SetProperty("#Trakt.Movie.Released", movie.Released);
-            SetProperty("#Trakt.Movie.Language", Translation.GetLanguageFromISOCode(movie.Language));
-            SetProperty("#Trakt.Movie.Runtime", movie.Runtime);
-            SetProperty("#Trakt.Movie.Tagline", movie.Tagline);
-            SetProperty("#Trakt.Movie.Title", movie.Title.RemapHighOrderChars());
-            SetProperty("#Trakt.Movie.Trailer", movie.Trailer);
-            SetProperty("#Trakt.Movie.Url", string.Format("http://trakt.tv/movies/{0}", movie.Ids.Slug));
-            SetProperty("#Trakt.Movie.Year", movie.Year);
-            SetProperty("#Trakt.Movie.Genres", TraktGenres.Translate(movie.Genres));
-            SetProperty("#Trakt.Movie.InCollection", movie.IsCollected());
-            SetProperty("#Trakt.Movie.InWatchList", movie.IsWatchlisted());
-            SetProperty("#Trakt.Movie.Plays", movie.Plays());
-            SetProperty("#Trakt.Movie.Watched", movie.IsWatched());
-            SetProperty("#Trakt.Movie.Rating", movie.UserRating());
-            SetProperty("#Trakt.Movie.Ratings.Percentage", movie.Rating.ToPercentage());
-            SetProperty("#Trakt.Movie.Ratings.Votes", movie.Votes);
-            SetProperty("#Trakt.Movie.Ratings.Icon", (movie.Rating >= 6) ? "love" : "hate");
-            SetProperty("#Trakt.Movie.CommentCount", movie.CommentCount);
+          SetProperty( "#Trakt.Movie.Id", movie.Ids.Trakt );
+          SetProperty( "#Trakt.Movie.ImdbId", movie.Ids.Imdb );
+          SetProperty( "#Trakt.Movie.TmdbId", movie.Ids.Tmdb );
+          SetProperty( "#Trakt.Movie.Slug", movie.Ids.Slug );
+          SetProperty( "#Trakt.Movie.Certification", movie.Certification );
+          SetProperty( "#Trakt.Movie.Overview", movie.Overview.ToNullIfEmpty() == null ? Translation.NoMovieSummary : movie.Overview.RemapHighOrderChars() );
+          SetProperty( "#Trakt.Movie.Released", movie.Released );
+          SetProperty( "#Trakt.Movie.Language", Translation.GetLanguageFromISOCode( movie.Language ) );
+          SetProperty( "#Trakt.Movie.Runtime", movie.Runtime );
+          SetProperty( "#Trakt.Movie.Tagline", movie.Tagline );
+          SetProperty( "#Trakt.Movie.Title", movie.Title.RemapHighOrderChars() );
+          SetProperty( "#Trakt.Movie.Trailer", movie.Trailer );
+          SetProperty( "#Trakt.Movie.Url", string.Format( "http://trakt.tv/movies/{0}", movie.Ids.Slug ) );
+          SetProperty( "#Trakt.Movie.Year", movie.Year );
+          SetProperty( "#Trakt.Movie.Genres", TraktGenres.Translate( movie.Genres ) );
+          SetProperty( "#Trakt.Movie.InCollection", movie.IsCollected() );
+          SetProperty( "#Trakt.Movie.InWatchList", movie.IsWatchlisted() );
+          SetProperty( "#Trakt.Movie.Plays", movie.Plays() );
+          SetProperty( "#Trakt.Movie.Watched", movie.IsWatched() );
+          SetProperty( "#Trakt.Movie.Rating", movie.UserRating() );
+          SetProperty( "#Trakt.Movie.Ratings.Percentage", movie.Rating.ToPercentage() );
+          SetProperty( "#Trakt.Movie.Ratings.Votes", movie.Votes );
+          SetProperty( "#Trakt.Movie.Ratings.Icon", ( movie.Rating >= 6 ) ? "love" : "hate" );
+          SetProperty( "#Trakt.Movie.CommentCount", movie.CommentCount );
+          SetProperty( "#Trakt.Movie.Country", movie.Country );
+          SetProperty( "#Trakt.Movie.SubGenres", movie.SubGenres );
+          SetProperty( "#Trakt.Movie.AfterCredits", movie.AfterCredits );
+          SetProperty( "#Trakt.Movie.DuringCredits", movie.DuringCredits );
+          SetProperty( "#Trakt.Movie.OriginalTitle", movie.OriginalTitle );
         }
 
         internal static void ClearSeasonProperties()
         {
-            GUIUtils.SetProperty("#Trakt.Season.TmdbId", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Season.TvdbId", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Season.TvRageId", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Season.Number", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Season.Overview", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Season.Title", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Season.Network", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Season.FirstAired", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Season.FirstAiredLocalized", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Season.EpisodeCount", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Season.EpisodeAiredCount", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Season.Watched", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Season.InCollection", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Season.InWatchList", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Season.Collected", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Season.Plays", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Season.Rating", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Season.Ratings.Icon", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Season.Ratings.Percentage", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Season.Ratings.Votes", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Season.Url", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Season.PosterImageFilename", string.Empty);
+          GUIUtils.SetProperty( "#Trakt.Season.TmdbId", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Season.TvdbId", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Season.Number", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Season.Overview", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Season.Title", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Season.Network", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Season.FirstAired", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Season.FirstAiredLocalized", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Season.EpisodeCount", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Season.EpisodeAiredCount", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Season.Watched", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Season.InCollection", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Season.InWatchList", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Season.Collected", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Season.Plays", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Season.Rating", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Season.Ratings.Icon", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Season.Ratings.Percentage", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Season.Ratings.Votes", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Season.Url", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Season.PosterImageFilename", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Season.OriginalTitle", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Season.TotalRuntime", string.Empty );
         }
 
-        internal static void SetSeasonProperties(TraktShowSummary show, TraktSeasonSummary season)
+        internal static void SetSeasonProperties( TraktShowSummary show, TraktSeasonSummary season )
         {
-            SetProperty("#Trakt.Season.TmdbId", season.Ids.Tmdb);
-            SetProperty("#Trakt.Season.TvdbId", season.Ids.Tvdb);
-            SetProperty("#Trakt.Season.TvRageId", season.Ids.TvRage);
-            SetProperty("#Trakt.Season.Number", season.Number);            
-            SetProperty("#Trakt.Season.Url", string.Format("http://trakt.tv/shows/{0}/seasons/{1}", show.Ids.Slug, season.Number));
-            //SetProperty("#Trakt.Season.PosterImageFilename", season.Images == null ? string.Empty : season.Images.Poster.LocalImageFilename(ArtworkType.SeasonPoster));
-            SetProperty("#Trakt.Season.EpisodeCount", season.EpisodeCount);
-            SetProperty("#Trakt.Season.EpisodeAiredCount", season.EpisodeAiredCount);
-            SetProperty("#Trakt.Season.Title", season.Title ?? string.Format("{0} {1}", Translation.Season, season.Number));
-            SetProperty("#Trakt.Season.Overview", season.Overview ?? show.Overview);
-            SetProperty("#Trakt.Season.Network", season.Network);
-            SetProperty("#Trakt.Season.FirstAired", season.FirstAired.FromISO8601().ToShortDateString());
-            SetProperty("#Trakt.Season.FirstAiredLocalized", season.FirstAired.FromISO8601().ToLocalTime().ToShortDateString());
-            SetProperty("#Trakt.Season.Watched", season.IsWatched(show));
-            SetProperty("#Trakt.Season.Plays", season.Plays(show));
-            SetProperty("#Trakt.Season.InCollection", season.IsCollected(show));
-            SetProperty("#Trakt.Season.InWatchList", season.IsWatchlisted(show));
-            SetProperty("#Trakt.Season.Collected", season.Collected(show));
-            SetProperty("#Trakt.Season.Rating", season.UserRating(show));
-            SetProperty("#Trakt.Season.Ratings.Percentage", season.Rating.ToPercentage());
-            SetProperty("#Trakt.Season.Ratings.Votes", season.Votes);
-            SetProperty("#Trakt.Season.Ratings.Icon", (season.Rating >= 6) ? "love" : "hate");
+          SetProperty( "#Trakt.Season.TmdbId", season.Ids.Tmdb );
+          SetProperty( "#Trakt.Season.TvdbId", season.Ids.Tvdb );
+          SetProperty( "#Trakt.Season.Number", season.Number );
+          SetProperty( "#Trakt.Season.Url", string.Format( "http://trakt.tv/shows/{0}/seasons/{1}", show.Ids.Slug, season.Number ) );
+          SetProperty( "#Trakt.Season.EpisodeCount", season.EpisodeCount );
+          SetProperty( "#Trakt.Season.EpisodeAiredCount", season.EpisodeAiredCount );
+          SetProperty( "#Trakt.Season.Title", season.Title ?? string.Format( "{0} {1}", Translation.Season, season.Number ) );
+          SetProperty( "#Trakt.Season.Overview", season.Overview ?? show.Overview );
+          SetProperty( "#Trakt.Season.Network", season.Network );
+          SetProperty( "#Trakt.Season.FirstAired", season.FirstAired.FromISO8601().ToShortDateString() );
+          SetProperty( "#Trakt.Season.FirstAiredLocalized", season.FirstAired.FromISO8601().ToLocalTime().ToShortDateString() );
+          SetProperty( "#Trakt.Season.Watched", season.IsWatched( show ) );
+          SetProperty( "#Trakt.Season.Plays", season.Plays( show ) );
+          SetProperty( "#Trakt.Season.InCollection", season.IsCollected( show ) );
+          SetProperty( "#Trakt.Season.InWatchList", season.IsWatchlisted( show ) );
+          SetProperty( "#Trakt.Season.Collected", season.Collected( show ) );
+          SetProperty( "#Trakt.Season.Rating", season.UserRating( show ) );
+          SetProperty( "#Trakt.Season.Ratings.Percentage", season.Rating.ToPercentage() );
+          SetProperty( "#Trakt.Season.Ratings.Votes", season.Votes );
+          SetProperty( "#Trakt.Season.Ratings.Icon", ( season.Rating >= 6 ) ? "love" : "hate" );
+          SetProperty( "#Trakt.Season.OriginalTitle", season.OriginalTitle );
+          SetProperty( "#Trakt.Season.TotalRuntime", season.TotalRuntime );
         }
 
         internal static void ClearShowProperties()
         {
-            GUIUtils.SetProperty("#Trakt.Show.Id", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Show.ImdbId", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Show.TvdbId", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Show.TmdbId", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Show.TvRageId", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Show.Title", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Show.Language", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Show.Url", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Show.AirDay", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Show.AirDayLocalized", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Show.AirTime", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Show.AirTimeLocalized", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Show.AirTimezone", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Show.AirTimezoneWindows", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Show.Certification", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Show.Country", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Show.FirstAired", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Show.FirstAiredLocalized", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Show.Network", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Show.Overview", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Show.Runtime", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Show.Year", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Show.Status", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Show.Genres", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Show.InWatchList", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Show.InCollection", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Show.Collected", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Show.Watched", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Show.AiredEpisodes", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Show.Plays", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Show.Rating", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Show.Ratings.Icon", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Show.Ratings.Percentage", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Show.Ratings.Votes", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Show.FanartImageFilename", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Show.PosterImageFilename", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Show.BannerImageFilename", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Show.CommentCount", string.Empty);
+          GUIUtils.SetProperty( "#Trakt.Show.Id", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Show.ImdbId", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Show.TvdbId", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Show.TmdbId", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Show.Title", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Show.Language", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Show.Url", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Show.AirDay", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Show.AirDayLocalized", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Show.AirTime", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Show.AirTimeLocalized", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Show.AirTimezone", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Show.AirTimezoneWindows", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Show.Certification", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Show.Country", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Show.FirstAired", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Show.FirstAiredLocalized", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Show.Network", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Show.Overview", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Show.Runtime", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Show.Year", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Show.Status", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Show.Genres", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Show.InWatchList", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Show.InCollection", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Show.Collected", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Show.Watched", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Show.AiredEpisodes", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Show.Plays", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Show.Rating", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Show.Ratings.Icon", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Show.Ratings.Percentage", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Show.Ratings.Votes", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Show.FanartImageFilename", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Show.PosterImageFilename", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Show.BannerImageFilename", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Show.CommentCount", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Show.Tagline", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Show.OriginalTitle", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Show.SubGenres", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Show.TotalRuntime", string.Empty );
         }
 
         internal static void SetShowProperties(TraktShowSummary show)
         {
-            if (show == null) return;
+          if ( show == null )
+            return;
 
-            SetProperty("#Trakt.Show.Id", show.Ids.Trakt);
-            SetProperty("#Trakt.Show.ImdbId", show.Ids.Imdb);
-            SetProperty("#Trakt.Show.TvdbId", show.Ids.Tvdb);
-            SetProperty("#Trakt.Show.TmdbId", show.Ids.Tmdb);
-            SetProperty("#Trakt.Show.TvRageId", show.Ids.TvRage);
-            SetProperty("#Trakt.Show.Title", show.Title.RemapHighOrderChars());
-            SetProperty("#Trakt.Show.Language", Translation.GetLanguageFromISOCode(show.Language));
-            SetProperty("#Trakt.Show.Url", string.Format("http://trakt.tv/shows/{0}", show.Ids.Slug));
-            if (show.Airs != null)
-            {
-                SetProperty("#Trakt.Show.AirDay", show.FirstAired.FromISO8601().ToLocalisedDayOfWeek());
-                SetProperty("#Trakt.Show.AirDayLocalized", show.FirstAired.FromISO8601().ToLocalTime().ToLocalisedDayOfWeek());
-                SetProperty("#Trakt.Show.AirTime", show.FirstAired.FromISO8601().ToShortTimeString());
-                SetProperty("#Trakt.Show.AirTimeLocalized", show.FirstAired.FromISO8601().ToLocalTime().ToShortTimeString());
-                SetProperty("#Trakt.Show.AirTimezone", show.Airs.Timezone);
-                SetProperty("#Trakt.Show.AirTimezoneWindows", show.Airs.Timezone.OlsenToWindowsTimezone());
-            }
-            SetProperty("#Trakt.Show.Certification", show.Certification);
-            SetProperty("#Trakt.Show.Country", show.Country.ToCountryName());
-            SetProperty("#Trakt.Show.FirstAired", show.FirstAired.FromISO8601().ToShortDateString());
-            SetProperty("#Trakt.Show.FirstAiredLocalized", show.FirstAired.FromISO8601().ToLocalTime().ToShortDateString());
-            SetProperty("#Trakt.Show.Network", show.Network);
-            SetProperty("#Trakt.Show.Overview", show.Overview.ToNullIfEmpty() == null ? Translation.NoShowSummary : show.Overview.RemapHighOrderChars());
-            SetProperty("#Trakt.Show.Runtime", show.Runtime);
-            SetProperty("#Trakt.Show.Year", show.Year);
-            SetProperty("#Trakt.Show.Status", show.Status);
-            SetProperty("#Trakt.Show.TranslatedStatus", (show.Status ?? "").Replace(" " ,"").Translate());
-            SetProperty("#Trakt.Show.Genres", TraktGenres.Translate(show.Genres));
-            SetProperty("#Trakt.Show.InWatchList", show.IsWatchlisted());
-            SetProperty("#Trakt.Show.InCollection", show.IsCollected());
-            SetProperty("#Trakt.Show.Collected", show.Collected());
-            SetProperty("#Trakt.Show.Watched", show.IsWatched());
-            SetProperty("#Trakt.Show.AiredEpisodes", show.AiredEpisodes);
-            SetProperty("#Trakt.Show.Plays", show.Plays());
-            SetProperty("#Trakt.Show.Rating", show.UserRating());
-            SetProperty("#Trakt.Show.Ratings.Percentage", show.Rating.ToPercentage());
-            SetProperty("#Trakt.Show.Ratings.Votes", show.Votes);
-            SetProperty("#Trakt.Show.Ratings.Icon", (show.Rating > 6) ? "love" : "hate");
-            SetProperty("#Trakt.Show.CommentCount", show.CommentCount);
-            //if (show.Images != null)
-            //{
-            //    SetProperty("#Trakt.Show.FanartImageFilename", show.Images.Fanart.LocalImageFilename(ArtworkType.ShowFanart));
-            //    SetProperty("#Trakt.Show.PosterImageFilename", show.Images.Poster.LocalImageFilename(ArtworkType.ShowPoster));
-            //    SetProperty("#Trakt.Show.BannerImageFilename", show.Images.Banner.LocalImageFilename(ArtworkType.ShowBanner));
-            //}
+          SetProperty( "#Trakt.Show.Id", show.Ids.Trakt );
+          SetProperty( "#Trakt.Show.ImdbId", show.Ids.Imdb );
+          SetProperty( "#Trakt.Show.TvdbId", show.Ids.Tvdb );
+          SetProperty( "#Trakt.Show.TmdbId", show.Ids.Tmdb );
+          SetProperty( "#Trakt.Show.Title", show.Title.RemapHighOrderChars() );
+          SetProperty( "#Trakt.Show.OriginalTitle", show.OriginalTitle );
+          SetProperty( "#Trakt.Show.Language", Translation.GetLanguageFromISOCode( show.Language ) );
+          SetProperty( "#Trakt.Show.Url", string.Format( "http://trakt.tv/shows/{0}", show.Ids.Slug ) );
+          SetProperty( "#Trakt.Show.AirDay", show.FirstAired.FromISO8601().ToLocalisedDayOfWeek() );
+          SetProperty( "#Trakt.Show.AirDayLocalized", show.FirstAired.FromISO8601().ToLocalTime().ToLocalisedDayOfWeek() );
+          SetProperty( "#Trakt.Show.AirTime", show.FirstAired.FromISO8601().ToShortTimeString() );
+          SetProperty( "#Trakt.Show.AirTimeLocalized", show.FirstAired.FromISO8601().ToLocalTime().ToShortTimeString() );
+          SetProperty( "#Trakt.Show.AirTimezone", show.Airs?.Timezone ?? string.Empty );
+          SetProperty( "#Trakt.Show.AirTimezoneWindows", show.Airs?.Timezone.OlsenToWindowsTimezone() ?? string.Empty );
+          SetProperty( "#Trakt.Show.Certification", show.Certification );
+          SetProperty( "#Trakt.Show.Country", show.Country.ToCountryName() );
+          SetProperty( "#Trakt.Show.FirstAired", show.FirstAired.FromISO8601().ToShortDateString() );
+          SetProperty( "#Trakt.Show.FirstAiredLocalized", show.FirstAired.FromISO8601().ToLocalTime().ToShortDateString() );
+          SetProperty( "#Trakt.Show.Network", show.Network );
+          SetProperty( "#Trakt.Show.Overview", show.Overview.ToNullIfEmpty() == null ? Translation.NoShowSummary : show.Overview.RemapHighOrderChars() );
+          SetProperty( "#Trakt.Show.Runtime", show.Runtime );
+          SetProperty( "#Trakt.Show.TotalRuntime", show.TotalRuntime );
+          SetProperty( "#Trakt.Show.Year", show.Year );
+          SetProperty( "#Trakt.Show.Status", show.Status );
+          SetProperty( "#Trakt.Show.TranslatedStatus", ( show.Status ?? "" ).Replace( " ", "" ).Translate() );
+          SetProperty( "#Trakt.Show.Genres", TraktGenres.Translate( show.Genres ) );
+          SetProperty( "#Trakt.Show.SubGenres", show.SubGenres );
+          SetProperty( "#Trakt.Show.InWatchList", show.IsWatchlisted() );
+          SetProperty( "#Trakt.Show.InCollection", show.IsCollected() );
+          SetProperty( "#Trakt.Show.Collected", show.Collected() );
+          SetProperty( "#Trakt.Show.Watched", show.IsWatched() );
+          SetProperty( "#Trakt.Show.AiredEpisodes", show.AiredEpisodes );
+          SetProperty( "#Trakt.Show.Plays", show.Plays() );
+          SetProperty( "#Trakt.Show.Rating", show.UserRating() );
+          SetProperty( "#Trakt.Show.Ratings.Percentage", show.Rating.ToPercentage() );
+          SetProperty( "#Trakt.Show.Ratings.Votes", show.Votes );
+          SetProperty( "#Trakt.Show.Ratings.Icon", ( show.Rating > 6 ) ? "love" : "hate" );
+          SetProperty( "#Trakt.Show.CommentCount", show.CommentCount );
+          SetProperty( "#Trakt.Show.Tagline", show.Tagline );
         }
 
         internal static void ClearEpisodeProperties()
         {
-            GUIUtils.SetProperty("#Trakt.Episode.Id", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Episode.TvdbId", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Episode.ImdbId", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Episode.TmdbId", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Episode.Number", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Episode.Season", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Episode.FirstAired", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Episode.FirstAiredLocalized", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Episode.FirstAiredLocalizedDayOfWeek", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Episode.FirstAiredLocalizedTime", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Episode.Title", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Episode.Url", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Episode.Overview", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Episode.Runtime", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Episode.InWatchList", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Episode.InCollection", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Episode.Plays", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Episode.Watched", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Episode.Rating", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Episode.Ratings.Icon", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Episode.Ratings.HatedCount", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Episode.Ratings.LovedCount", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Episode.Ratings.Percentage", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Episode.Ratings.Votes", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Episode.EpisodeImageFilename", string.Empty);
-            GUIUtils.SetProperty("#Trakt.Episode.CommentCount", string.Empty);
+          GUIUtils.SetProperty( "#Trakt.Episode.Id", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Episode.TvdbId", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Episode.ImdbId", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Episode.TmdbId", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Episode.Number", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Episode.Season", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Episode.FirstAired", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Episode.FirstAiredLocalized", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Episode.FirstAiredLocalizedDayOfWeek", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Episode.FirstAiredLocalizedTime", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Episode.Title", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Episode.Url", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Episode.Overview", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Episode.Runtime", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Episode.InWatchList", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Episode.InCollection", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Episode.Plays", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Episode.Watched", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Episode.Rating", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Episode.Ratings.Icon", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Episode.Ratings.HatedCount", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Episode.Ratings.LovedCount", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Episode.Ratings.Percentage", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Episode.Ratings.Votes", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Episode.EpisodeImageFilename", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Episode.CommentCount", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Episode.OriginalTitle", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Episode.Released", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Episode.EffectiveReleaseDate", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Episode.EpisodeType", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Episode.AfterCredits", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Episode.DuringCredits", string.Empty );
         }
 
-        internal static void SetEpisodeProperties(TraktShowSummary show, TraktEpisodeSummary episode)
+        internal static void SetEpisodeProperties( TraktShowSummary show, TraktEpisodeSummary episode )
         {
-            if (episode == null) return;
+          if ( episode == null )
+            return;
 
-            SetProperty("#Trakt.Episode.Id", episode.Ids.Trakt);
-            SetProperty("#Trakt.Episode.TvdbId", episode.Ids.Tvdb);
-            SetProperty("#Trakt.Episode.ImdbId", episode.Ids.Imdb);
-            SetProperty("#Trakt.Episode.TmdbId", episode.Ids.Imdb);
-            SetProperty("#Trakt.Episode.Number", episode.Number);
-            SetProperty("#Trakt.Episode.Season", episode.Season);
-            if (episode.FirstAired != null)
-            {
-                // FirstAired is converted to UTC from original countries timezone on trakt
-                SetProperty("#Trakt.Episode.FirstAired", episode.FirstAired.FromISO8601().ToShortDateString());
-                SetProperty("#Trakt.Episode.FirstAiredLocalized", episode.FirstAired.FromISO8601().ToLocalTime().ToShortDateString());
-                SetProperty("#Trakt.Episode.FirstAiredLocalizedDayOfWeek", episode.FirstAired.FromISO8601().ToLocalTime().ToLocalisedDayOfWeek());
-                SetProperty("#Trakt.Episode.FirstAiredLocalizedTime", episode.FirstAired.FromISO8601().ToLocalTime().ToShortTimeString());
-            }
-            SetProperty("#Trakt.Episode.Title", string.IsNullOrEmpty(episode.Title) ? string.Format("{0} {1}", Translation.Episode, episode.Number.ToString()) : episode.Title.RemapHighOrderChars());
-            SetProperty("#Trakt.Episode.Url", string.Format("http://trakt.tv/shows/{0}/seasons/{1}/episodes/{2}", show.Ids.Slug, episode.Season, episode.Number));
-            SetProperty("#Trakt.Episode.Overview", episode.Overview.ToNullIfEmpty() == null ? Translation.NoEpisodeSummary : episode.Overview.RemapHighOrderChars());
-            SetProperty("#Trakt.Episode.Runtime", show.Runtime);
-            SetProperty("#Trakt.Episode.InWatchList", episode.IsWatchlisted());
-            SetProperty("#Trakt.Episode.InCollection", episode.IsCollected(show));
-            SetProperty("#Trakt.Episode.Plays", episode.Plays(show));
-            SetProperty("#Trakt.Episode.Watched", episode.IsWatched(show));
-            SetProperty("#Trakt.Episode.Rating", episode.UserRating(show));
-            SetProperty("#Trakt.Episode.Ratings.Percentage", episode.Rating.ToPercentage());
-            SetProperty("#Trakt.Episode.Ratings.Votes", episode.Votes);
-            SetProperty("#Trakt.Episode.Ratings.Icon", (episode.Rating >= 6) ? "love" : "hate");
-            SetProperty("#Trakt.Episode.CommentCount", episode.CommentCount);
-            //if (episode.Images != null)
-            //{
-            //    SetProperty("#Trakt.Episode.EpisodeImageFilename", episode.Images.ScreenShot.LocalImageFilename(ArtworkType.EpisodeImage));
-            //}
+          SetProperty( "#Trakt.Episode.Id", episode.Ids.Trakt );
+          SetProperty( "#Trakt.Episode.TvdbId", episode.Ids.Tvdb );
+          SetProperty( "#Trakt.Episode.ImdbId", episode.Ids.Imdb );
+          SetProperty( "#Trakt.Episode.TmdbId", episode.Ids.Imdb );
+          SetProperty( "#Trakt.Episode.Number", episode.Number );
+          SetProperty( "#Trakt.Episode.Season", episode.Season );
+          SetProperty( "#Trakt.Episode.Title", string.IsNullOrEmpty( episode.Title ) ? string.Format( "{0} {1}", Translation.Episode, episode.Number.ToString() ) : episode.Title.RemapHighOrderChars() );
+          SetProperty( "#Trakt.Episode.Url", string.Format( "http://trakt.tv/shows/{0}/seasons/{1}/episodes/{2}", show.Ids.Slug, episode.Season, episode.Number ) );
+          SetProperty( "#Trakt.Episode.Overview", episode.Overview.ToNullIfEmpty() == null ? Translation.NoEpisodeSummary : episode.Overview.RemapHighOrderChars() );
+          SetProperty( "#Trakt.Episode.Runtime", show.Runtime );
+          SetProperty( "#Trakt.Episode.InWatchList", episode.IsWatchlisted() );
+          SetProperty( "#Trakt.Episode.InCollection", episode.IsCollected( show ) );
+          SetProperty( "#Trakt.Episode.Plays", episode.Plays( show ) );
+          SetProperty( "#Trakt.Episode.Watched", episode.IsWatched( show ) );
+          SetProperty( "#Trakt.Episode.Rating", episode.UserRating( show ) );
+          SetProperty( "#Trakt.Episode.Ratings.Percentage", episode.Rating.ToPercentage() );
+          SetProperty( "#Trakt.Episode.Ratings.Votes", episode.Votes );
+          SetProperty( "#Trakt.Episode.Ratings.Icon", ( episode.Rating >= 6 ) ? "love" : "hate" );
+          SetProperty( "#Trakt.Episode.CommentCount", episode.CommentCount );
+          SetProperty( "#Trakt.Episode.OriginalTitle", episode.OriginalTitle );
+          SetProperty( "#Trakt.Episode.Released", episode.Released );
+          SetProperty( "#Trakt.Episode.EffectiveReleaseDate", episode.EffectiveReleaseDate );
+          SetProperty( "#Trakt.Episode.EpisodeType", episode.EpisodeType );
+          SetProperty( "#Trakt.Episode.AfterCredits", episode.AfterCredits );
+          SetProperty( "#Trakt.Episode.DuringCredits", episode.DuringCredits );
+
+          // FirstAired is converted to UTC from original countries timezone on trakt
+          SetProperty( "#Trakt.Episode.FirstAired", episode.FirstAired?.FromISO8601().ToShortDateString() ?? string.Empty );
+          SetProperty( "#Trakt.Episode.FirstAiredLocalized", episode.FirstAired?.FromISO8601().ToLocalTime().ToShortDateString() ?? string.Empty );
+          SetProperty( "#Trakt.Episode.FirstAiredLocalizedDayOfWeek", episode.FirstAired?.FromISO8601().ToLocalTime().ToLocalisedDayOfWeek() ?? string.Empty );
+          SetProperty( "#Trakt.Episode.FirstAiredLocalizedTime", episode.FirstAired?.FromISO8601().ToLocalTime().ToShortTimeString() ?? string.Empty );
         }
 
         internal static void ClearPersonProperties()
@@ -1683,16 +1694,6 @@ namespace TraktPlugin.GUI
             SetProperty("#Trakt.Person.TmdbId", person.Ids.TmdbId);
             SetProperty("#Trakt.Person.TvRageId", person.Ids.TvRageId);
             SetProperty("#Trakt.Person.Name", person.Name);
-            //if (person.Images != null)
-            //{
-            //    SetProperty("#Trakt.Person.HeadshotUrl", person.Images.HeadShot.FullSize);
-            //    SetProperty("#Trakt.Person.HeadshotFilename", person.Images.HeadShot.LocalImageFilename(ArtworkType.PersonHeadshot));
-            //    if (person.Images.Fanart != null && System.IO.File.Exists(person.Images.Fanart.LocalImageFilename(ArtworkType.PersonFanart)))
-            //    {
-            //        SetProperty("#Trakt.Person.FanartUrl", person.Images.Fanart.FullSize);
-            //        SetProperty("#Trakt.Person.FanartFilename", person.Images.Fanart.LocalImageFilename(ArtworkType.PersonFanart));
-            //    }
-            //}
             SetProperty("#Trakt.Person.Url", string.Format("http://trakt.tv/people/{0}", person.Ids.Slug));
             SetProperty("#Trakt.Person.Biography", person.Biography ?? Translation.NoPersonBiography.RemapHighOrderChars());
             SetProperty("#Trakt.Person.Birthday", person.Birthday);
@@ -2336,7 +2337,6 @@ namespace TraktPlugin.GUI
                 MediaType = MediaItemType.Show,
                 IMDb = show.Ids.Imdb.ToNullIfEmpty(),
                 TVDb = show.Ids.Tvdb.ToString(),
-                TVRage = show.Ids.TvRage.ToString(),
                 TMDb = show.Ids.Tmdb.ToString(),
                 Plot = show.Overview,
                 Poster = TmdbCache.GetShowPosterFilename(showImages),
@@ -2397,7 +2397,6 @@ namespace TraktPlugin.GUI
                 IMDb = show.Ids.Imdb.ToNullIfEmpty(),
                 TMDb = show.Ids.Tmdb.ToString(),
                 TVDb = show.Ids.Tvdb.ToString(),
-                TVRage = show.Ids.TvRage.ToString(),
                 Plot = show.Overview,
                 Poster = TmdbCache.GetShowPosterFilename(showImages),
                 Title = show.Title,
@@ -2419,7 +2418,6 @@ namespace TraktPlugin.GUI
                 IMDb = show.Ids.Imdb.ToNullIfEmpty(),
                 TMDb = show.Ids.Tmdb.ToString(),
                 TVDb = show.Ids.Tvdb.ToString(),
-                TVRage = show.Ids.TvRage.ToString(),
                 Plot = show.Overview,
                 Poster = TmdbCache.GetShowPosterFilename(showImages),
                 Title = show.Title,

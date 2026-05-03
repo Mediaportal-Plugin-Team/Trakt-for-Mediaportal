@@ -582,14 +582,16 @@ namespace TraktPlugin.GUI
 
         private void ClearProperties()
         {
-            GUIUtils.SetProperty("#Trakt.Show.WatchList.Inserted", string.Empty);
-            GUICommon.ClearShowProperties();
+          GUIUtils.SetProperty( "#Trakt.Show.WatchList.Inserted", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Show.WatchList.Notes", string.Empty );
+          GUICommon.ClearShowProperties();
         }
 
-        private void PublishWatchlistSkinProperties(TraktShowWatchListItem item)
+        private void PublishWatchlistSkinProperties( TraktShowWatchListItem item )
         {
-            GUICommon.SetProperty("#Trakt.Show.WatchList.Inserted", item.ListedAt.FromISO8601().ToShortDateString());
-            GUICommon.SetShowProperties(item.Show);
+          GUICommon.SetProperty( "#Trakt.Show.WatchList.Inserted", item.ListedAt.FromISO8601().ToShortDateString() );
+          GUICommon.SetProperty( "#Trakt.Show.WatchList.Notes", item.Notes );
+          GUICommon.SetShowProperties( item.Show );
         }
 
         private void OnShowSelected(GUIListItem item, GUIControl parent)

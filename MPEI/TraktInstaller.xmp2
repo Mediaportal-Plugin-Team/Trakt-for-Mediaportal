@@ -1562,12 +1562,14 @@ Click Next to continue or Cancel to exit Setup.
 
 
 Trakt will also synchronize your watched flags across multiple installations.</ExtensionDescription>
-    <VersionDescription>* Support for pagination on Watched and Ratings sync
+    <VersionDescription>* Updated skin properties
+* Set pagination max items to 250 due to future API restrictions.
+* Protect against bad data from API request on movie collection endpoint.
 
 </VersionDescription>
     <DevelopmentStatus>Stable</DevelopmentStatus>
     <OnlineLocation>https://github.com/Mediaportal-Plugin-Team/Trakt-for-Mediaportal/releases/download/v[Version]/TraktPlugin-v[Version].mpe1</OnlineLocation>
-    <ReleaseDate>2026-04-26T13:13:13</ReleaseDate>
+    <ReleaseDate>2026-05-03T13:13:13</ReleaseDate>
     <Tags>trakt,tv shows,movies,mp-tvseries,movingpictures,my videos,my films</Tags>
     <PlatformCompatibility>AnyCPU</PlatformCompatibility>
     <Location>.\Release\TraktPlugin-v[Version].mpe1</Location>

@@ -1131,14 +1131,18 @@ namespace TraktPlugin.GUI
             }
         }
 
-        private void ClearProperties()
-        {
+          private void ClearProperties()
+          {
+            GUIUtils.SetProperty( "#Trakt.List.ItemType", string.Empty );
+            GUIUtils.SetProperty( "#Trakt.List.Rank", string.Empty );
+            GUIUtils.SetProperty( "#Trakt.List.Notes", string.Empty );
+
             GUICommon.ClearMovieProperties();
             GUICommon.ClearShowProperties();
             GUICommon.ClearSeasonProperties();
             GUICommon.ClearEpisodeProperties();
             GUICommon.ClearPersonProperties();
-        }
+          }
 
         private void PublishEpisodeSkinProperties(TraktListItem item)
         {
@@ -1223,7 +1227,8 @@ namespace TraktPlugin.GUI
             }
             GUIUtils.SetProperty("#Trakt.List.ItemType", SelectedType.ToString());
             GUIUtils.SetProperty("#Trakt.List.Rank", listItem.Rank.ToString());
-        }
+            GUIUtils.SetProperty("#Trakt.List.Notes", listItem.Notes);
+          }
 
         private void UpdateButtonState()
         {

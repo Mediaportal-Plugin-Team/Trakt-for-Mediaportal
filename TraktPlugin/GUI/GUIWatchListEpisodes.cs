@@ -467,22 +467,24 @@ namespace TraktPlugin.GUI
 
         private void ClearProperties()
         {
-            GUICommon.SetProperty("#Trakt.Episode.WatchList.Inserted", string.Empty);
+          GUICommon.SetProperty( "#Trakt.Episode.WatchList.Inserted", string.Empty );
+          GUICommon.SetProperty( "#Trakt.Episode.WatchList.Notes", string.Empty );
 
-            GUICommon.ClearShowProperties();
-            GUICommon.ClearEpisodeProperties();
+          GUICommon.ClearShowProperties();
+          GUICommon.ClearEpisodeProperties();
         }
 
-        private void PublishWatchlistSkinProperties(TraktEpisodeWatchListItem item)
+        private void PublishWatchlistSkinProperties( TraktEpisodeWatchListItem item )
         {
-            // publish watchlist properties
-            GUICommon.SetProperty("#Trakt.Episode.WatchList.Inserted", item.ListedAt.FromISO8601().ToShortDateString());
+          // publish watchlist properties
+          GUICommon.SetProperty( "#Trakt.Episode.WatchList.Inserted", item.ListedAt.FromISO8601().ToShortDateString() );
+          GUICommon.SetProperty( "#Trakt.Episode.WatchList.Notes", item.Notes );
 
-            GUICommon.SetShowProperties(item.Show);
-            GUICommon.SetEpisodeProperties(item.Show, item.Episode);
+          GUICommon.SetShowProperties( item.Show );
+          GUICommon.SetEpisodeProperties( item.Show, item.Episode );
         }
 
-        private void OnEpisodeSelected(GUIListItem item, GUIControl parent)
+        private void OnEpisodeSelected( GUIListItem item, GUIControl parent)
         {
             PreviousSelectedIndex = Facade.SelectedListItemIndex;
 

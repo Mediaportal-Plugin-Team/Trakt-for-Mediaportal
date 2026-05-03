@@ -658,14 +658,16 @@ namespace TraktPlugin.GUI
 
         private void ClearProperties()
         {
-            GUIUtils.SetProperty("#Trakt.Movie.WatchList.Inserted", string.Empty);
-            GUICommon.ClearMovieProperties();
+          GUIUtils.SetProperty( "#Trakt.Movie.WatchList.Inserted", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Movie.WatchList.Notes", string.Empty );
+          GUICommon.ClearMovieProperties();
         }
 
-        private void PublishWatchlistSkinProperties(TraktMovieWatchListItem item)
+        private void PublishWatchlistSkinProperties( TraktMovieWatchListItem item )
         {
-            GUICommon.SetProperty("#Trakt.Movie.WatchList.Inserted", item.ListedAt.FromISO8601().ToShortDateString());
-            GUICommon.SetMovieProperties(item.Movie);
+          GUICommon.SetProperty( "#Trakt.Movie.WatchList.Inserted", item.ListedAt.FromISO8601().ToShortDateString() );
+          GUICommon.SetProperty( "#Trakt.Movie.WatchList.Notes", item.Notes );
+          GUICommon.SetMovieProperties( item.Movie );
         }
 
         private void OnMovieSelected(GUIListItem item, GUIControl parent)
