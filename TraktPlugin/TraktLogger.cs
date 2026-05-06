@@ -1,5 +1,6 @@
-﻿using MediaPortal.Configuration;
-using Newtonsoft.Json;
+﻿extern alias nsoft;
+using MediaPortal.Configuration;
+using nsoft::Newtonsoft.Json;
 using System;
 using System.IO;
 using System.Linq;
