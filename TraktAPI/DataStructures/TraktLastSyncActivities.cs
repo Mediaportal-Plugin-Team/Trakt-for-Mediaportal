@@ -72,6 +72,9 @@ namespace TraktAPI.DataStructures
 
       [DataMember( Name = "paused_at" )]
       public string PausedAt { get; set; }
+
+      [DataMember( Name = "favorited_at" )]
+      public string FavoritedAt { get; set; }
     }
 
     [DataMember( Name = "shows" )]
@@ -119,6 +122,9 @@ namespace TraktAPI.DataStructures
 
       [DataMember( Name = "hidden_at" )]
       public string HiddenAt { get; set; }
+
+      [DataMember( Name = "favorited_at" )]
+      public string FavoritedAt { get; set; }
     }
 
     [DataMember( Name = "comments" )]
