@@ -21,12 +21,14 @@
   <string name="ActivityCheckedIn">{0} checked into {1}</string>
   <string name="ActivityCollected">{0} collected {1}</string>
   <string name="ActivityCollectedEpisodes">{0} collected {1} episodes of {2}</string>
+  <string name="ActivityFavorited">{0} added {1} to their favorites</string>
   <string name="ActivitySeen">{0} seen {1}</string>
   <string name="ActivitySeenEpisodes">{0} seen {1} episodes of {2}</string>
   <string name="ActivityRating">{0} rated {1}</string>
   <string name="ActivityRatingAdvanced">{0} rated {1} [{2}/10]</string>
   <string name="ActivityWatchlist">{0} added {1} to their watchlist</string>
-  <string name="ActivityYourWatchlist">{0} added {1} to watchlist</string>
+  <string name="ActivityYourFavorites">{0} added {1} to your favorites</string>
+  <string name="ActivityYourWatchlist">{0} added {1} to your watchlist</string>
   <string name="ActivityAddToList">{0} added {1} to {2}</string>
   <string name="ActivityCreatedList">{0} created {1}</string>
   <string name="ActivityUpdatedList">{0} updated {1}</string>
@@ -46,6 +48,7 @@
   <string name="ActivityFilterActions">Filter By Actions...</string>
   <string name="ActivityFilterTypes">Filter By Types...</string>
   <string name="AddFriend">Add Friend...</string>
+  <string name="AddToFavorites">Add to Favorites</string>
   <string name="AddToLibrary">Add to Collection</string>
   <string name="AddToList">Add to List...</string>
   <string name="AddToWatchList">Add to Watchlist</string>
@@ -217,6 +220,8 @@
   <string name="FailedLogin">Failed to login to trakt.tv, check username and password in settings</string>
   <string name="FailedOnlineSettings">Failed to get online settings from trakt</string>
   <string name="FailedUpdateList">Failed to update list online</string>
+  <string name="Favorited">Favorited</string>
+  <string name="Favorites">Favorites</string>
   <string name="FailedApplicationAuthorization">Failed to authorize user for application</string>
   <string name="FeatureNotAvailable">Sorry, this feature is currently not available</string>
   <string name="Filters">Filters</string>
@@ -339,6 +344,7 @@
   <string name="HideComments">Hide Comments</string>
   <string name="HideCollected">Hide Collected</string>
   <string name="HideEpisodes">Hide Episodes</string>
+  <string name="HideFavorited">Hide Favorited</string>
   <string name="HideLiked">Hide Liked</string>
   <string name="HideLists">Hide Lists</string>
   <string name="HideMovies">Hide Movies</string>
@@ -410,6 +416,8 @@
   <string name="MovieCredits">Movie Credits</string>
   <string name="MovieCount">{0} Movies</string>
   <string name="MultiSelectDialog">Multi-Select Dialog</string>
+  <string name="MyFavoriteMovies">Favorite Movies</string>
+  <string name="MyFavoriteShows">Favorite Shows</string>
   <!--N-->
   <string name="Name">Name</string>
   <string name="Network">Network</string>
@@ -531,6 +539,7 @@
   <string name="RecentWatchedEpisodes">Recently Watched Episodes</string>
   <string name="RecentWatchedMovies">Recently Watched Movies</string>
   <string name="RecentAddedEpisodes">Recently Added Episodes</string>
+  <string name="RemoveFromFavorites">Remove from Favorites</string>
   <string name="RecentAddedMovies">Recently Added Movies</string>
   <string name="RecentComments">Recent Comments</string>
   <string name="RecentShouts">Recent Shouts</string>

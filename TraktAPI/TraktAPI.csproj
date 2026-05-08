@@ -51,6 +51,7 @@
     <Compile Include="DataStructures\TraktAccount.cs" />
     <Compile Include="DataStructures\TraktActivity.cs" />
     <Compile Include="DataStructures\TraktAuthenticationToken.cs" />
+    <Compile Include="DataStructures\TraktFavoriteItem.cs" />
     <Compile Include="DataStructures\TraktListPopular.cs" />
     <Compile Include="DataStructures\TraktListsPopular.cs" />
     <Compile Include="DataStructures\TraktListsTrending.cs" />

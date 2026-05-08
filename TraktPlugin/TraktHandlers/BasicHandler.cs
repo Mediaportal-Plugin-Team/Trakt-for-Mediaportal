@@ -55,7 +55,8 @@ namespace TraktPlugin.TraktHandlers
         CustomList = 1,
         Recommendations = 2,
         Watchlist = 4,
-        All = 1 | 2 | 4
+        Favorites = 8,
+        All = 1 | 2 | 4 | 8
     }
 
     /// <summary>

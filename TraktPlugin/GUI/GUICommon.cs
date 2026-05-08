@@ -1,17 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using MediaPortal.Dialogs;
+﻿using MediaPortal.Dialogs;
 using MediaPortal.GUI.Library;
 using MediaPortal.GUI.Video;
 using MediaPortal.Video.Database;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
 using Trailers.Providers;
-using TraktPlugin.Cache;
-using TraktPlugin.Extensions;
 using TraktAPI.DataStructures;
 using TraktAPI.Enums;
 using TraktAPI.Extensions;
+using TraktPlugin.Cache;
+using TraktPlugin.Extensions;
 
 namespace TraktPlugin.GUI
 {
@@ -31,6 +31,8 @@ namespace TraktPlugin.GUI
         RemoveFromCollection,
         AddToWatchList,
         RemoveFromWatchList,
+        AddToFavorites,
+        RemoveFromFavorites,
         AddToList,
         RemoveFromList,
         Related,
@@ -54,6 +56,8 @@ namespace TraktPlugin.GUI
         MarkAsUnWatched,
         AddToWatchList,
         RemoveFromWatchList,
+        AddToFavorites,
+        RemoveFromFavorites,
         Filters,
         AddToList,
         AddToLibrary,
@@ -170,6 +174,7 @@ namespace TraktPlugin.GUI
     enum TraktMenuItems
     {
         AddToWatchList,
+        AddToFavorites,
         AddToCustomList,
         Rate,
         Cast,
@@ -272,8 +277,9 @@ namespace TraktPlugin.GUI
         hide_recommendations,
         hide_calendar,
         hide_progress_collected,
-        hide_progress_watched
-    }
+        hide_progress_watched,
+        favorite,
+  }
 
     /// <summary>
     /// Defaults to all, but you can instead send a comma delimited list of types.
@@ -1401,7 +1407,7 @@ namespace TraktPlugin.GUI
           GUIUtils.SetProperty( "#Trakt.Movie.FanartImageFilename", string.Empty );
           GUIUtils.SetProperty( "#Trakt.Movie.InCollection", string.Empty );
           GUIUtils.SetProperty( "#Trakt.Movie.InWatchList", string.Empty );
-          GUIUtils.SetProperty( "#Trakt.Movie.Plays", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Movie.InFavorites", string.Empty );
           GUIUtils.SetProperty( "#Trakt.Movie.Watched", string.Empty );
           GUIUtils.SetProperty( "#Trakt.Movie.Rating", string.Empty );
           GUIUtils.SetProperty( "#Trakt.Movie.Ratings.Icon", string.Empty );
@@ -1437,6 +1443,7 @@ namespace TraktPlugin.GUI
           SetProperty( "#Trakt.Movie.Genres", TraktGenres.Translate( movie.Genres ) );
           SetProperty( "#Trakt.Movie.InCollection", movie.IsCollected() );
           SetProperty( "#Trakt.Movie.InWatchList", movie.IsWatchlisted() );
+          SetProperty( "#Trakt.Movie.InFavorites", movie.IsFavorited() );
           SetProperty( "#Trakt.Movie.Plays", movie.Plays() );
           SetProperty( "#Trakt.Movie.Watched", movie.IsWatched() );
           SetProperty( "#Trakt.Movie.Rating", movie.UserRating() );
@@ -1530,6 +1537,7 @@ namespace TraktPlugin.GUI
           GUIUtils.SetProperty( "#Trakt.Show.Status", string.Empty );
           GUIUtils.SetProperty( "#Trakt.Show.Genres", string.Empty );
           GUIUtils.SetProperty( "#Trakt.Show.InWatchList", string.Empty );
+          GUIUtils.SetProperty( "#Trakt.Show.InFavorites", string.Empty );
           GUIUtils.SetProperty( "#Trakt.Show.InCollection", string.Empty );
           GUIUtils.SetProperty( "#Trakt.Show.Collected", string.Empty );
           GUIUtils.SetProperty( "#Trakt.Show.Watched", string.Empty );
@@ -1582,6 +1590,7 @@ namespace TraktPlugin.GUI
           SetProperty( "#Trakt.Show.Genres", TraktGenres.Translate( show.Genres ) );
           SetProperty( "#Trakt.Show.SubGenres", show.SubGenres );
           SetProperty( "#Trakt.Show.InWatchList", show.IsWatchlisted() );
+          SetProperty( "#Trakt.Show.InFavorites", show.IsFavorited() );
           SetProperty( "#Trakt.Show.InCollection", show.IsCollected() );
           SetProperty( "#Trakt.Show.Collected", show.Collected() );
           SetProperty( "#Trakt.Show.Watched", show.IsWatched() );
@@ -1712,10 +1721,10 @@ namespace TraktPlugin.GUI
         /// </summary>
         internal static List<GUIListItem> GetContextMenuItemsForActivity(TraktActivity.Activity activity)
         {
-            GUIListItem listItem = null;
+            GUIListItem listItem;
             var listItems = new List<GUIListItem>();
 
-            // Add Watchlist
+            // Add/Remove Watchlist
             if (!activity.IsWatchlisted())
             {
                 listItem = new GUIListItem(Translation.AddToWatchList);
@@ -1727,6 +1736,23 @@ namespace TraktPlugin.GUI
                 listItem = new GUIListItem(Translation.RemoveFromWatchList);
                 listItem.ItemId = (int)ActivityContextMenuItem.RemoveFromWatchList;
                 listItems.Add(listItem);
+            }
+
+            // Add/Remove Favorites (movies and shows only)
+            if ( activity.Type == ActivityType.movie.ToString() || activity.Type == ActivityType.show.ToString() )
+            {
+              if ( !activity.IsFavorited() )
+              {
+                listItem = new GUIListItem( Translation.AddToFavorites );
+                listItem.ItemId = (int)ActivityContextMenuItem.AddToFavorites;
+                listItems.Add( listItem );
+              }
+              else
+              {
+                listItem = new GUIListItem( Translation.RemoveFromFavorites );
+                listItem.ItemId = (int)ActivityContextMenuItem.RemoveFromFavorites;
+                listItems.Add( listItem );
+              }
             }
 
             // Mark As Watched
@@ -1832,6 +1858,20 @@ namespace TraktPlugin.GUI
                 listItem.ItemId = (int)MediaContextMenuItem.RemoveFromWatchList;
             }
 
+            // Add/Remove Favorites
+            if ( !movie.IsFavorited() )
+            {
+              listItem = new GUIListItem( Translation.AddToFavorites );
+              dlg.Add( listItem );
+              listItem.ItemId = (int)MediaContextMenuItem.AddToFavorites;
+            }
+            else
+            {
+              listItem = new GUIListItem( Translation.RemoveFromFavorites );
+              dlg.Add( listItem );
+              listItem.ItemId = (int)MediaContextMenuItem.RemoveFromFavorites;
+            }
+
             // Add to Custom list
             listItem = new GUIListItem(Translation.AddToList);
             dlg.Add(listItem);
@@ -1922,7 +1962,7 @@ namespace TraktPlugin.GUI
 
         internal static void CreateShowsContextMenu(ref IDialogbox dlg, TraktShow show, bool dashboard)
         {
-            GUIListItem listItem = null;
+            GUIListItem listItem;
 
             // Add/Remove Watchlist            
             if (!show.IsWatchlisted())
@@ -1937,6 +1977,21 @@ namespace TraktPlugin.GUI
                 dlg.Add(listItem);
                 listItem.ItemId = (int)MediaContextMenuItem.RemoveFromWatchList;
             }
+
+            // Add/Remove Favorites
+            if ( !show.IsFavorited() )
+            {
+              listItem = new GUIListItem( Translation.AddToFavorites );
+              dlg.Add( listItem );
+              listItem.ItemId = (int)MediaContextMenuItem.AddToFavorites;
+            }
+            else
+            {
+              listItem = new GUIListItem( Translation.RemoveFromFavorites );
+              dlg.Add( listItem );
+              listItem.ItemId = (int)MediaContextMenuItem.RemoveFromFavorites;
+            }
+
 
             // Show Season Information
             listItem = new GUIListItem(Translation.ShowSeasonInfo);
@@ -2578,6 +2633,10 @@ namespace TraktPlugin.GUI
             dlg.Add(pItem);
             pItem.ItemId = (int)TraktMenuItems.AddToWatchList;
 
+            pItem = new GUIListItem( Translation.AddToFavorites );
+            dlg.Add( pItem );
+            pItem.ItemId = (int)TraktMenuItems.AddToFavorites;
+
             pItem = new GUIListItem(Translation.AddToList);
             dlg.Add(pItem);
             pItem.ItemId = (int)TraktMenuItems.AddToCustomList;
@@ -2687,6 +2746,11 @@ namespace TraktPlugin.GUI
                     TraktHelper.AddMovieToWatchList(title, year, imdbid, true);
                     break;
 
+                case ((int)TraktMenuItems.AddToFavorites):
+                  TraktLogger.Info( "Adding movie to Favorites. Title = '{0}', Year = '{1}', IMDb ID = '{2}'", title, year.ToLogString(), imdbid.ToLogString() );
+                  TraktHelper.AddMovieToFavorites( title, year, imdbid, true );
+                  break;
+
                 case ((int)TraktMenuItems.AddToCustomList):
                     TraktLogger.Info("Adding movie to Custom List. Title = '{0}', Year = '{1}', IMDb ID = '{2}'", title, year.ToLogString(), imdbid.ToLogString());
                     TraktHelper.AddRemoveMovieInUserList(title, year, imdbid, false);
@@ -2788,6 +2852,10 @@ namespace TraktPlugin.GUI
             pItem = new GUIListItem(Translation.AddToWatchList);
             dlg.Add(pItem);
             pItem.ItemId = (int)TraktMenuItems.AddToWatchList;
+
+            pItem = new GUIListItem( Translation.AddToFavorites );
+            dlg.Add( pItem );
+            pItem.ItemId = (int)TraktMenuItems.AddToFavorites;
 
             pItem = new GUIListItem(Translation.AddToList);
             dlg.Add(pItem);
@@ -2912,6 +2980,11 @@ namespace TraktPlugin.GUI
                 case ((int)TraktMenuItems.AddToWatchList):
                     TraktLogger.Info("Adding tv show to Watchlist. Title = '{0}', Year = '{1}', TVDb ID = '{2}'", title, year.ToLogString(), tvdbid.ToLogString());
                     TraktHelper.AddShowToWatchList(title, year.ToNullableInt32(), tvdbid.ToNullableInt32(), imdbid.ToNullIfEmpty(), null, null);
+                    break;
+
+                case ((int)TraktMenuItems.AddToFavorites):
+                    TraktLogger.Info("Adding tv show to Favorites. Title = '{0}', Year = '{1}', TVDb ID = '{2}'", title, year.ToLogString(), tvdbid.ToLogString());
+                    TraktHelper.AddShowToFavorites(title, year.ToNullableInt32(), tvdbid.ToNullableInt32(), imdbid.ToNullIfEmpty(), null, null);
                     break;
 
                 case ((int)TraktMenuItems.AddToCustomList):
@@ -3583,6 +3656,17 @@ namespace TraktPlugin.GUI
                     else
                     {
                         title = string.Format(Translation.ActivityYourWatchlist, userName, itemName);
+                    }
+                    break;
+
+                case ActivityAction.favorite:
+                    if (view != ActivityView.me)
+                    {
+                        title = string.Format(Translation.ActivityFavorited, userName, itemName);
+                    }
+                    else
+                    {
+                        title = string.Format(Translation.ActivityYourFavorites, userName, itemName);
                     }
                     break;
 

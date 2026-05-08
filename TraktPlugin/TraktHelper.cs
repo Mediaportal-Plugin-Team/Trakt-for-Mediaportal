@@ -282,6 +282,104 @@ namespace TraktPlugin
 
         #endregion
 
+        #region Movie Favorites
+
+        public static void AddMovieToFavorites( TraktMovie movie, bool updatePluginFilters )
+        {
+          AddMovieToFavorites( movie.Title, movie.Year, movie.Ids.Imdb, movie.Ids.Tmdb, movie.Ids.Trakt, updatePluginFilters );
+        }
+
+        public static void AddMovieToFavorites( string title, string year, string imdbid, bool updatePluginFilters )
+        {
+          AddMovieToFavorites( title, year.ToNullableInt32(), imdbid, null, null, updatePluginFilters );
+        }
+
+        public static void AddMovieToFavorites( string title, int? year, string imdbid, int? tmdbid, int? traktid, bool updatePluginFilters )
+        {
+          if ( !GUICommon.CheckLogin( false ) )
+            return;
+
+          var movie = new TraktMovie
+          {
+            Ids = new TraktMovieId
+            {
+              Trakt = traktid,
+              Imdb = imdbid,
+              Tmdb = tmdbid
+            },
+            Title = title,
+            Year = year
+          };
+
+          var syncThread = new Thread( ( objSyncData ) =>
+          {
+            var response = TraktAPI.TraktAPI.AddMovieToFavorites( objSyncData as TraktMovie );
+            if ( response == null )
+              return;
+
+            if ( updatePluginFilters && IsMovingPicturesAvailableAndEnabled )
+            {
+              // update categories & filters menu in MovingPictures
+              MovingPictures.AddMovieCriteriaToFavoritesNode( imdbid );
+            }
+            GUI.GUIWatchListMovies.ClearCache( TraktSettings.Username );
+          } )
+          {
+            IsBackground = true,
+            Name = "Favorites"
+          };
+
+          syncThread.Start( movie );
+
+          TraktCache.AddMovieToFavorites( movie );
+        }
+
+        public static void RemoveMovieFromFavorites( TraktMovie movie, bool updateMovingPicturesFilters )
+        {
+          RemoveMovieFromFavorites( movie.Title, movie.Year, movie.Ids.Imdb, movie.Ids.Tmdb, movie.Ids.Trakt, updateMovingPicturesFilters );
+        }
+
+        public static void RemoveMovieFromFavorites( string title, int? year, string imdbid, int? tmdbid, int? traktid, bool updatePluginFilters )
+        {
+          if ( !GUICommon.CheckLogin( false ) )
+            return;
+
+          var movie = new TraktMovie
+          {
+            Ids = new TraktMovieId
+            {
+              Trakt = traktid,
+              Imdb = imdbid,
+              Tmdb = tmdbid
+            },
+            Title = title,
+            Year = year
+          };
+
+          var syncThread = new Thread( ( objSyncData ) =>
+          {
+            var response = TraktAPI.TraktAPI.RemoveMovieFromFavorites( objSyncData as TraktMovie );
+            if ( response == null )
+              return;
+
+            if ( updatePluginFilters && IsMovingPicturesAvailableAndEnabled )
+            {
+              // update categories & filters menu in MovingPictures              
+              MovingPictures.RemoveMovieCriteriaFromFavoritesNode( imdbid );
+            }
+          } )
+          {
+            IsBackground = true,
+            Name = "Favorites"
+          };
+
+          syncThread.Start( movie );
+
+          TraktCache.RemoveMovieFromFavorites( movie );
+        }
+
+        #endregion
+
         #region Show WatchList
 
         public static void AddShowToWatchList(TraktShow show)
@@ -366,6 +464,88 @@ namespace TraktPlugin
             TraktCache.RemoveShowFromWatchlist(show);
         }
 
+        #endregion
+
+        #region Show Favorites
+
+        public static void AddShowToFavorites( TraktShow show )
+        {
+          AddShowToFavorites( show.Title, show.Year, show.Ids.Tvdb, show.Ids.Imdb, show.Ids.Tmdb, show.Ids.Trakt );
+        }
+
+        public static void AddShowToFavorites( string title, string year, string tvdbid )
+        {
+          AddShowToFavorites( title, year.ToNullableInt32(), tvdbid.ToNullableInt32(), null, null, null );
+        }
+
+        public static void AddShowToFavorites( string title, int? year, int? tvdbid, string imdbid, int? tmdbid, int? traktid )
+        {
+          if ( !GUICommon.CheckLogin( false ) )
+            return;
+
+          var show = new TraktShow
+          {
+            Ids = new TraktShowId
+            {
+              Trakt = traktid,
+              Imdb = imdbid,
+              Tmdb = tmdbid,
+              Tvdb = tvdbid
+            },
+            Title = title,
+            Year = year
+          };
+
+          var syncThread = new Thread( ( objSyncData ) =>
+          {
+            var response = TraktAPI.TraktAPI.AddShowToFavorites( objSyncData as TraktShow );
+          } )
+          {
+            IsBackground = true,
+            Name = "Favorites"
+          };
+
+          syncThread.Start( show );
+
+          TraktCache.AddShowToFavorites( show );
+        }
+
+        public static void RemoveShowFromFavorites( TraktShow show )
+        {
+          RemoveShowFromFavorites( show.Title, show.Year, show.Ids.Tvdb, show.Ids.Imdb, show.Ids.Tmdb, show.Ids.Trakt );
+        }
+
+        public static void RemoveShowFromFavorites( string title, int? year, int? tvdbid, string imdbid, int? tmdbid, int? traktid )
+        {
+          if ( !GUICommon.CheckLogin( false ) )
+            return;
+
+          var show = new TraktShow
+          {
+            Ids = new TraktShowId
+            {
+              Trakt = traktid,
+              Imdb = imdbid,
+              Tmdb = tmdbid,
+              Tvdb = tvdbid
+            },
+            Title = title,
+            Year = year
+          };
+
+          var syncThread = new Thread( ( objSyncData ) =>
+          {
+            var response = TraktAPI.TraktAPI.RemoveShowFromFavorites( objSyncData as TraktShow );
+          } )
+          {
+            IsBackground = true,
+            Name = "Favorites"
+          };
+
+          syncThread.Start( show );
+
+          TraktCache.RemoveShowFromFavorites( show );
+        }
         #endregion
 
         #region Season WatchList

@@ -6,7 +6,6 @@ using System.Net;
 using System.Text;
 using System.Threading;
 using System.Web;
-using System.Web.UI;
 using TraktAPI.DataStructures;
 using TraktAPI.Enums;
 using TraktAPI.Extensions;
@@ -920,6 +919,47 @@ namespace TraktAPI
               TotalPages = int.Parse( headers[ "X-Pagination-Page-Count" ] ),
               TotalItems = int.Parse( headers[ "X-Pagination-Item-Count" ] ),
               Items = response.FromJSONArray<TraktEpisodeWatchListItem>()
+            };
+          }
+          catch
+          {
+            // most likely bad header response
+            return null;
+          }
+        }
+
+        #endregion
+
+        #region Favourites
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="username">The username of the user whose favorites are being retrieved</param>
+        /// <param name="type">all, movies, shows</param>
+        /// <param name="sortBy">rank , added , title , released , runtime , popularity , random , percentage , imdb_rating , tmdb_rating , rt_tomatometer , rt_audience , metascore , votes , imdb_votes , tmdb_votes , my_rating , watched , collected .</param>
+        /// <param name="sortHow">asc , desc</param>
+        /// <param name="extendedInfoParams">Extended Info: images, full (comma separated)</param>
+        /// <param name="page">Number of page of results to be returned</param>
+        /// <param name="maxItems">Number of results to return per page/param>
+        /// <returns></returns>
+        public static TraktFavoriteItems GetFavourites( string username = "me", string type = "all", string sortBy = "rank", string sortHow = "asc", string extendedInfoParams = "min", int page = 1, int maxItems = 100 )
+        {
+          var response = GetFromTrakt( 
+            string.Format( TraktURIs.UserFavoriteItems, username, type, sortBy, sortHow, extendedInfoParams, page, maxItems ), out WebHeaderCollection headers );
+      
+          if ( response == null )
+            return null;
+
+          try
+          {
+            return new TraktFavoriteItems
+            {
+              CurrentPage = page,
+              TotalItemsPerPage = maxItems,
+              TotalPages = int.Parse( headers[ "X-Pagination-Page-Count" ] ),
+              TotalItems = int.Parse( headers[ "X-Pagination-Item-Count" ] ),
+              Items = response.FromJSONArray<TraktFavoriteItem>()
             };
           }
           catch
@@ -2313,6 +2353,69 @@ namespace TraktAPI
             return RemoveEpisodesFromWatchlist(episodes);
         }
 
+    #endregion
+
+        #region Favorites Sync
+
+        public static TraktSyncResponse AddMoviesToFavorites( TraktSyncMovies movies )
+        {
+          var response = PostToTrakt( TraktURIs.SyncFavoritesAdd, movies.ToJSON() );
+          return response.FromJSON<TraktSyncResponse>();
+        }
+
+        public static TraktSyncResponse RemoveMoviesFromFavorites( TraktSyncMovies movies )
+        {
+          var response = PostToTrakt( TraktURIs.SyncFavoritesRemove, movies.ToJSON() );
+          return response.FromJSON<TraktSyncResponse>();
+        }
+
+        public static TraktSyncResponse AddShowsToFavorites( TraktSyncShows shows )
+        {
+          var response = PostToTrakt( TraktURIs.SyncFavoritesAdd, shows.ToJSON() );
+          return response.FromJSON<TraktSyncResponse>();
+        }
+
+        public static TraktSyncResponse RemoveShowsFromFavorites( TraktSyncShows shows )
+        {
+          var response = PostToTrakt( TraktURIs.SyncFavoritesRemove, shows.ToJSON() );
+          return response.FromJSON<TraktSyncResponse>();
+        }
+    #endregion
+
+        #region Favorites Sync (Single)
+
+        public static TraktSyncResponse AddMovieToFavorites(TraktMovie movie)
+        {
+            var movies = new TraktSyncMovies
+            {
+                Movies = new List<TraktMovie>() { movie }
+            };
+            return AddMoviesToFavorites(movies);
+        }
+        public static TraktSyncResponse RemoveMovieFromFavorites(TraktMovie movie)
+        {
+            var movies = new TraktSyncMovies
+            {
+                Movies = new List<TraktMovie>() { movie }
+            };
+            return RemoveMoviesFromFavorites(movies);
+        }
+        public static TraktSyncResponse AddShowToFavorites(TraktShow show)
+        {
+            var shows = new TraktSyncShows
+            {
+                Shows = new List<TraktShow>() { show }
+            };
+            return AddShowsToFavorites(shows);
+        }
+        public static TraktSyncResponse RemoveShowFromFavorites(TraktShow show)
+        {
+            var shows = new TraktSyncShows
+            {
+                Shows = new List<TraktShow>() { show }
+            };
+            return RemoveShowsFromFavorites(shows);
+        }
         #endregion
 
         #region Comments

@@ -217,6 +217,18 @@ namespace TraktPlugin.TraktHandlers
             }
             #endregion
 
+            #region Get fav movies from trakt.tv
+            var traktFavoriteMovies = TraktCache.GetFavoriteMoviesFromTrakt();
+            if ( traktFavoriteMovies == null )
+            {
+              TraktLogger.Error( "Error getting favorite movies from trakt server" );
+            }
+            else
+            {
+              TraktLogger.Info( "There are {0} favorite movies in trakt.tv library", traktFavoriteMovies.Count() );
+            }
+            #endregion
+
             #region Get custom lists from trakt.tv
             var traktCustomLists = TraktCache.GetCustomLists();
             if (traktCustomLists == null)
@@ -2178,6 +2190,73 @@ namespace TraktPlugin.TraktHandlers
         }
 
         /// <summary>
+        /// Removes a movie criteria from the Favorites node in the Categories and Filters menu(s)
+        /// </summary>
+        /// <param name="movie">IMDb movie ID used for the criteria</param>
+        internal static void RemoveMovieCriteriaFromFavoritesNode( string movieId )
+        {
+          if ( !BasicHandler.IsValidImdb( movieId ) )
+            return;
+
+          // remove from categories menu
+          if ( TraktSettings.MovingPicturesCategories && TraktCategoriesMenuExists )
+          {
+            TraktLogger.Debug( "Removing movie from the favorites node in the categories menu. Criteria = '{0}'", movieId );
+            var node = GetNodeByName( TraktCategoriesMenuRootNode, GUI.Translation.Favorites );
+            if ( node != null )
+            {
+              RemoveMovieCriteriaFromNode( node, movieId );
+            }
+          }
+
+          // remove from filters menu
+          if ( TraktSettings.MovingPicturesFilters && TraktFiltersMenuExists )
+          {
+            TraktLogger.Debug( "Removing movie from the favorites node in the filters menu. Criteria = '{0}'", movieId );
+            var node = GetNodeByName( TraktFiltersMenuRootNode, GUI.Translation.Favorites );
+            if ( node != null )
+            {
+              RemoveMovieCriteriaFromNode( node, movieId );
+            }
+          }
+        }
+
+        /// <summary>
+        /// Adds a movie criteria to the Favorites node in the Categories and Filters menu(s)
+        /// </summary>
+        /// <param name="movieId">IMDb movie ID used for the criteria</param>
+        internal static void AddMovieCriteriaToFavoritesNode( string movieId )
+        {
+          if ( !BasicHandler.IsValidImdb( movieId ) )
+            return;
+
+          // add to categories menu
+          if ( TraktSettings.MovingPicturesCategories && TraktCategoriesMenuExists )
+          {
+            TraktLogger.Info( "Added movie '{0}' to the favorites node in the categories menu.", movieId );
+            var node = GetNodeByName( TraktCategoriesMenuRootNode, GUI.Translation.Favorites );
+            if ( node != null )
+            {
+              AddMovieCriteriaToNode( node, movieId );
+            }
+          }
+
+          // add to filters menu
+          if ( TraktSettings.MovingPicturesFilters && TraktFiltersMenuExists )
+          {
+            TraktLogger.Info( "Adding movie '{0}' to the favorites node in the filters menu.", movieId );
+            var node = GetNodeByName( TraktFiltersMenuRootNode, GUI.Translation.Favorites );
+            if ( node != null )
+            {
+              AddMovieCriteriaToNode( node, movieId );
+            }
+          }
+
+          // clear the favorites cache as it's now out of sync
+          TraktCache.ClearCustomListCache();
+        }
+
+        /// <summary>
         /// Removes a movie criteria from the Recommendations node in the Categories and Filters menu(s)
         /// </summary>
         /// <param name="movie">IMDb movie ID used for the criteria</param>
@@ -2336,6 +2415,17 @@ namespace TraktPlugin.TraktHandlers
                 AddMoviesCriteriaToNode(watchListNode, watchlist.Select(m => m.Movie.Ids.Imdb));
             }
 
+            var favorites = TraktCache.GetFavoriteMoviesFromTrakt();
+            if ( favorites != null && ( syncLists & SyncListType.Favorites ) != 0 )
+            {
+              TraktLogger.Info( "Found {0} favorite movies on trakt.tv", favorites.Count() );
+              var favoritesNode = CreateNode( TraktCategoriesMenuRootNode, GUI.Translation.Favorites );
+
+              // add criteria to the nodes filter
+              TraktLogger.Info( "Adding users favorites from trakt.tv to the categories menu" );
+              AddMoviesCriteriaToNode( favoritesNode, favorites.Select( m => m.Movie.Ids.Imdb ) );
+            }
+
             var customLists = TraktCache.GetCustomLists();
             if (customLists != null && (syncLists & SyncListType.CustomList) != 0)
             {
@@ -2409,6 +2499,17 @@ namespace TraktPlugin.TraktHandlers
                 // add criteria to the nodes filter
                 TraktLogger.Info("Adding users watchlist from trakt.tv to the categories menu");
                 AddMoviesCriteriaToNode(watchListNode, watchlist.Select(m => m.Movie.Ids.Imdb));
+            }
+
+            var favorites = TraktCache.GetFavoriteMoviesFromTrakt();
+            if (favorites != null && (syncLists & SyncListType.Favorites) != 0)
+            {
+                TraktLogger.Info("Found {0} favorite movies on trakt.tv", favorites.Count());
+                var favoritesNode = CreateNode(TraktFiltersMenuRootNode, GUI.Translation.Favorites);
+
+                // add criteria to the nodes filter
+                TraktLogger.Info("Adding users favorite movies from trakt.tv to the categories menu");
+                AddMoviesCriteriaToNode(favoritesNode, favorites.Select(m => m.Movie.Ids.Imdb));
             }
 
             var customLists = TraktCache.GetCustomLists();

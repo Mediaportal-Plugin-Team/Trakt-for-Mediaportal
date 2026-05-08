@@ -261,11 +261,13 @@ namespace TraktPlugin.GUI
         public static string ActivityCheckedIn = "{0} checked into {1}";
         public static string ActivityCollected = "{0} collected {1}";
         public static string ActivityCollectedEpisodes = "{0} collected {1} episodes of {2}";
+        public static string ActivityFavorited = "{0} added {1} to their favorites";
         public static string ActivitySeen = "{0} seen {1}";
         public static string ActivitySeenEpisodes = "{0} seen {1} episodes of {2}";
         public static string ActivityRating = "{0} rated {1}";
         public static string ActivityRatingAdvanced = "{0} rated {1} [{2}/10]";
         public static string ActivityWatchlist = "{0} added {1} to their watchlist";
+        public static string ActivityYourFavorites = "{0} added {1} to your favorites";
         public static string ActivityYourWatchlist = "{0} added {1} to watchlist";
         public static string ActivityAddToList = "{0} added {1} to {2}";
         public static string ActivityCreatedList = "{0} created list {1}";
@@ -286,6 +288,7 @@ namespace TraktPlugin.GUI
         public static string ActivityFilterTypes = "Filter By Types...";
         public static string AiredEpisodes = "Aired Episodes";
         public static string AddFriend = "Add Friend...";
+        public static string AddToFavorites = "Add to Favorites";
         public static string AddToLibrary = "Add to Collection";
         public static string AddToList = "Add to List...";
         public static string AddToWatchList = "Add to Watchlist";
@@ -461,6 +464,8 @@ namespace TraktPlugin.GUI
         public static string FailedOnlineSettings = "Failed to get online settings from trakt";
         public static string FailedApplicationAuthorization = "Failed to authorize user for application";
         public static string FailedUpdateList = "Failed to update list online";
+        public static string Favorited = "Favorited";
+        public static string Favorites = "Favorites";
         public static string FeatureNotAvailable = "Sorry, this feature is currently not available";
         public static string Filters = "Filters";
         public static string FirstAired = "First Aired";
@@ -584,6 +589,7 @@ namespace TraktPlugin.GUI
         public static string HideComments = "Hide Comments";
         public static string HideCollected = "Hide Collected";
         public static string HideEpisodes = "Hide Episodes";
+        public static string HideFavorited = "Hide Favorited";
         public static string HideLiked = "Hide Liked";
         public static string HideLists = "Hide Lists";
         public static string HideMovies = "Hide Movies";
@@ -643,7 +649,6 @@ namespace TraktPlugin.GUI
         public static string LoggedIn = "Logged In";
         public static string Login = "Login";
         
-
         // M
         public static string MakeupArtist = "Makeup Artist";
         public static string MarkAsWatched = "Mark as Watched";
@@ -661,6 +666,10 @@ namespace TraktPlugin.GUI
         public static string MusicEditor = "Music Editor";
         public static string MovieCredits = "Movie Credits";
         public static string MovieCount = "{0} Movies";
+        public static string MyFavoriteMovies = "Favorite Movies";
+        public static string MyFavoriteShows = "Favorite Shows";
+        public static string MyFavoriteSeasons = "Favorite Seasons";
+        public static string MyFavoriteEpisodes = "Favorite Episodes  ";
 
         // N
         public static string Name = "Name";
@@ -797,7 +806,8 @@ namespace TraktPlugin.GUI
         public static string RecentWatchedMovies = "Recently Watched Movies";
         public static string RecentWatchedEpisodes = "Recently Watched Episodes";
         public static string RecentAddedMovies = "Recently Added Movies";
-        public static string RecentAddedEpisodes = "Recently Added Episodes";        
+        public static string RecentAddedEpisodes = "Recently Added Episodes";
+        public static string RemoveFromFavorites = "Remove from Favorites";
         public static string RemoveFromLibrary = "Remove from Collection";
         public static string RemoveFromWatchList = "Remove from Watchlist";
         public static string RemoveShowFromWatchList = "Remove Show from Watchlist";

@@ -1,13 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using MediaPortal.Configuration;
+using MediaPortal.Util;
+using System;
 using System.ComponentModel;
 using System.Drawing;
 using System.IO;
 using System.Net;
-using MediaPortal.Configuration;
-using MediaPortal.Util;
-using TraktPlugin.TmdbAPI.DataStructures;
 using TraktAPI.DataStructures;
+using TraktPlugin.TmdbAPI.DataStructures;
 
 namespace TraktPlugin.GUI
 {
@@ -18,7 +17,8 @@ namespace TraktPlugin.GUI
         Watchlist = 1,
         Seenit = 2,
         Library = 4,
-    }
+        Favorite = 8 // TODO: not currently used but may be added in the future
+  }
 
     /// <summary>
     /// Support both Advanced and Simple rating overlays

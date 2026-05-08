@@ -24,7 +24,7 @@ namespace TraktPlugin
         me
     }
 
-    #region Data Structures
+    #region Data Models
 
     [DataContract]
     public class ActivityFilter
@@ -95,6 +95,9 @@ namespace TraktPlugin
 
             [DataMember]
             public bool HiddenWatchedProgress = true;
+
+            [DataMember]
+            public bool Favorited = true;
         }
 
         [DataMember]
@@ -983,8 +986,12 @@ namespace TraktPlugin
                     imageFilename = activity.Rating > 5 ? "traktActivityLove.png" : "traktActivityHate.png";
                     break;
 
-                case ActivityAction.watchlist:
+                case ActivityAction.watchlist:                
                     imageFilename = "traktActivityWatchlist.png";
+                    break;
+
+                case ActivityAction.favorite:
+                    imageFilename = "traktActivityFavorite.png";
                     break;
 
                 case ActivityAction.shout:
@@ -1349,75 +1356,97 @@ namespace TraktPlugin
             #endregion
 
             #region watchlisted movies
-            if (TraktSettings.DashboardActivityFilter.Types.Movies && TraktSettings.DashboardActivityFilter.Actions.Watchlisted)
+            if ( TraktSettings.DashboardActivityFilter.Types.Movies && TraktSettings.DashboardActivityFilter.Actions.Watchlisted )
             {
-                var watchlistedMovies = TraktCache.GetWatchlistedMoviesFromTrakt(true);
-                if (watchlistedMovies != null)
+              var watchlistedMovies = TraktCache.GetWatchlistedMoviesFromTrakt( true );
+              if ( watchlistedMovies != null )
+              {
+                foreach ( var movie in watchlistedMovies.OrderByDescending( e => e.ListedAt ).Take( maxActivityItems ) )
                 {
-                    foreach (var movie in watchlistedMovies.OrderByDescending(e => e.ListedAt).Take(maxActivityItems))
+                  var watchlistedMovieActivity = new TraktActivity.Activity
+                  {
+                    Id = i++,
+                    Action = ActivityAction.watchlist.ToString(),
+                    Type = ActivityType.movie.ToString(),
+                    Movie = new TraktMovieSummary
                     {
-                        var watchlistedMovieActivity = new TraktActivity.Activity
-                        {
-                            Id = i++,
-                            Action = ActivityAction.watchlist.ToString(),
-                            Type = ActivityType.movie.ToString(),
-                            Movie = new TraktMovieSummary
-                            {
-                                Ids = movie.Movie.Ids,
-                                Title = movie.Movie.Title,
-                                Year = movie.Movie.Year
-                            },
-                            Timestamp = movie.ListedAt,
-                            User = GetUserProfile()
-                        };
+                      Ids = movie.Movie.Ids,
+                      Title = movie.Movie.Title,
+                      Year = movie.Movie.Year
+                    },
+                    Timestamp = movie.ListedAt,
+                    User = GetUserProfile()
+                  };
 
-                        // add activity to the list
-                        activity.Activities.Add(watchlistedMovieActivity);
-                    }
+                  // add activity to the list
+                  activity.Activities.Add( watchlistedMovieActivity );
                 }
+              }
             }
             #endregion
 
-            #region rated episodes
-            if (TraktSettings.DashboardActivityFilter.Types.Episodes && TraktSettings.DashboardActivityFilter.Actions.Rated)
+            #region favorited movies
+            if ( TraktSettings.DashboardActivityFilter.Types.Movies && TraktSettings.DashboardActivityFilter.Actions.Favorited )
             {
-                var ratedEpisodes = TraktCache.GetRatedEpisodesFromTrakt(true);
-                if (ratedEpisodes != null)
+              var favoritedMovies = TraktCache.GetFavoriteMoviesFromTrakt( true );
+              if ( favoritedMovies != null )
+              {
+                foreach ( var movie in favoritedMovies.OrderByDescending( e => e.ListedAt ).Take( maxActivityItems ) )
                 {
-                    foreach (var episode in ratedEpisodes.OrderByDescending(e => e.RatedAt).Take(maxActivityItems))
+                  var favoritedMovieActivity = new TraktActivity.Activity
+                  {
+                    Id = i++,
+                    Action = ActivityAction.favorite.ToString(),
+                    Type = ActivityType.movie.ToString(),
+                    Movie = new TraktMovieSummary
                     {
-                        var ratedEpActivity = new TraktActivity.Activity
-                        {
-                            Id = i++,
-                            Action = ActivityAction.rating.ToString(),
-                            Type = ActivityType.episode.ToString(),
-                            Episode = new TraktEpisodeSummary
-                            {
-                                Ids = episode.Episode.Ids,
-                                Number = episode.Episode.Number,
-                                Season = episode.Episode.Season,
-                                Title = episode.Episode.Title
-                            },
-                            Show = new TraktShowSummary
-                            {
-                                Title = episode.Show.Title,
-                                Year = episode.Show.Year,
-                                Ids = episode.Show.Ids
-                            },
-                            Rating = episode.Rating,
-                            Timestamp = episode.RatedAt,
-                            User = GetUserProfile()
-                        };
+                      Ids = movie.Movie.Ids,
+                      Title = movie.Movie.Title,
+                      Year = movie.Movie.Year
+                    },
+                    Timestamp = movie.ListedAt,
+                    User = GetUserProfile()
+                  };
 
-                        // add activity to the list
-                        activity.Activities.Add(ratedEpActivity);
-                    }
+                  // add activity to the list
+                  activity.Activities.Add( favoritedMovieActivity );
                 }
+              }
+            }
+            #endregion
+
+            #region favorited shows
+            if ( TraktSettings.DashboardActivityFilter.Types.Shows && TraktSettings.DashboardActivityFilter.Actions.Favorited )
+            {
+              var favoritedShows = TraktCache.GetFavoriteShowsFromTrakt( true );
+              if ( favoritedShows != null )
+              {
+                foreach ( var show in favoritedShows.OrderByDescending( e => e.ListedAt ).Take( maxActivityItems ) )
+                {
+                  var favoritedShowActivity = new TraktActivity.Activity
+                  {
+                    Id = i++,
+                    Action = ActivityAction.favorite.ToString(),
+                    Type = ActivityType.show.ToString(),
+                    Show = new TraktShowSummary
+                    {
+                      Ids = show.Show.Ids,
+                      Title = show.Show.Title,
+                      Year = show.Show.Year
+                    },
+                    Timestamp = show.ListedAt,
+                    User = GetUserProfile()
+                  };
+
+                  // add activity to the list
+                  activity.Activities.Add( favoritedShowActivity );
+                }
+              }
             }
             #endregion
 
             #region rated seasons
-            if (TraktSettings.DashboardActivityFilter.Types.Seasons && TraktSettings.DashboardActivityFilter.Actions.Rated)
+            if ( TraktSettings.DashboardActivityFilter.Types.Seasons && TraktSettings.DashboardActivityFilter.Actions.Rated)
             {
                 var ratedSeasons = TraktCache.GetRatedSeasonsFromTrakt(true);
                 if (ratedSeasons != null)
@@ -2205,6 +2234,14 @@ namespace TraktPlugin
                 ItemTitle2 = !TraktSettings.DashboardActivityFilter.Actions.Watchlisted ? Translation.Yes : Translation.No
             });
 
+            items.Add( new MultiSelectionItem
+            {
+              IsToggle = true,
+              ItemID = ActivityAction.favorite.ToString(),
+              ItemTitle = Translation.HideFavorited,
+              ItemTitle2 = !TraktSettings.DashboardActivityFilter.Actions.Favorited ? Translation.Yes : Translation.No
+            } );
+
             items.Add(new MultiSelectionItem
             {
                 IsToggle = true,
@@ -2300,6 +2337,10 @@ namespace TraktPlugin
                     case ActivityAction.watchlist:
                         TraktSettings.DashboardActivityFilter.Actions.Watchlisted = !TraktSettings.DashboardActivityFilter.Actions.Watchlisted;
                         break;
+
+                    case ActivityAction.favorite:
+                      TraktSettings.DashboardActivityFilter.Actions.Favorited = !TraktSettings.DashboardActivityFilter.Actions.Favorited;
+                      break;
 
                     case ActivityAction.pause:
                         TraktSettings.DashboardActivityFilter.Actions.Paused = !TraktSettings.DashboardActivityFilter.Actions.Paused;
@@ -2471,7 +2512,13 @@ namespace TraktPlugin
                     (selectedItem as GUIShowListItem).Images.NotifyPropertyChanged("Poster");
                     break;
 
-                case ((int)MediaContextMenuItem.ShowSeasonInfo):
+                case ( (int)MediaContextMenuItem.AddToFavorites ):
+                  TraktHelper.AddShowToFavorites( selectedTrendingItem.Show );
+                  OnTrendingShowSelected( selectedItem, trendingShowsFacade );
+                  ( selectedItem as GUIShowListItem ).Images.NotifyPropertyChanged( "Poster" );
+                  break;
+
+                case ( (int)MediaContextMenuItem.ShowSeasonInfo):
                     GUIWindowManager.ActivateWindow((int)TraktGUIWindows.ShowSeasons, selectedTrendingItem.Show.ToJSON());
                     break;
 
@@ -2488,6 +2535,12 @@ namespace TraktPlugin
                     OnTrendingShowSelected(selectedItem, trendingShowsFacade);
                     (selectedItem as GUIShowListItem).Images.NotifyPropertyChanged("Poster");
                     break;
+
+                case ( (int)MediaContextMenuItem.RemoveFromFavorites ):
+                  TraktHelper.RemoveShowFromFavorites( selectedTrendingItem.Show );
+                  OnTrendingShowSelected( selectedItem, trendingShowsFacade );
+                  ( selectedItem as GUIShowListItem ).Images.NotifyPropertyChanged( "Poster" );
+                  break;
 
                 case ((int)MediaContextMenuItem.AddToList):
                     TraktHelper.AddRemoveShowInUserList(selectedTrendingItem.Show, false);
@@ -2592,6 +2645,18 @@ namespace TraktPlugin
                     OnTrendingMovieSelected(selectedItem, trendingMoviesFacade);
                     (selectedItem as GUIMovieListItem).Images.NotifyPropertyChanged("Poster");
                     break;
+
+                case ( (int)MediaContextMenuItem.AddToFavorites ):
+                  TraktHelper.AddMovieToFavorites( selectedTrendingItem.Movie, true );
+                  OnTrendingMovieSelected( selectedItem, trendingMoviesFacade );
+                  ( selectedItem as GUIMovieListItem ).Images.NotifyPropertyChanged( "Poster" );
+                  break;
+
+                case ( (int)MediaContextMenuItem.RemoveFromFavorites ):
+                  TraktHelper.RemoveMovieFromFavorites( selectedTrendingItem.Movie, true );
+                  OnTrendingMovieSelected( selectedItem, trendingMoviesFacade );
+                  ( selectedItem as GUIMovieListItem ).Images.NotifyPropertyChanged( "Poster" );
+                  break;
 
                 case ((int)MediaContextMenuItem.AddToList):
                     TraktHelper.AddRemoveMovieInUserList(selectedTrendingItem.Movie, false);
@@ -2896,6 +2961,20 @@ namespace TraktPlugin
                     // force reload of activity view as we only check if the most recent item has changed
                     mReloadActivityView = true;
                     break;
+
+                case ( (int)ActivityContextMenuItem.AddToFavorites ):
+                  if ( activity.Movie != null )
+                    TraktHelper.AddMovieToFavorites( activity.Movie, true );
+                  else
+                    TraktHelper.AddShowToFavorites( activity.Show );
+                  break;
+
+                case ( (int)ActivityContextMenuItem.RemoveFromFavorites ):
+                  if ( activity.Movie != null )
+                    TraktHelper.RemoveMovieFromFavorites( activity.Movie, true );
+                  else
+                    TraktHelper.RemoveShowFromFavorites( activity.Show );
+                  break;
 
                 case ((int)ActivityContextMenuItem.MarkAsWatched):
                     if (activity.Movie != null)
