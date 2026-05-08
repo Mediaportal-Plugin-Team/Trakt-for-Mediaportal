@@ -28,6 +28,7 @@ namespace TraktPlugin
         private static readonly string MoviesCommentedFile = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\{username}\Library\Movies\Commented.json");
         private static readonly string MoviesPausedFile = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\{username}\Library\Movies\Paused.json");
         private static readonly string MoviesHiddenFile = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\{username}\Library\Movies\Hidden.json");
+        private static readonly string MoviesFavoritesFile = Path.Combine( Config.GetFolder( Config.Dir.Config ), @"Trakt\{username}\Library\Movies\Favorites.json" );
 
         private static readonly string EpisodesWatchlistedFile = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\{username}\Library\Episodes\Watchlisted.json");
         private static readonly string EpisodesCollectedFile = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\{username}\Library\Episodes\Collected.json");
@@ -35,16 +36,19 @@ namespace TraktPlugin
         private static readonly string EpisodesRatedFile = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\{username}\Library\Episodes\Rated.json");
         private static readonly string EpisodesCommentedFile = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\{username}\Library\Episodes\Commented.json");
         private static readonly string EpisodesPausedFile = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\{username}\Library\Episodes\Paused.json");
+        private static readonly string EpisodesFavoritesFile = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\{username}\Library\Episodes\Favorites.json");
 
         private static readonly string ShowsWatchlistedFile = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\{username}\Library\Shows\Watchlisted.json");
         private static readonly string ShowsRatedFile = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\{username}\Library\Shows\Rated.json");
         private static readonly string ShowsCommentedFile = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\{username}\Library\Shows\Commented.json");
         private static readonly string ShowsHiddenFile = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\{username}\Library\Shows\Hidden.json");
+        private static readonly string ShowsFavoritesFile = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\{username}\Library\Shows\Favorites.json");
 
         private static readonly string SeasonsWatchlistedFile = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\{username}\Library\Seasons\Watchlisted.json");
         private static readonly string SeasonsRatedFile = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\{username}\Library\Seasons\Rated.json");
         private static readonly string SeasonsCommentedFile = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\{username}\Library\Seasons\Commented.json");
         private static readonly string SeasonsHiddenFile = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\{username}\Library\Seasons\Hidden.json");
+        private static readonly string SeasonsFavoritesFile = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\{username}\Library\Seasons\Favorites.json");
 
         private static readonly string CustomListsFile = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\{username}\Library\Lists\Menu.json");
         private static readonly string CustomListFile = Path.Combine(Config.GetFolder(Config.Dir.Config), @"Trakt\{username}\Library\Lists\{listname}.json");
@@ -88,6 +92,9 @@ namespace TraktPlugin
                 GetWatchlistedShowsFromTrakt();
                 GetWatchlistedSeasonsFromTrakt();
                 GetWatchlistedEpisodesFromTrakt();
+                GetFavoriteShowsFromTrakt();
+                //GetFavoriteSeasonsFromTrakt();
+                //GetFavoriteEpisodesFromTrakt();
                 GetCommentedEpisodesFromTrakt();
                 GetCommentedSeasonsFromTrakt();
                 GetCommentedShowsFromTrakt();
@@ -106,6 +113,7 @@ namespace TraktPlugin
                 GetCollectedMoviesFromTrakt();
                 GetRatedMoviesFromTrakt();
                 GetWatchlistedMoviesFromTrakt();
+                GetFavoriteMoviesFromTrakt();
                 GetCommentedMoviesFromTrakt();
                 GetHiddenMoviesFromTrakt();
 
@@ -1347,6 +1355,83 @@ namespace TraktPlugin
         }
         static IEnumerable<TraktMovie> _RecommendedMovies = null;
 
+        public static IEnumerable<TraktFavoriteItem> GetFavoriteMoviesFromTrakt( bool ignoreLastSyncTime = false )
+        {
+          lock ( syncLists )
+          {
+            // get from cache regardless of last sync time
+            if ( ignoreLastSyncTime )
+              return FavoriteMovies;
+
+            TraktLogger.Info( "Getting current user favorited movies from trakt" );
+
+            // get the last time we did anything to our library online
+            var lastSyncActivities = LastSyncActivities;
+
+            // something bad happened e.g. site not available
+            if ( lastSyncActivities == null || lastSyncActivities.Movies == null )
+              return null;
+
+            // check the last time we have against the online time
+            // if the times are the same try to load from cache
+            if ( lastSyncActivities.Movies.FavoritedAt == TraktSettings.LastSyncActivities.Movies.FavoritedAt )
+            {
+              var cachedItems = FavoriteMovies;
+              if ( cachedItems != null )
+                return cachedItems;
+            }
+
+            TraktLogger.Info( "Movie favorites cache is out of date, requesting updated data. Local Date = '{0}', Online Date = '{1}'", TraktSettings.LastSyncActivities.Movies.FavoritedAt ?? "<empty>", lastSyncActivities.Movies.FavoritedAt ?? "<empty>" );
+
+            int maxItemsPerPage = 100;
+
+            // we get from online, local cache is not up to date (first page)
+            var onlineItems = TraktAPI.TraktAPI.GetFavourites( type: "movies", page: 1, maxItems: maxItemsPerPage );
+            if ( onlineItems == null || onlineItems.Items == null )
+              return null;
+
+            _FavoriteMovies = onlineItems.Items;
+
+            // get more pages if required
+            while ( onlineItems.CurrentPage < onlineItems.TotalPages )
+            {
+              // Note: API returns total pages for all favorite types not just this one (movies)
+              // so we need to check returned items against our expected max items per page
+              if ( onlineItems.Items.Count() < ( maxItemsPerPage * onlineItems.CurrentPage ) )
+                break;
+
+              onlineItems = TraktAPI.TraktAPI.GetFavourites( type: "movies", page: onlineItems.CurrentPage + 1, maxItems: maxItemsPerPage );
+              if ( onlineItems == null || onlineItems.Items == null )
+                break;
+
+              _FavoriteMovies = _FavoriteMovies.Concat( onlineItems.Items );
+            }
+
+            // save to local file cache
+            SaveFileCache( MoviesFavoritesFile, _FavoriteMovies.ToList().ToJSON() );
+
+            // save new activity time for next time
+            TraktSettings.LastSyncActivities.Movies.FavoritedAt = lastSyncActivities.Movies.FavoritedAt;
+
+            return _FavoriteMovies;
+          }
+        }
+
+        static IEnumerable<TraktFavoriteItem> FavoriteMovies
+        {
+          get
+          {
+            if ( _FavoriteMovies == null )
+            {
+              var persistedItems = LoadFileCache( MoviesFavoritesFile, null );
+              if ( persistedItems != null )
+                _FavoriteMovies = persistedItems.FromJSONArray<TraktFavoriteItem>();
+            }
+            return _FavoriteMovies;
+          }
+        }
+        static IEnumerable<TraktFavoriteItem> _FavoriteMovies = null;
+
         #endregion
 
         #region Shows
@@ -1434,6 +1519,83 @@ namespace TraktPlugin
         }
         static IEnumerable<TraktShowWatchListItem> _WatchListShows = null;
 
+        public static IEnumerable<TraktFavoriteItem> GetFavoriteShowsFromTrakt( bool ignoreLastSyncTime = false )
+        {
+          lock ( syncLists )
+          {
+            // get from cache regardless of last sync time
+            if ( ignoreLastSyncTime )
+              return FavoriteShows;
+
+            TraktLogger.Info( "Getting current user favorited shows from trakt" );
+
+            // get the last time we did anything to our library online
+            var lastSyncActivities = LastSyncActivities;
+
+            // something bad happened e.g. site not available
+            if ( lastSyncActivities == null || lastSyncActivities.Shows == null )
+              return null;
+
+            // check the last time we have against the online time
+            // if the times are the same try to load from cache
+            if ( lastSyncActivities.Shows.FavoritedAt == TraktSettings.LastSyncActivities.Shows.FavoritedAt )
+            {
+              var cachedItems = FavoriteShows;
+              if ( cachedItems != null )
+                return cachedItems;
+            }
+
+            TraktLogger.Info( "TV show favorites cache is out of date, requesting updated data. Local Date = '{0}', Online Date = '{1}'", TraktSettings.LastSyncActivities.Shows.FavoritedAt ?? "<empty>", lastSyncActivities.Shows.FavoritedAt ?? "<empty>" );
+
+            int maxItemsPerPage = 100;
+
+            // we get from online, local cache is not up to date (first page)
+            var onlineItems = TraktAPI.TraktAPI.GetFavourites( type: "shows", page: 1, maxItems: maxItemsPerPage );
+            if ( onlineItems == null || onlineItems.Items == null )
+              return null;
+
+            _FavoriteShows = onlineItems.Items;
+
+            // get more pages if required
+            while ( onlineItems.CurrentPage < onlineItems.TotalPages )
+            {
+              // Note: API returns total pages for all favorite types not just this one (shows)
+              // so we need to check returned items against our expected max items per page
+              if ( onlineItems.Items.Count() < ( maxItemsPerPage * onlineItems.CurrentPage ) )
+                break;
+
+              onlineItems = TraktAPI.TraktAPI.GetFavourites( type: "shows", page: onlineItems.CurrentPage + 1, maxItems: maxItemsPerPage );
+              if ( onlineItems == null || onlineItems.Items == null )
+                break;
+
+              _FavoriteShows = _FavoriteShows.Concat( onlineItems.Items );
+            }
+
+            // save to local file cache
+            SaveFileCache( ShowsFavoritesFile, _FavoriteShows.ToList().ToJSON() );
+
+            // save new activity time for next time
+            TraktSettings.LastSyncActivities.Shows.FavoritedAt = lastSyncActivities.Shows.FavoritedAt;
+
+            return _FavoriteShows;
+          }
+        }
+
+        static IEnumerable<TraktFavoriteItem> FavoriteShows
+        {
+          get
+          {
+            if ( _FavoriteShows == null )
+            {
+              var persistedItems = LoadFileCache( ShowsFavoritesFile, null );
+              if ( persistedItems != null )
+                _FavoriteShows = persistedItems.FromJSONArray<TraktFavoriteItem>();
+            }
+            return _FavoriteShows;
+          }
+        }
+        static IEnumerable<TraktFavoriteItem> _FavoriteShows = null;
+
         #endregion
 
         #region Seasons
@@ -1520,7 +1682,84 @@ namespace TraktPlugin
             }
         }
         static IEnumerable<TraktSeasonWatchListItem> _WatchListSeasons = null;
-       
+
+        public static IEnumerable<TraktFavoriteItem> GetFavoriteSeasonsFromTrakt( bool ignoreLastSyncTime = false )
+        {
+          lock ( syncLists )
+          {
+            // get from cache regardless of last sync time
+            if ( ignoreLastSyncTime )
+              return FavoriteSeasons;
+
+            TraktLogger.Info( "Getting current user favorited seasons from trakt" );
+
+            // get the last time we did anything to our library online
+            var lastSyncActivities = LastSyncActivities;
+
+            // something bad happened e.g. site or feature not available
+            if ( lastSyncActivities?.Seasons?.FavoritedAt == null )
+              return null;
+
+            // check the last time we have against the online time
+            // if the times are the same try to load from cache
+            if ( lastSyncActivities.Seasons.FavoritedAt == TraktSettings.LastSyncActivities.Seasons.FavoritedAt )
+            {
+              var cachedItems = FavoriteSeasons;
+              if ( cachedItems != null )
+                return cachedItems;
+            }
+
+            TraktLogger.Info( "TV seasons favorites cache is out of date, requesting updated data. Local Date = '{0}', Online Date = '{1}'", TraktSettings.LastSyncActivities.Seasons.FavoritedAt ?? "<empty>", lastSyncActivities.Seasons.FavoritedAt ?? "<empty>" );
+
+            int maxItemsPerPage = 100;
+
+            // we get from online, local cache is not up to date (first page)
+            var onlineItems = TraktAPI.TraktAPI.GetFavourites( type: "seasons", page: 1, maxItems: maxItemsPerPage );
+            if ( onlineItems == null || onlineItems.Items == null )
+              return null;
+
+            _FavoriteSeasons = onlineItems.Items;
+
+            // get more pages if required
+            while ( onlineItems.CurrentPage < onlineItems.TotalPages )
+            {
+              // Note: API returns total pages for all favorite types not just this one (seasons)
+              // so we need to check returned items against our expected max items per page
+              if ( onlineItems.Items.Count() < ( maxItemsPerPage * onlineItems.CurrentPage ) )
+                break;
+
+              onlineItems = TraktAPI.TraktAPI.GetFavourites( type: "seasons", page: onlineItems.CurrentPage + 1, maxItems: maxItemsPerPage );
+              if ( onlineItems == null || onlineItems.Items == null )
+                break;
+
+              _FavoriteSeasons = _FavoriteSeasons.Concat( onlineItems.Items );
+            }
+
+            // save to local file cache
+            SaveFileCache( SeasonsFavoritesFile, _FavoriteSeasons.ToList().ToJSON() );
+
+            // save new activity time for next time
+            TraktSettings.LastSyncActivities.Seasons.FavoritedAt = lastSyncActivities.Seasons.FavoritedAt;
+
+            return _FavoriteShows;
+          }
+        }
+
+        static IEnumerable<TraktFavoriteItem> FavoriteSeasons
+        {
+          get
+          {
+            if ( _FavoriteSeasons == null )
+            {
+              var persistedItems = LoadFileCache( SeasonsFavoritesFile, null );
+              if ( persistedItems != null )
+                _FavoriteSeasons = persistedItems.FromJSONArray<TraktFavoriteItem>();
+            }
+            return _FavoriteSeasons;
+          }
+        }
+        static IEnumerable<TraktFavoriteItem> _FavoriteSeasons = null;
+
         #endregion
 
         #region Episodes
@@ -1607,6 +1846,83 @@ namespace TraktPlugin
             }
         }
         static IEnumerable<TraktEpisodeWatchListItem> _WatchListEpisodes = null;
+
+        public static IEnumerable<TraktFavoriteItem> GetFavoriteEpisodesFromTrakt( bool ignoreLastSyncTime = false )
+        {
+          lock ( syncLists )
+          {
+            // get from cache regardless of last sync time
+            if ( ignoreLastSyncTime )
+              return FavoriteEpisodes;
+
+            TraktLogger.Info( "Getting current user favorited episodes from trakt" );
+
+            // get the last time we did anything to our library online
+            var lastSyncActivities = LastSyncActivities;
+
+            // something bad happened e.g. site or feature not available
+            if ( lastSyncActivities?.Episodes?.FavoritedAt == null )
+              return null;
+
+            // check the last time we have against the online time
+            // if the times are the same try to load from cache
+            if ( lastSyncActivities.Episodes.FavoritedAt == TraktSettings.LastSyncActivities.Episodes.FavoritedAt )
+            {
+              var cachedItems = FavoriteEpisodes;
+              if ( cachedItems != null )
+                return cachedItems;
+            }
+
+            TraktLogger.Info( "TV episodes favorites cache is out of date, requesting updated data. Local Date = '{0}', Online Date = '{1}'", TraktSettings.LastSyncActivities.Episodes.FavoritedAt ?? "<empty>", lastSyncActivities.Episodes.FavoritedAt ?? "<empty>" );
+
+            int maxItemsPerPage = 100;
+
+            // we get from online, local cache is not up to date (first page)
+            var onlineItems = TraktAPI.TraktAPI.GetFavourites( type: "episodes", page: 1, maxItems: maxItemsPerPage );
+            if ( onlineItems == null || onlineItems.Items == null )
+              return null;
+
+            _FavoriteEpisodes = onlineItems.Items;
+
+            // get more pages if required
+            while ( onlineItems.CurrentPage < onlineItems.TotalPages )
+            {
+              // Note: API returns total pages for all favorite types not just this one (episodes)
+              // so we need to check returned items against our expected max items per page
+              if ( onlineItems.Items.Count() < ( maxItemsPerPage * onlineItems.CurrentPage ) )
+                break;
+
+              onlineItems = TraktAPI.TraktAPI.GetFavourites( type: "episodes", page: onlineItems.CurrentPage + 1, maxItems: maxItemsPerPage );
+              if ( onlineItems == null || onlineItems.Items == null )
+                break;
+
+              _FavoriteEpisodes = _FavoriteEpisodes.Concat( onlineItems.Items );
+            }
+
+            // save to local file cache
+            SaveFileCache( EpisodesFavoritesFile, _FavoriteEpisodes.ToList().ToJSON() );
+
+            // save new activity time for next time
+            TraktSettings.LastSyncActivities.Episodes.FavoritedAt = lastSyncActivities.Episodes.FavoritedAt;
+
+            return _FavoriteEpisodes;
+          }
+        }
+
+        static IEnumerable<TraktFavoriteItem> FavoriteEpisodes
+        {
+          get
+          {
+            if ( _FavoriteEpisodes == null )
+            {
+              var persistedItems = LoadFileCache( EpisodesFavoritesFile, null );
+              if ( persistedItems != null )
+                _FavoriteEpisodes = persistedItems.FromJSONArray<TraktFavoriteItem>();
+            }
+            return _FavoriteEpisodes;
+          }
+        }
+        static IEnumerable<TraktFavoriteItem> _FavoriteEpisodes = null;
 
         #endregion
 
@@ -2802,6 +3118,17 @@ namespace TraktPlugin
                                             ((m.Movie.Ids.Tmdb == movie.Ids.Tmdb) && m.Movie.Ids.Tmdb != null));
         }
 
+
+        public static bool IsFavorited( this TraktMovie movie )
+        {
+          if ( FavoriteMovies == null )
+            return false;
+
+          return FavoriteMovies.Any( m => ( ( m.Movie.Ids.Trakt == movie.Ids.Trakt ) && m.Movie.Ids.Trakt != null ) ||
+                                          ( ( m.Movie.Ids.Imdb == movie.Ids.Imdb ) && m.Movie.Ids.Imdb.ToNullIfEmpty() != null ) ||
+                                          ( ( m.Movie.Ids.Tmdb == movie.Ids.Tmdb ) && m.Movie.Ids.Tmdb != null ) );
+        }
+
         public static int? UserRating(this TraktMovie movie)
         {
             if (RatedMovies == null)
@@ -2881,6 +3208,14 @@ namespace TraktPlugin
                 return false;
 
             return WatchListShows.Any(s => (((s.Show.Ids.Trakt == show.Ids.Trakt) && s.Show.Ids.Trakt != null) || ((s.Show.Ids.Tvdb == show.Ids.Tvdb) && show.Ids.Tvdb != null)));
+        }
+
+        public static bool IsFavorited( this TraktShow show )
+        {
+          if ( FavoriteShows == null )
+            return false;
+
+          return FavoriteShows.Any( s => ( ( ( s.Show.Ids.Trakt == show.Ids.Trakt ) && s.Show.Ids.Trakt != null ) || ( ( s.Show.Ids.Tvdb == show.Ids.Tvdb ) && show.Ids.Tvdb != null ) ) );
         }
 
         public static int? UserRating(this TraktShow show)
@@ -3221,6 +3556,16 @@ namespace TraktPlugin
                 return false;
         }
 
+        public static bool IsFavorited( this TraktActivity.Activity activity )
+        {
+          if ( activity.Movie != null )
+            return activity.Movie.IsFavorited();
+          else if ( activity.Show != null )
+            return activity.Show.IsFavorited();
+          else
+            return false;
+        }
+
         public static int Plays(this TraktActivity.Activity activity)
         {
             if (activity.Movie != null)
@@ -3404,6 +3749,11 @@ namespace TraktPlugin
             _WatchListSeasons = null;
             _WatchListEpisodes = null;
 
+            _FavoriteMovies = null;
+            _FavoriteShows = null;
+            _FavoriteSeasons = null;
+            _FavoriteEpisodes = null;
+
             _PausedEpisodes = null;
             _PausedMovies = null;
 
@@ -3500,6 +3850,24 @@ namespace TraktPlugin
             });
 
             _WatchListMovies = watchlistMovies;
+        }
+
+        internal static void AddMovieToFavorites( TraktMovie movie )
+        {
+          var favoriteMovies = ( _FavoriteMovies ?? new List<TraktFavoriteItem>() ).ToList();
+
+          favoriteMovies.Add( new TraktFavoriteItem
+          {
+            ListedAt = DateTime.UtcNow.ToISO8601(),
+            Movie = new TraktMovieSummary
+            {
+              Ids = movie.Ids,
+              Title = movie.Title,
+              Year = movie.Year
+            }
+          } );
+
+          _FavoriteMovies = favoriteMovies;
         }
 
         internal static void AddMoviesToCollection(List<TraktSyncMovieCollected> movies)
@@ -3656,6 +4024,24 @@ namespace TraktPlugin
             });
 
             _WatchListShows = watchlistShows;
+        }
+
+        internal static void AddShowToFavorites( TraktShow show )
+        {
+          var favoriteShows = ( _FavoriteShows ?? new List<TraktFavoriteItem>() ).ToList();
+
+          favoriteShows.Add( new TraktFavoriteItem
+          {
+            ListedAt = DateTime.UtcNow.ToISO8601(),
+            Show = new TraktShowSummary
+            {
+              Ids = show.Ids,
+              Title = show.Title,
+              Year = show.Year
+            }
+          } );
+
+          _FavoriteShows = favoriteShows;
         }
 
         internal static void AddShowToCollection(TraktShow show, List<TraktEpisode> episodes)
@@ -4116,6 +4502,25 @@ namespace TraktPlugin
             _WatchListMovies = watchlistMovies;
         }
 
+        internal static void RemoveMovieFromFavorites( TraktMovie movie )
+        {
+          if ( _FavoriteMovies == null || movie.Ids == null )
+            return;
+
+          var favoriteMovies = _FavoriteMovies.ToList();
+          favoriteMovies.RemoveAll( m => ( ( m.Movie.Ids.Trakt == movie.Ids.Trakt ) && m.Movie.Ids.Trakt != null ) ||
+                                         ( ( m.Movie.Ids.Imdb == movie.Ids.Imdb ) && m.Movie.Ids.Imdb.ToNullIfEmpty() != null ) ||
+                                         ( ( m.Movie.Ids.Tmdb == movie.Ids.Tmdb ) && m.Movie.Ids.Tmdb != null ) );
+
+          // remove using Title + Year
+          if ( movie.Ids.Trakt == null && movie.Ids.Imdb.ToNullIfEmpty() == null && movie.Ids.Tmdb == null )
+          {
+            favoriteMovies.RemoveAll( m => m.Movie.Title.ToLowerInvariant() == movie.Title.ToLower() && m.Movie.Year == movie.Year );
+          }
+
+          _FavoriteMovies = favoriteMovies;
+        }
+
         internal static void RemoveMoviesFromCollection(List<TraktMovie> movies)
         {
             foreach (var movie in movies)
@@ -4248,6 +4653,25 @@ namespace TraktPlugin
             }
 
             _WatchListShows = watchlistShows;
+        }
+
+        internal static void RemoveShowFromFavorites( TraktShow show )
+        {
+          if ( _FavoriteShows == null || show.Ids == null )
+            return;
+
+          var favoriteShows = _FavoriteShows.ToList();
+          favoriteShows.RemoveAll( s => ( ( s.Show.Ids.Trakt == show.Ids.Trakt ) && s.Show.Ids.Trakt != null ) ||
+                                        ( ( s.Show.Ids.Imdb == show.Ids.Imdb ) && s.Show.Ids.Imdb.ToNullIfEmpty() != null ) ||
+                                        ( ( s.Show.Ids.Tvdb == show.Ids.Tvdb ) && s.Show.Ids.Tvdb != null ) );
+
+          // remove using Title + Year
+          if ( show.Ids.Trakt == null && show.Ids.Imdb.ToNullIfEmpty() == null && show.Ids.Tvdb == null )
+          {
+            favoriteShows.RemoveAll( s => s.Show.Title.ToLowerInvariant() == show.Title.ToLower() && s.Show.Year == show.Year );
+          }
+
+          _FavoriteShows = favoriteShows;
         }
 
         internal static void RemoveShowFromCollection(TraktShow show)
@@ -4564,6 +4988,7 @@ namespace TraktPlugin
             SaveFileCache(MoviesPausedFile, _PausedMovies.ToList().ToJSON());
             SaveFileCache(MoviesCommentedFile, _CommentedMovies.ToList().ToJSON());
             SaveFileCache(MoviesHiddenFile, _HiddenMovies.ToList().ToJSON());
+            SaveFileCache(MoviesFavoritesFile, _FavoriteMovies.ToList().ToJSON());
 
             SaveFileCache(EpisodesWatchlistedFile, _WatchListEpisodes.ToList().ToJSON());
             SaveFileCache(EpisodesCollectedFile, _CollectedEpisodes.ToList().ToJSON());
@@ -4571,16 +4996,19 @@ namespace TraktPlugin
             SaveFileCache(EpisodesRatedFile, _RatedEpisodes.ToList().ToJSON());
             SaveFileCache(EpisodesPausedFile, _PausedEpisodes.ToList().ToJSON());
             SaveFileCache(EpisodesCommentedFile, _CommentedEpisodes.ToList().ToJSON());
-
+            //SaveFileCache(EpisodesFavoritesFile, _FavoriteEpisodes.ToList().ToJSON());
+       
             SaveFileCache(ShowsWatchlistedFile, _WatchListShows.ToList().ToJSON());
             SaveFileCache(ShowsRatedFile, _RatedShows.ToList().ToJSON());
             SaveFileCache(ShowsCommentedFile, _CommentedShows.ToList().ToJSON());
             SaveFileCache(ShowsHiddenFile, _HiddenShows.ToList().ToJSON());
+            SaveFileCache(ShowsFavoritesFile, _FavoriteShows.ToList().ToJSON());
 
             SaveFileCache(SeasonsWatchlistedFile, _WatchListSeasons.ToList().ToJSON());
             SaveFileCache(SeasonsRatedFile, _RatedSeasons.ToList().ToJSON());
             SaveFileCache(SeasonsCommentedFile, _CommentedSeasons.ToList().ToJSON());
             SaveFileCache(SeasonsHiddenFile, _HiddenSeasons.ToList().ToJSON());
+            //SaveFileCache(SeasonsFavoritesFile, _FavoriteSeasons.ToList().ToJSON());
 
             SaveFileCache(CustomListCommentedFile, _CommentedLists.ToList().ToJSON());
             SaveFileCache(CustomListLikedFile, _LikedLists.ToList().ToJSON());

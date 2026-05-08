@@ -271,7 +271,19 @@ namespace TraktPlugin.GUI
                     (Facade.SelectedListItem as GUIMovieListItem).Images.NotifyPropertyChanged("Poster");
                     break;
 
-                case ((int)MediaContextMenuItem.AddToList):
+                case ( (int)MediaContextMenuItem.AddToFavorites ):
+                  TraktHelper.AddMovieToFavorites( selectedPopularMovie, true );
+                  OnMovieSelected( selectedItem, Facade );
+                  ( Facade.SelectedListItem as GUIMovieListItem ).Images.NotifyPropertyChanged( "Poster" );
+                  break;
+
+                case ( (int)MediaContextMenuItem.RemoveFromFavorites ):
+                  TraktHelper.RemoveMovieFromFavorites( selectedPopularMovie, true );
+                  OnMovieSelected( selectedItem, Facade );
+                  ( Facade.SelectedListItem as GUIMovieListItem ).Images.NotifyPropertyChanged( "Poster" );
+                  break;
+
+                case ( (int)MediaContextMenuItem.AddToList):
                     TraktHelper.AddRemoveMovieInUserList(selectedPopularMovie, false);
                     break;
 

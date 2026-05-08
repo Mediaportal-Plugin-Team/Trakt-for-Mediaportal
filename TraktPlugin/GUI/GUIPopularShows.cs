@@ -263,6 +263,18 @@ namespace TraktPlugin.GUI
                     if (TraktSettings.PopularShowsHideWatchlisted) LoadPopularShows(CurrentPage);
                     break;
 
+                case ( (int)MediaContextMenuItem.AddToFavorites ):
+                  TraktHelper.AddShowToFavorites( selectedPopularItem );
+                  OnShowSelected( selectedItem, Facade );
+                  ( Facade.SelectedListItem as GUIShowListItem ).Images.NotifyPropertyChanged( "Poster" );
+                  break;
+
+                case ( (int)MediaContextMenuItem.RemoveFromFavorites ):
+                  TraktHelper.RemoveShowFromFavorites( selectedPopularItem );
+                  OnShowSelected( selectedItem, Facade );
+                  ( Facade.SelectedListItem as GUIShowListItem ).Images.NotifyPropertyChanged( "Poster" );
+                  break;
+
                 case ((int)MediaContextMenuItem.ShowSeasonInfo):
                     GUIWindowManager.ActivateWindow((int)TraktGUIWindows.ShowSeasons, selectedPopularItem.ToJSON());
                     break;

@@ -230,6 +230,18 @@ namespace TraktPlugin.GUI
                     if (TraktSettings.AnticipatedShowsHideWatchlisted) LoadAnticipatedShows(CurrentPage);
                     break;
 
+                case ( (int)MediaContextMenuItem.AddToFavorites ):
+                  TraktHelper.AddShowToFavorites( selectedAnticipatedItem.Show );
+                  OnShowSelected( selectedItem, Facade );
+                  ( Facade.SelectedListItem as GUIShowListItem ).Images.NotifyPropertyChanged( "Poster" );
+                  break;
+
+                case ( (int)MediaContextMenuItem.RemoveFromFavorites ):
+                  TraktHelper.RemoveShowFromFavorites( selectedAnticipatedItem.Show );
+                  OnShowSelected( selectedItem, Facade );
+                  ( Facade.SelectedListItem as GUIShowListItem ).Images.NotifyPropertyChanged( "Poster" );
+                  break;
+
                 case ((int)MediaContextMenuItem.ShowSeasonInfo):
                     GUIWindowManager.ActivateWindow((int)TraktGUIWindows.ShowSeasons, selectedAnticipatedItem.Show.ToJSON());
                     break;
