@@ -32,7 +32,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json">
-      <HintPath>Externals\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\Externals\Newtonsoft.Json.dll</HintPath>
       <Aliases>nsoft</Aliases>
       <Private>False</Private>
     </Reference>
