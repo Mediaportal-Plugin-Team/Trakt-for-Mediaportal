@@ -75,6 +75,8 @@ namespace TraktPlugin.GUI
             AddEpisodeToWatchList,
             RemoveShowFromWatchList,
             RemoveEpisodeFromWatchList,
+            AddToFavorites,
+            RemoveFromFavorites,
             Related,
             AddToLibrary,
             RemoveFromLibrary,
@@ -430,6 +432,20 @@ namespace TraktPlugin.GUI
                 listItem.ItemId = (int)ContextMenuItem.RemoveShowFromWatchList;
             }
 
+            // Add/Remove Show Favorite
+            if ( !calendarItem.Show.IsFavorited() )
+            {
+              listItem = new GUIListItem( Translation.AddToFavorites );
+              dlg.Add( listItem );
+              listItem.ItemId = (int)ContextMenuItem.AddToFavorites;
+            }
+            else
+            {
+              listItem = new GUIListItem( Translation.RemoveFromFavorites );
+              dlg.Add( listItem );
+              listItem.ItemId = (int)ContextMenuItem.RemoveFromFavorites;
+            }
+
             // Add/Remove Episode Watchlist
             if (!calendarItem.Episode.IsWatchlisted())
             {
@@ -567,6 +583,18 @@ namespace TraktPlugin.GUI
                     OnEpisodeSelected(Facade.SelectedListItem, Facade);
                     GUIWatchListShows.ClearCache(TraktSettings.Username);
                     break;
+
+                case ( (int)ContextMenuItem.AddToFavorites ):
+                  TraktHelper.AddShowToFavorites( calendarItem.Show );
+                  OnEpisodeSelected( Facade.SelectedListItem, Facade );
+                  ( Facade.SelectedListItem as GUIEpisodeListItem ).Images.NotifyPropertyChanged( "Screen" );
+                  break;
+
+                case ( (int)ContextMenuItem.RemoveFromFavorites ):
+                  TraktHelper.RemoveShowFromFavorites( calendarItem.Show );
+                  OnEpisodeSelected( Facade.SelectedListItem, Facade );
+                  ( Facade.SelectedListItem as GUIEpisodeListItem ).Images.NotifyPropertyChanged( "Screen" );
+                  break;
 
                 case ((int)ContextMenuItem.AddEpisodeToWatchList):
                     TraktHelper.AddEpisodeToWatchList(calendarItem.Episode);
