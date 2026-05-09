@@ -487,6 +487,10 @@ namespace TraktPlugin.GUI
         public static string FriendRequestMessage = "You have {0} friend requests, approve or deny from friends window";
         public static string FollowerRequestMessage = "You have {0} follower requests, approve or deny from network window";
         public static string FullName = "Full Name";
+        public static string FavoriteMovies = "Favorite Movies";
+        public static string FavoriteShows = "Favorite Shows";
+        public static string FavoriteSeasons = "Favorite Seasons";
+        public static string FavoriteEpisodes = "Favorite Episodes";
 
         // G
         public static string Gaffer = "Gaffer";
@@ -536,6 +540,7 @@ namespace TraktPlugin.GUI
         public static string GettingActivity = "Getting Activity";
         public static string GettingCalendar = "Getting Calendar";
         public static string GettingEpisodes = "Getting Episodes";
+        public static string GettingFavorites = "Getting Favorites";
         public static string GettingFriendsList = "Getting Friends List";
         public static string GettingFriendsRequests = "Getting Friends Requests";
         public static string GettingFollowerRequests = "Getting Follower Requests";
@@ -666,10 +671,6 @@ namespace TraktPlugin.GUI
         public static string MusicEditor = "Music Editor";
         public static string MovieCredits = "Movie Credits";
         public static string MovieCount = "{0} Movies";
-        public static string MyFavoriteMovies = "Favorite Movies";
-        public static string MyFavoriteShows = "Favorite Shows";
-        public static string MyFavoriteSeasons = "Favorite Seasons";
-        public static string MyFavoriteEpisodes = "Favorite Episodes  ";
 
         // N
         public static string Name = "Name";
@@ -700,6 +701,8 @@ namespace TraktPlugin.GUI
         public static string NoMovieWatchList = "{0} has no movies in Watchlist!";
         public static string NoShowWatchList = "{0} has no shows in Watchlist!";
         public static string NoEpisodeWatchList = "{0} has no episodes in Watchlist!";
+        public static string NoMovieFavorites = "{0} has no movies in Favorites!";
+        public static string NoShowFavorites = "{0} has no shows in Favorites!";
         public static string NoSearchTypesSelected = "You must first select one or more search types\nbefore performing an online search.";
         public static string NoShoutsForItem = "No Shouts for {0}!";
         public static string NoPeopleToSearch = "There are no people to search by.";

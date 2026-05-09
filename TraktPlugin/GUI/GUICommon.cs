@@ -132,8 +132,12 @@ namespace TraktPlugin.GUI
         AnticipatedMovies = 87605,
         AnticipatedShows = 87606,
         BoxOffice = 87607,
-        CalendarMovies = 87700
-    }
+        CalendarMovies = 87700,
+        UserFavoriteMovies = 87701,
+        UserFavoriteShows = 87702,
+        FavoritedMovies = 87703,
+        FavoritedShows = 87704,
+  }
 
     enum TraktDashboardControls
     {
@@ -296,7 +300,6 @@ namespace TraktPlugin.GUI
         list,
         comment
     }
-
 
     public enum TraktListType
     {
@@ -2199,8 +2202,10 @@ namespace TraktPlugin.GUI
                 pItem.ItemId = (int)SortingFields.Anticipated;
             }
 
-            // Custom Lists
-            if (GUIWindowManager.ActiveWindow == (int)TraktGUIWindows.CustomListItems)
+            // Custom Lists / Favorites
+            if ( GUIWindowManager.ActiveWindow == (int)TraktGUIWindows.CustomListItems ||
+                 GUIWindowManager.ActiveWindow == (int)TraktGUIWindows.UserFavoriteMovies ||
+                 GUIWindowManager.ActiveWindow == (int)TraktGUIWindows.UserFavoriteShows )
             {
                 pItem = new GUIListItem(Translation.Rank);
                 dlg.Add(pItem);
