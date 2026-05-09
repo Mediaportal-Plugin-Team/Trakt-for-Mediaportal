@@ -1099,6 +1099,38 @@ namespace TraktAPI
 
         #endregion
 
+        #region Favorited (Community)
+
+        /// <summary>
+        /// Returns the most favorited movies in the specified time period, defaulting to weekly. All stats are relative to the specific time period.
+        /// </summary>
+        /// <param name="period">Time period. Possible values:  daily , weekly , monthly , all.</param>
+        public static TraktMoviesFavorited GetFavoritedMovies( string period = "weekly", int page = 1, int maxItems = 100 )
+        {
+          var response = GetFromTrakt( string.Format( TraktURIs.FavoritedMovies, period, page, maxItems ), out WebHeaderCollection headers );
+          if ( response == null )
+            return null;
+
+          try
+          {
+            return new TraktMoviesFavorited
+            {
+              CurrentPage = page,
+              TotalItemsPerPage = maxItems,
+              TotalPages = int.Parse( headers[ "X-Pagination-Page-Count" ] ),
+              TotalItems = int.Parse( headers[ "X-Pagination-Item-Count" ] ),
+              Movies = response.FromJSONArray<TraktMovieFavorited>()
+            };
+          }
+          catch
+          {
+            // most likely bad header response
+            return null;
+          }
+        }
+
+        #endregion
+
         #region Anticipated
 
         public static TraktMoviesAnticipated GetAnticipatedMovies(int page = 1, int maxItems = 100)
@@ -1360,6 +1392,38 @@ namespace TraktAPI
                 // most likely bad header response
                 return null;
             }
+        }
+
+        #endregion
+
+        #region Favorited (Community)
+
+        /// <summary>
+        /// Returns the most favorited shows in the specified time period, defaulting to weekly. All stats are relative to the specific time period.
+        /// </summary>
+        /// <param name="period">Time period. Possible values:  daily , weekly , monthly , all.</param>
+        public static TraktShowsFavorited GetFavoritedShows( string period = "weekly", int page = 1, int maxItems = 100 )
+        {
+          var response = GetFromTrakt( string.Format( TraktURIs.FavoritedShows, period, page, maxItems ), out WebHeaderCollection headers );
+          if ( response == null )
+            return null;
+
+          try
+          {
+            return new TraktShowsFavorited
+            {
+              CurrentPage = page,
+              TotalItemsPerPage = maxItems,
+              TotalPages = int.Parse( headers[ "X-Pagination-Page-Count" ] ),
+              TotalItems = int.Parse( headers[ "X-Pagination-Item-Count" ] ),
+              Shows = response.FromJSONArray<TraktShowFavorited>()
+            };
+          }
+          catch
+          {
+            // most likely bad header response
+            return null;
+          }
         }
 
         #endregion

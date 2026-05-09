@@ -76,6 +76,9 @@ namespace TraktAPI
     public const string TrendingMovies = "https://api.trakt.tv/movies/trending?extended=full&page={0}&limit={1}";
     public const string TrendingShows = "https://api.trakt.tv/shows/trending?extended=full&page={0}&limit={1}";
 
+    public const string FavoritedMovies = "https://api.trakt.tv/movies/favorited/{0}?extended=full&page={1}&limit={2}";
+    public const string FavoritedShows = "https://api.trakt.tv/shows/favorited/{0}?extended=full&page={1}&limit={2}";
+
     public const string PopularMovies = "https://api.trakt.tv/movies/popular?extended=full&page={0}&limit={1}";
     public const string PopularShows = "https://api.trakt.tv/shows/popular?extended=full&page={0}&limit={1}";
 
