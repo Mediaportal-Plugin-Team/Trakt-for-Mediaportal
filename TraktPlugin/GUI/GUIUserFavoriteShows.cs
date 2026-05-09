@@ -11,7 +11,7 @@ using Action = MediaPortal.GUI.Library.Action;
 
 namespace TraktPlugin.GUI
 {
-  public class GUIFavoriteMovies : GUIWindow
+  public class GUIUserFavoriteShows : GUIWindow
   {
     #region Skin Controls
 
@@ -39,22 +39,19 @@ namespace TraktPlugin.GUI
 
     enum ContextMenuItem
     {
+      ShowSeasonInfo,
       RemoveFromFavorites,
       AddToFavorites,
       RemoveFromWatchList,
       AddToWatchList,
       AddToList,
-      ChangeLayout,
-      MarkAsWatched,
-      MarkAsUnWatched,
-      AddToLibrary,
-      RemoveFromLibrary,
+      Trailers,
       Related,
       Rate,
       Shouts,
       Cast,
       Crew,
-      Trailers,
+      ChangeLayout,
       SearchWithMpNZB,
       SearchTorrent
     }
@@ -63,11 +60,13 @@ namespace TraktPlugin.GUI
 
     #region Constructor
 
-    public GUIFavoriteMovies()
+    public GUIUserFavoriteShows()
     {
-      backdrop = new ImageSwapper();
-      backdrop.PropertyOne = "#Trakt.UserFavoriteMovies.Fanart.1";
-      backdrop.PropertyTwo = "#Trakt.UserFavoriteMovies.Fanart.2";
+      backdrop = new ImageSwapper
+      {
+        PropertyOne = "#Trakt.UserFavoriteShows.Fanart.1",
+        PropertyTwo = "#Trakt.UserFavoriteShows.Fanart.2"
+      };
     }
 
     #endregion
@@ -80,7 +79,7 @@ namespace TraktPlugin.GUI
     static DateTime LastRequest = new DateTime();
     static readonly Dictionary<string, IEnumerable<TraktFavoriteItem>> userFavorites = new Dictionary<string, IEnumerable<TraktFavoriteItem>>();
 
-    static IEnumerable<TraktFavoriteItem> FavoriteMovies
+    static IEnumerable<TraktFavoriteItem> FavoriteShows
     {
       get
       {
@@ -90,7 +89,7 @@ namespace TraktPlugin.GUI
 
           // NB: since we're returning all items there is no need to use the sortby API parameters for each page request
           int maxItemsPerPage = 100;
-          TraktFavoriteItems favoriteItems = TraktAPI.TraktAPI.GetFavourites( username, type: "movies", extendedInfoParams: "full", page: 1, maxItems: maxItemsPerPage );
+          TraktFavoriteItems favoriteItems = TraktAPI.TraktAPI.GetFavourites( username, type: "shows", extendedInfoParams: "full", page: 1, maxItems: maxItemsPerPage );
 
           if ( favoriteItems == null || favoriteItems.Items == null )
           {
@@ -98,27 +97,27 @@ namespace TraktPlugin.GUI
             return null;
           }
 
-          _FavoriteMovies = favoriteItems.Items;
+          _FavoriteShows = favoriteItems.Items;
 
           // get next page(s) if required
           while ( favoriteItems.CurrentPage < favoriteItems.TotalPages )
           {
-            // Note: API returns total pages for all watchlist types not just this one (movies)
+            // Note: API returns total pages for all watchlist types not just this one (shows)
             // so we need to check returned items against our expected max items per page
-            if ( _FavoriteMovies.Count() < ( maxItemsPerPage * favoriteItems.CurrentPage ) )
+            if ( _FavoriteShows.Count() < ( maxItemsPerPage * favoriteItems.CurrentPage ) )
               break;
 
-            favoriteItems = TraktAPI.TraktAPI.GetFavourites( username, type: "movies", extendedInfoParams: "full", page: favoriteItems.CurrentPage + 1, maxItems: maxItemsPerPage );
+            favoriteItems = TraktAPI.TraktAPI.GetFavourites( username, type: "shows", extendedInfoParams: "full", page: favoriteItems.CurrentPage + 1, maxItems: maxItemsPerPage );
             if ( favoriteItems == null || favoriteItems.Items == null )
               break;
 
-            _FavoriteMovies = _FavoriteMovies.Concat( favoriteItems.Items );
+            _FavoriteShows = _FavoriteShows.Concat( favoriteItems.Items );
           }
 
           if ( userFavorites.Keys.Contains( CurrentUser ) )
             userFavorites.Remove( CurrentUser );
 
-          userFavorites.Add( CurrentUser, _FavoriteMovies );
+          userFavorites.Add( CurrentUser, _FavoriteShows );
           LastRequest = DateTime.UtcNow;
           PreviousSelectedIndex = 0;
         }
@@ -126,7 +125,7 @@ namespace TraktPlugin.GUI
         return userFavorites[ CurrentUser ];
       }
     }
-    static IEnumerable<TraktFavoriteItem> _FavoriteMovies = null;
+    static IEnumerable<TraktFavoriteItem> _FavoriteShows = null;
 
     #endregion
 
@@ -142,13 +141,13 @@ namespace TraktPlugin.GUI
     {
       get
       {
-        return (int)TraktGUIWindows.UserFavoriteMovies;
+        return (int)TraktGUIWindows.UserFavoriteShows;
       }
     }
 
     public override bool Init()
     {
-      return Load( GUIGraphicsContext.Skin + @"\Trakt.UserFavorite.Movies.xml" );
+      return Load( GUIGraphicsContext.Skin + @"\Trakt.UserFavorite.Shows.xml" );
     }
 
     protected override void OnPageLoad()
@@ -165,18 +164,18 @@ namespace TraktPlugin.GUI
       // Init Properties
       InitProperties();
 
-      // Load Favorite Movies
-      LoadFavoriteMovies();
+      // Load Favorite Shows
+      LoadFavoriteShows();
     }
 
     protected override void OnPageDestroy( int new_windowId )
     {
-      GUIMovieListItem.StopDownload = true;
+      GUIShowListItem.StopDownload = true;
       PreviousSelectedIndex = Facade.SelectedListItemIndex;
       ClearProperties();
 
       // save current layout
-      TraktSettings.UserFavoriteMoviesDefaultLayout = (int)CurrentLayout;
+      TraktSettings.UserFavoriteShowsDefaultLayout = (int)CurrentLayout;
 
       base.OnPageDestroy( new_windowId );
     }
@@ -193,7 +192,7 @@ namespace TraktPlugin.GUI
         case ( 50 ):
           if ( actionType == Action.ActionType.ACTION_SELECT_ITEM )
           {
-            CheckAndPlayMovie( true );
+            CheckAndPlayEpisode( true );
           }
           break;
 
@@ -204,15 +203,15 @@ namespace TraktPlugin.GUI
 
         // Sort Button
         case ( 8 ):
-          var newSortBy = GUICommon.ShowSortMenu( TraktSettings.SortByUserFavoriteMovies );
+          var newSortBy = GUICommon.ShowSortMenu( TraktSettings.SortByUserFavoriteShows );
           if ( newSortBy != null )
           {
-            if ( newSortBy.Field != TraktSettings.SortByUserFavoriteMovies.Field )
+            if ( newSortBy.Field != TraktSettings.SortByUserFavoriteShows.Field )
             {
-              TraktSettings.SortByUserFavoriteMovies = newSortBy;
+              TraktSettings.SortByUserFavoriteShows = newSortBy;
               PreviousSelectedIndex = 0;
               UpdateButtonState();
-              LoadFavoriteMovies();
+              LoadFavoriteShows();
             }
           }
           break;
@@ -234,7 +233,7 @@ namespace TraktPlugin.GUI
           break;
         case Action.ActionType.ACTION_PLAY:
         case Action.ActionType.ACTION_MUSIC_PLAY:
-          CheckAndPlayMovie( false );
+          CheckAndPlayEpisode( false );
           break;
         default:
           base.OnAction( action );
@@ -244,7 +243,7 @@ namespace TraktPlugin.GUI
 
     protected override void OnShowContextMenu()
     {
-      var selectedItem = this.Facade.SelectedListItem as GUIMovieListItem;
+      var selectedItem = this.Facade.SelectedListItem as GUIShowListItem;
       if ( selectedItem == null )
         return;
 
@@ -259,8 +258,14 @@ namespace TraktPlugin.GUI
       dlg.Reset();
       dlg.SetHeading( GUIUtils.PluginName() );
 
-      GUIListItem listItem = null;
+      GUIListItem listItem;
 
+      // Show Season Information
+      listItem = new GUIListItem( Translation.ShowSeasonInfo );
+      dlg.Add( listItem );
+      listItem.ItemId = (int)ContextMenuItem.ShowSeasonInfo;
+
+      // Add to Favorites / Remove from Favorites
       // only allow removal if viewing your own favorites
       if ( CurrentUser == TraktSettings.Username )
       {
@@ -268,7 +273,7 @@ namespace TraktPlugin.GUI
         dlg.Add( listItem );
         listItem.ItemId = (int)ContextMenuItem.RemoveFromFavorites;
       }
-      else if ( !selectedFavoriteItem.Movie.IsFavorited() )
+      else if ( !selectedFavoriteItem.Show.IsFavorited() )
       {
         // viewing someone else's favorites and not in yours
         listItem = new GUIListItem( Translation.AddToFavorites );
@@ -277,7 +282,7 @@ namespace TraktPlugin.GUI
       }
 
       // Add to Watchlist
-      if ( !selectedFavoriteItem.Movie.IsWatchlisted() )
+      if ( !selectedFavoriteItem.Show.IsWatchlisted() )
       {
         listItem = new GUIListItem( Translation.AddToWatchList );
         dlg.Add( listItem );
@@ -295,46 +300,13 @@ namespace TraktPlugin.GUI
       dlg.Add( listItem );
       listItem.ItemId = (int)ContextMenuItem.AddToList;
 
-      // Mark As Watched
-      if ( !selectedFavoriteItem.Movie.IsWatched() )
-      {
-        listItem = new GUIListItem( Translation.MarkAsWatched );
-        dlg.Add( listItem );
-        listItem.ItemId = (int)ContextMenuItem.MarkAsWatched;
-      }
-
-      // Mark As UnWatched
-      if ( selectedFavoriteItem.Movie.IsWatched() )
-      {
-        listItem = new GUIListItem( Translation.MarkAsUnWatched );
-        dlg.Add( listItem );
-        listItem.ItemId = (int)ContextMenuItem.MarkAsUnWatched;
-      }
-
-      // Add to Library
-      // Don't allow if it will be removed again on next sync
-      // movie could be part of a DVD collection
-      if ( !selectedFavoriteItem.Movie.IsCollected() && !TraktSettings.KeepTraktLibraryClean )
-      {
-        listItem = new GUIListItem( Translation.AddToLibrary );
-        dlg.Add( listItem );
-        listItem.ItemId = (int)ContextMenuItem.AddToLibrary;
-      }
-
-      if ( selectedFavoriteItem.Movie.IsCollected() )
-      {
-        listItem = new GUIListItem( Translation.RemoveFromLibrary );
-        dlg.Add( listItem );
-        listItem.ItemId = (int)ContextMenuItem.RemoveFromLibrary;
-      }
-
-      // Related Movies
-      listItem = new GUIListItem( Translation.RelatedMovies );
+      // Related Shows
+      listItem = new GUIListItem( Translation.RelatedShows );
       dlg.Add( listItem );
       listItem.ItemId = (int)ContextMenuItem.Related;
 
-      // Rate Movie
-      listItem = new GUIListItem( Translation.RateMovie );
+      // Rate Show
+      listItem = new GUIListItem( Translation.RateShow );
       dlg.Add( listItem );
       listItem.ItemId = (int)ContextMenuItem.Rate;
 
@@ -366,17 +338,17 @@ namespace TraktPlugin.GUI
         listItem.ItemId = (int)ContextMenuItem.Trailers;
       }
 
-      if ( !selectedFavoriteItem.Movie.IsCollected() && TraktHelper.IsMpNZBAvailableAndEnabled )
+      if ( !selectedFavoriteItem.Show.IsCollected() && TraktHelper.IsMpNZBAvailableAndEnabled )
       {
-        // Search for movie with mpNZB
+        // Search for show with mpNZB
         listItem = new GUIListItem( Translation.SearchWithMpNZB );
         dlg.Add( listItem );
         listItem.ItemId = (int)ContextMenuItem.SearchWithMpNZB;
       }
 
-      if ( !selectedFavoriteItem.Movie.IsCollected() && TraktHelper.IsMyTorrentsAvailableAndEnabled )
+      if ( !selectedFavoriteItem.Show.IsCollected() && TraktHelper.IsMyTorrentsAvailableAndEnabled )
       {
-        // Search for movie with MyTorrents
+        // Search for show with MyTorrents
         listItem = new GUIListItem( Translation.SearchTorrent );
         dlg.Add( listItem );
         listItem.ItemId = (int)ContextMenuItem.SearchTorrent;
@@ -389,48 +361,37 @@ namespace TraktPlugin.GUI
 
       switch ( dlg.SelectedId )
       {
-        case ( (int)ContextMenuItem.MarkAsWatched ):
-          TraktHelper.AddMovieToWatchHistory( selectedFavoriteItem.Movie );
-          selectedItem.IsPlayed = true;
-          OnMovieSelected( selectedItem, Facade );
-          ( Facade.SelectedListItem as GUIMovieListItem ).Images.NotifyPropertyChanged( "Poster" );
-          GUIWatchListMovies.ClearCache( TraktSettings.Username );
-          break;
-
-        case ( (int)ContextMenuItem.MarkAsUnWatched ):
-          TraktHelper.RemoveMovieFromWatchHistory( selectedFavoriteItem.Movie );
-          selectedItem.IsPlayed = false;
-          OnMovieSelected( selectedItem, Facade );
-          ( Facade.SelectedListItem as GUIMovieListItem ).Images.NotifyPropertyChanged( "Poster" );
+        case ( (int)ContextMenuItem.ShowSeasonInfo ):
+          GUIWindowManager.ActivateWindow( (int)TraktGUIWindows.ShowSeasons, selectedFavoriteItem.Show.ToJSON() );
           break;
 
         case ( (int)ContextMenuItem.AddToWatchList ):
-          TraktHelper.AddMovieToWatchList( selectedFavoriteItem.Movie, true );
-          OnMovieSelected( selectedItem, Facade );
-          ( Facade.SelectedListItem as GUIMovieListItem ).Images.NotifyPropertyChanged( "Poster" );
+          TraktHelper.AddShowToWatchList( selectedFavoriteItem.Show );
+          OnShowSelected( selectedItem, Facade );
+          ( Facade.SelectedListItem as GUIShowListItem ).Images.NotifyPropertyChanged( "Poster" );
           break;
 
         case ( (int)ContextMenuItem.RemoveFromFavorites ):
           PreviousSelectedIndex = this.Facade.SelectedListItemIndex;
-          TraktHelper.RemoveMovieFromFavorites( selectedFavoriteItem.Movie, true );
-          if ( _FavoriteMovies.Count() >= 1 )
+          TraktHelper.RemoveShowFromFavorites( selectedFavoriteItem.Show );
+          if ( _FavoriteShows.Count() >= 1 )
           {
             // remove from list
-            var moviesToExcept = new List<TraktFavoriteItem>();
-            moviesToExcept.Add( selectedFavoriteItem );
-            _FavoriteMovies = FavoriteMovies?.Except( moviesToExcept );
-            userFavorites[ CurrentUser ] = _FavoriteMovies;
-            LoadFavoriteMovies();
+            var showsToExcept = new List<TraktFavoriteItem>();
+            showsToExcept.Add( selectedFavoriteItem );
+            _FavoriteShows = FavoriteShows?.Except( showsToExcept );
+            userFavorites[ CurrentUser ] = _FavoriteShows;
+            LoadFavoriteShows();
           }
           else
           {
-            // no more movies left
+            // no more shows left
             ClearProperties();
             GUIControl.ClearControl( GetID, Facade.GetID );
-            _FavoriteMovies = null;
+            _FavoriteShows = null;
             userFavorites.Remove( CurrentUser );
             // notify and exit
-            GUIUtils.ShowNotifyDialog( GUIUtils.PluginName(), Translation.NoMovieFavorites );
+            GUIUtils.ShowNotifyDialog( GUIUtils.PluginName(), Translation.NoShowFavorites );
             GUIWindowManager.ShowPreviousWindow();
             return;
           }
@@ -438,62 +399,46 @@ namespace TraktPlugin.GUI
 
         case ( (int)ContextMenuItem.RemoveFromWatchList ):
           PreviousSelectedIndex = this.Facade.SelectedListItemIndex;
-          TraktHelper.RemoveMovieFromWatchList( selectedFavoriteItem.Movie, true );
-          ( Facade.SelectedListItem as GUIMovieListItem ).Images.NotifyPropertyChanged( "Poster" );
+          TraktHelper.RemoveShowFromWatchList( selectedFavoriteItem.Show );
+          ( Facade.SelectedListItem as GUIShowListItem ).Images.NotifyPropertyChanged( "Poster" );
           break;
 
         case ( (int)ContextMenuItem.AddToList ):
-          TraktHelper.AddRemoveMovieInUserList( selectedFavoriteItem.Movie, false );
+          TraktHelper.AddRemoveShowInUserList( selectedFavoriteItem.Show, false );
           break;
 
         case ( (int)ContextMenuItem.Trailers ):
-          GUICommon.ShowMovieTrailersMenu( selectedFavoriteItem.Movie );
-          break;
-
-        case ( (int)ContextMenuItem.AddToLibrary ):
-          TraktHelper.AddMovieToCollection( selectedFavoriteItem.Movie );
-          OnMovieSelected( selectedItem, Facade );
-          ( Facade.SelectedListItem as GUIMovieListItem ).Images.NotifyPropertyChanged( "Poster" );
-          if ( CurrentUser != TraktSettings.Username )
-            GUIWatchListMovies.ClearCache( TraktSettings.Username );
-          break;
-
-        case ( (int)ContextMenuItem.RemoveFromLibrary ):
-          TraktHelper.RemoveMovieFromCollection( selectedFavoriteItem.Movie );
-          OnMovieSelected( selectedItem, Facade );
-          ( Facade.SelectedListItem as GUIMovieListItem ).Images.NotifyPropertyChanged( "Poster" );
-          if ( CurrentUser != TraktSettings.Username )
-            GUIWatchListMovies.ClearCache( TraktSettings.Username );
+          GUICommon.ShowTVShowTrailersMenu( selectedFavoriteItem.Show );
           break;
 
         case ( (int)ContextMenuItem.Related ):
-          TraktHelper.ShowRelatedMovies( selectedFavoriteItem.Movie );
+          TraktHelper.ShowRelatedShows( selectedFavoriteItem.Show );
           break;
 
         case ( (int)ContextMenuItem.Rate ):
-          GUICommon.RateMovie( selectedFavoriteItem.Movie );
-          OnMovieSelected( selectedItem, Facade );
-          ( Facade.SelectedListItem as GUIMovieListItem ).Images.NotifyPropertyChanged( "Poster" );
+          GUICommon.RateShow( selectedFavoriteItem.Show );
+          OnShowSelected( selectedItem, Facade );
+          ( Facade.SelectedListItem as GUIShowListItem ).Images.NotifyPropertyChanged( "Poster" );
           if ( CurrentUser != TraktSettings.Username )
-            GUIWatchListMovies.ClearCache( TraktSettings.Username );
+            GUIWatchListShows.ClearCache( TraktSettings.Username );
           break;
 
         case ( (int)ContextMenuItem.Shouts ):
-          TraktHelper.ShowMovieShouts( selectedFavoriteItem.Movie );
+          TraktHelper.ShowTVShowShouts( selectedFavoriteItem.Show );
           break;
 
         case ( (int)ContextMenuItem.Cast ):
-          GUICreditsMovie.Movie = selectedFavoriteItem.Movie;
-          GUICreditsMovie.Type = GUICreditsMovie.CreditType.Cast;
-          GUICreditsMovie.Fanart = TmdbCache.GetMovieBackdropFilename( selectedItem.Images.MovieImages );
-          GUIWindowManager.ActivateWindow( (int)TraktGUIWindows.CreditsMovie );
+          GUICreditsShow.Show = selectedFavoriteItem.Show;
+          GUICreditsShow.Type = GUICreditsShow.CreditType.Cast;
+          GUICreditsShow.Fanart = TmdbCache.GetShowBackdropFilename( selectedItem.Images.ShowImages );
+          GUIWindowManager.ActivateWindow( (int)TraktGUIWindows.CreditsShow );
           break;
 
         case ( (int)ContextMenuItem.Crew ):
-          GUICreditsMovie.Movie = selectedFavoriteItem.Movie;
-          GUICreditsMovie.Type = GUICreditsMovie.CreditType.Crew;
-          GUICreditsMovie.Fanart = TmdbCache.GetMovieBackdropFilename( selectedItem.Images.MovieImages );
-          GUIWindowManager.ActivateWindow( (int)TraktGUIWindows.CreditsMovie );
+          GUICreditsShow.Show = selectedFavoriteItem.Show;
+          GUICreditsShow.Type = GUICreditsShow.CreditType.Crew;
+          GUICreditsShow.Fanart = TmdbCache.GetShowBackdropFilename( selectedItem.Images.ShowImages );
+          GUIWindowManager.ActivateWindow( (int)TraktGUIWindows.CreditsShow );
           break;
 
         case ( (int)ContextMenuItem.ChangeLayout ):
@@ -501,12 +446,12 @@ namespace TraktPlugin.GUI
           break;
 
         case ( (int)ContextMenuItem.SearchWithMpNZB ):
-          string loadingParam = string.Format( "search:{0}", selectedFavoriteItem.Movie.Title );
+          string loadingParam = string.Format( "search:{0}", selectedFavoriteItem.Show.Title );
           GUIWindowManager.ActivateWindow( (int)ExternalPluginWindows.MpNZB, loadingParam );
           break;
 
         case ( (int)ContextMenuItem.SearchTorrent ):
-          string loadPar = selectedFavoriteItem.Movie.Title;
+          string loadPar = selectedFavoriteItem.Show.Title;
           GUIWindowManager.ActivateWindow( (int)ExternalPluginWindows.MyTorrents, loadPar );
           break;
 
@@ -521,80 +466,80 @@ namespace TraktPlugin.GUI
 
     #region Private Methods
 
-    private void CheckAndPlayMovie( bool jumpTo )
+    private void CheckAndPlayEpisode( bool jumpTo )
     {
       var selectedItem = this.Facade.SelectedListItem;
       if ( selectedItem == null )
         return;
 
-      var selectedWatchlistItem = selectedItem.TVTag as TraktMovieWatchListItem;
-      GUICommon.CheckAndPlayMovie( jumpTo, selectedWatchlistItem.Movie );
+      var selecteItem = selectedItem.TVTag as TraktFavoriteItem;
+      GUICommon.CheckAndPlayFirstUnwatchedEpisode( selecteItem.Show, jumpTo );
     }
 
-    private void LoadFavoriteMovies()
+    private void LoadFavoriteShows()
     {
       GUIUtils.SetProperty( "#Trakt.Items", string.Empty );
 
       GUIBackgroundTask.Instance.ExecuteInBackgroundAndCallback( () =>
       {
-        return FavoriteMovies;
+        return FavoriteShows;
       },
       delegate ( bool success, object result )
       {
         if ( success )
         {
           var favorites = result as IEnumerable<TraktFavoriteItem>;
-          SendFavoriteMoviesToFacade( favorites );
+          SendFavoriteShowsToFacade( favorites );
         }
       }, Translation.GettingFavorites, true );
     }
 
-    private void SendFavoriteMoviesToFacade( IEnumerable<TraktFavoriteItem> movieFavorites )
+    private void SendFavoriteShowsToFacade( IEnumerable<TraktFavoriteItem> showFavorites )
     {
       // clear facade
       GUIControl.ClearControl( GetID, Facade.GetID );
 
-      if ( movieFavorites == null )
+      if ( showFavorites == null )
       {
         GUIUtils.ShowNotifyDialog( Translation.Error, Translation.ErrorGeneral );
         GUIWindowManager.ShowPreviousWindow();
         return;
       }
 
-      if ( movieFavorites.Count() == 0 )
+      if ( showFavorites.Count() == 0 )
       {
-        GUIUtils.ShowNotifyDialog( GUIUtils.PluginName(), string.Format( Translation.NoMovieFavorites, CurrentUser ) );
+        GUIUtils.ShowNotifyDialog( GUIUtils.PluginName(), string.Format( Translation.NoShowFavorites, CurrentUser ) );
         CurrentUser = TraktSettings.Username;
         GUIWindowManager.ShowPreviousWindow();
         return;
       }
 
-      // sort movies
-      var sortedList = movieFavorites.Where( m => !string.IsNullOrEmpty( m.Movie.Title ) ).ToList();
-      sortedList.Sort( new GUIListItemMovieSorter( TraktSettings.SortByUserFavoriteMovies.Field, TraktSettings.SortByUserFavoriteMovies.Direction ) );
+      // sort shows
+      var sortedList = showFavorites.Where( s => !string.IsNullOrEmpty( s.Show.Title ) ).ToList();
+      sortedList.Sort( new GUIListItemShowSorter( TraktSettings.SortByUserFavoriteShows.Field, TraktSettings.SortByUserFavoriteShows.Direction ) );
 
       int itemId = 0;
-      var movieImages = new List<GUITmdbImage>();
+      var showImages = new List<GUITmdbImage>();
 
-      // Add each movie
+      // Add each show
       foreach ( var favoriteItem in sortedList )
       {
         // add image for download
-        var images = new GUITmdbImage { MovieImages = new TmdbMovieImages { Id = favoriteItem.Movie.Ids.Tmdb } };
-        movieImages.Add( images );
+        var images = new GUITmdbImage { ShowImages = new TmdbShowImages { Id = favoriteItem.Show.Ids.Tmdb } };
+        showImages.Add( images );
 
-        var item = new GUIMovieListItem( favoriteItem.Movie.Title, (int)TraktGUIWindows.UserFavoriteMovies );
+        var item = new GUIShowListItem( favoriteItem.Show.Title, (int)TraktGUIWindows.UserFavoriteShows );
 
-        item.Label2 = favoriteItem.Movie.Year == null ? "----" : favoriteItem.Movie.Year.ToString();
+        item.Label2 = favoriteItem.Show.Year == null ? "----" : favoriteItem.Show.Year.ToString();
         item.TVTag = favoriteItem;
-        item.Movie = favoriteItem.Movie;
+        item.Show = favoriteItem.Show;
         item.Images = images;
         item.ItemId = Int32.MaxValue - itemId;
-        item.IsPlayed = favoriteItem.Movie.IsWatched();
+        item.IsPlayed = favoriteItem.Show.IsWatched();
         item.IconImage = GUIImageHandler.GetDefaultPoster( false );
         item.IconImageBig = GUIImageHandler.GetDefaultPoster();
         item.ThumbnailImage = GUIImageHandler.GetDefaultPoster();
-        item.OnItemSelected += OnMovieSelected;
+        item.OnItemSelected += OnShowSelected;
         Utils.SetDefaultIcons( item );
         Facade.Add( item );
         itemId++;
@@ -604,17 +549,17 @@ namespace TraktPlugin.GUI
       Facade.CurrentLayout = CurrentLayout;
       GUIControl.FocusControl( GetID, Facade.GetID );
 
-      if ( PreviousSelectedIndex >= movieFavorites.Count() )
+      if ( PreviousSelectedIndex >= showFavorites.Count() )
         Facade.SelectIndex( PreviousSelectedIndex - 1 );
       else
         Facade.SelectIndex( PreviousSelectedIndex );
 
       // set facade properties
-      GUIUtils.SetProperty( "#itemcount", movieFavorites.Count().ToString() );
-      GUIUtils.SetProperty( "#Trakt.Items", string.Format( "{0} {1}", movieFavorites.Count().ToString(), movieFavorites.Count() > 1 ? Translation.Movies : Translation.Movie ) );
+      GUIUtils.SetProperty( "#itemcount", showFavorites.Count().ToString() );
+      GUIUtils.SetProperty( "#Trakt.Items", string.Format( "{0} {1}", showFavorites.Count().ToString(), showFavorites.Count() > 1 ? Translation.Shows : Translation.Show ) );
 
-      // Download movie images Async and set to facade
-      GUIMovieListItem.GetImages( movieImages );
+      // Download show images Async and set to facade
+      GUIShowListItem.GetImages( showImages );
     }
 
     private void InitProperties()
@@ -624,13 +569,13 @@ namespace TraktPlugin.GUI
       backdrop.GUIImageTwo = FanartBackground2;
       backdrop.LoadingImage = loadingImage;
 
-      // load Favorite movies for user
+      // load Favorite shows for user
       if ( string.IsNullOrEmpty( CurrentUser ) )
         CurrentUser = TraktSettings.Username;
-      GUICommon.SetProperty( "#Trakt.FavoriteMovies.CurrentUser", CurrentUser );
+      GUICommon.SetProperty( "#Trakt.FavoriteShows.CurrentUser", CurrentUser );
 
       // load last layout
-      CurrentLayout = (GUIFacadeControl.Layout)TraktSettings.UserFavoriteMoviesDefaultLayout;
+      CurrentLayout = (GUIFacadeControl.Layout)TraktSettings.UserFavoriteShowsDefaultLayout;
 
       // Update Button States
       UpdateButtonState();
@@ -639,10 +584,10 @@ namespace TraktPlugin.GUI
       {
         sortButton.SortChanged += ( o, e ) =>
         {
-          TraktSettings.SortByUserFavoriteMovies.Direction = (SortingDirections)( e.Order - 1 );
+          TraktSettings.SortByUserFavoriteShows.Direction = (SortingDirections)( e.Order - 1 );
           PreviousSelectedIndex = 0;
           UpdateButtonState();
-          LoadFavoriteMovies();
+          LoadFavoriteShows();
         };
       }
     }
@@ -655,34 +600,34 @@ namespace TraktPlugin.GUI
       // update sortby button label
       if ( sortButton != null )
       {
-        sortButton.Label = GUICommon.GetSortByString( TraktSettings.SortByUserFavoriteMovies );
-        sortButton.IsAscending = ( TraktSettings.SortByUserFavoriteMovies.Direction == SortingDirections.Ascending );
+        sortButton.Label = GUICommon.GetSortByString( TraktSettings.SortByUserFavoriteShows );
+        sortButton.IsAscending = ( TraktSettings.SortByUserFavoriteShows.Direction == SortingDirections.Ascending );
       }
-      GUIUtils.SetProperty( "#Trakt.SortBy", GUICommon.GetSortByString( TraktSettings.SortByUserFavoriteMovies ) );
+      GUIUtils.SetProperty( "#Trakt.SortBy", GUICommon.GetSortByString( TraktSettings.SortByUserFavoriteShows ) );
     }
 
     private void ClearProperties()
     {
-      GUIUtils.SetProperty( "#Trakt.Movie.Favorite.Inserted", string.Empty );
-      GUIUtils.SetProperty( "#Trakt.Movie.Favorite.Notes", string.Empty );
-      GUICommon.ClearMovieProperties();
+      GUIUtils.SetProperty( "#Trakt.Show.Favorite.Inserted", string.Empty );
+      GUIUtils.SetProperty( "#Trakt.Show.Favorite.Notes", string.Empty );
+      GUICommon.ClearShowProperties();
     }
 
     private void PublishFavoriteSkinProperties( TraktFavoriteItem item )
     {
-      GUICommon.SetProperty( "#Trakt.Movie.Favorite.Inserted", item.ListedAt.FromISO8601().ToShortDateString() );
-      GUICommon.SetProperty( "#Trakt.Movie.Favorite.Notes", item.Notes );
-      GUICommon.SetMovieProperties( item.Movie );
+      GUICommon.SetProperty( "#Trakt.Show.Favorite.Inserted", item.ListedAt.FromISO8601().ToShortDateString() );
+      GUICommon.SetProperty( "#Trakt.Show.Favorite.Notes", item.Notes );
+      GUICommon.SetShowProperties( item.Show );
     }
 
-    private void OnMovieSelected( GUIListItem item, GUIControl parent )
+    private void OnShowSelected( GUIListItem item, GUIControl parent )
     {
       PreviousSelectedIndex = Facade.SelectedListItemIndex;
 
       var favoriteItem = item.TVTag as TraktFavoriteItem;
       PublishFavoriteSkinProperties( favoriteItem );
 
-      string fanart = TmdbCache.GetMovieBackdropFilename( ( item as GUIMovieListItem ).Images.MovieImages );
+      string fanart = TmdbCache.GetShowBackdropFilename( ( item as GUIShowListItem ).Images.ShowImages );
       if ( !string.IsNullOrEmpty( fanart ) )
       {
         GUIImageHandler.LoadFanart( backdrop, fanart );

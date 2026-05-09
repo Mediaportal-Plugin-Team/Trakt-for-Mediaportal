@@ -272,6 +272,7 @@
     <Compile Include="GUI\GUIRecentWatchedEpisodes.cs" />
     <Compile Include="GUI\GUIRecentWatchedMovies.cs" />
     <Compile Include="GUI\GUITVMenu.cs" />
+    <Compile Include="GUI\GUIUserFavoriteShows.cs" />
     <Compile Include="GUI\GUIUserProfile.cs" />
     <Compile Include="GUI\GUIWatchListEpisodes.cs" />
     <Compile Include="GUI\GUIRecommendationsMovies.cs" />
@@ -284,7 +285,7 @@
     <Compile Include="GUI\GUICalendarTV.cs" />
     <Compile Include="GUI\GUIExtensions.cs" />
     <Compile Include="GUI\GUIImageHandler.cs" />
-    <Compile Include="GUI\GUIFavoriteMovies.cs" />
+    <Compile Include="GUI\GUIUserFavoriteMovies.cs" />
     <Compile Include="GUI\GUIWatchListMovies.cs" />
     <Compile Include="GUI\GUIWatchListShows.cs" />
     <Compile Include="Extensions\SecurityExtensions.cs" />

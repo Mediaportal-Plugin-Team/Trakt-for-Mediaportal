@@ -802,8 +802,8 @@ namespace TraktPlugin
                 ShowRecommendationEndYear = xmlreader.GetValueAsInt(cTrakt, cShowRecommendationEndYear, 0);
                 SortByRecommendedMovies = xmlreader.GetValueAsString(cTrakt, cSortByRecommendedMovies, "{\"Field\": 0,\"Direction\": 0}").FromJSON<SortBy>();
                 SortByRecommendedShows = xmlreader.GetValueAsString(cTrakt, cSortByRecommendedShows, "{\"Field\": 0,\"Direction\": 0}").FromJSON<SortBy>();
-                SortByUserFavoriteMovies = xmlreader.GetValueAsString( cTrakt, cSortByUserFavoriteMovies, "{\"Field\": 9,\"Direction\": 1}" ).FromJSON<SortBy>();
-                SortByUserFavoriteShows = xmlreader.GetValueAsString( cTrakt, cSortByUserFavoriteShows, "{\"Field\": 9,\"Direction\": 1}" ).FromJSON<SortBy>();
+                SortByUserFavoriteMovies = xmlreader.GetValueAsString( cTrakt, cSortByUserFavoriteMovies, "{\"Field\": 10,\"Direction\": 1}" ).FromJSON<SortBy>();
+                SortByUserFavoriteShows = xmlreader.GetValueAsString( cTrakt, cSortByUserFavoriteShows, "{\"Field\": 10,\"Direction\": 1}" ).FromJSON<SortBy>();
                 SortByFavoritedMovies = xmlreader.GetValueAsString( cTrakt, cSortByFavoritedMovies, "{\"Field\": 9,\"Direction\": 1}" ).FromJSON<SortBy>();
                 SortByFavoritedShows = xmlreader.GetValueAsString( cTrakt, cSortByFavoritedShows, "{\"Field\": 9,\"Direction\": 1}" ).FromJSON<SortBy>();
                 SortByTrendingMovies = xmlreader.GetValueAsString(cTrakt, cSortByTrendingMovies, "{\"Field\": 5,\"Direction\": 1}").FromJSON<SortBy>();
