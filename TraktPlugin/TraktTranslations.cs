@@ -399,6 +399,7 @@ namespace TraktPlugin.GUI
         public static string CostumeSupervisor = "Costume Supervisor";
         public static string Country = "Country";
         public static string CurrentPage = "Current Page";
+        public static string CurrentPeriod = "Period: {0}";
         public static string CustomLists = "Custom Lists";
         public static string Crew = "Crew";
 
@@ -487,6 +488,12 @@ namespace TraktPlugin.GUI
         public static string FriendRequestMessage = "You have {0} friend requests, approve or deny from friends window";
         public static string FollowerRequestMessage = "You have {0} follower requests, approve or deny from network window";
         public static string FullName = "Full Name";
+        public static string FavoritedMovies = "Favorited Movies";
+        public static string FavoritedShows = "Favorited Shows";
+        public static string FavoriteMovies = "Favorite Movies";
+        public static string FavoriteShows = "Favorite Shows";
+        public static string FavoriteSeasons = "Favorite Seasons";
+        public static string FavoriteEpisodes = "Favorite Episodes";
 
         // G
         public static string Gaffer = "Gaffer";
@@ -536,6 +543,7 @@ namespace TraktPlugin.GUI
         public static string GettingActivity = "Getting Activity";
         public static string GettingCalendar = "Getting Calendar";
         public static string GettingEpisodes = "Getting Episodes";
+        public static string GettingFavorites = "Getting Favorites";
         public static string GettingFriendsList = "Getting Friends List";
         public static string GettingFriendsRequests = "Getting Friends Requests";
         public static string GettingFollowerRequests = "Getting Follower Requests";
@@ -552,6 +560,8 @@ namespace TraktPlugin.GUI
         public static string GettingSearchResults = "Getting Search Results";
         public static string GettingTrendingMovies = "Getting Trending Movies";
         public static string GettingTrendingShows = "Getting Trending Shows";
+        public static string GettingFavoritedMovies = "Getting Favorited Movies";
+        public static string GettingFavoritedShows = "Getting Favorited Shows";
         public static string GettingPopularMovies = "Getting Popular Movies";
         public static string GettingPopularShows = "Getting Popular Shows";
         public static string GettingRecommendedMovies = "Getting Recommended Movies";
@@ -666,10 +676,6 @@ namespace TraktPlugin.GUI
         public static string MusicEditor = "Music Editor";
         public static string MovieCredits = "Movie Credits";
         public static string MovieCount = "{0} Movies";
-        public static string MyFavoriteMovies = "Favorite Movies";
-        public static string MyFavoriteShows = "Favorite Shows";
-        public static string MyFavoriteSeasons = "Favorite Seasons";
-        public static string MyFavoriteEpisodes = "Favorite Episodes  ";
 
         // N
         public static string Name = "Name";
@@ -695,11 +701,15 @@ namespace TraktPlugin.GUI
         public static string NoFollowerReqTaunt = "You have no follower requests!";
         public static string NoTrendingMovies = "No Movies currently being watched!";
         public static string NoTrendingShows = "No Shows currently being watched!";
+        public static string NoFavoritedMovies = "No Favorited Movies Found!";
+        public static string NoFavoritedShows = "No Favorited Shows Found!";
         public static string NoMovieRecommendations = "No Movie Recommendations Found!";
         public static string NoShowRecommendations = "No Show Recommendations Found!";
         public static string NoMovieWatchList = "{0} has no movies in Watchlist!";
         public static string NoShowWatchList = "{0} has no shows in Watchlist!";
         public static string NoEpisodeWatchList = "{0} has no episodes in Watchlist!";
+        public static string NoMovieFavorites = "{0} has no movies in Favorites!";
+        public static string NoShowFavorites = "{0} has no shows in Favorites!";
         public static string NoSearchTypesSelected = "You must first select one or more search types\nbefore performing an online search.";
         public static string NoShoutsForItem = "No Shouts for {0}!";
         public static string NoPeopleToSearch = "There are no people to search by.";
@@ -733,6 +743,11 @@ namespace TraktPlugin.GUI
         public static string People = "People";
         public static string Percentage = "Percentage";
         public static string Protected = "Protected";
+        public static string Period = "Period";
+        public static string PeriodDaily = "Daily";
+        public static string PeriodWeekly = "Weekly";
+        public static string PeriodMonthly = "Monthly";
+        public static string PeriodAll = "All";
         public static string Person = "Person";
         public static string PersonSummary = "Person Summary";
         public static string PersonWatching = "1 Person Watching";
@@ -1041,6 +1056,7 @@ namespace TraktPlugin.GUI
         public static string UserProfile = "User Profile";
         public static string UserRatingsDistribution = "Ratings distribution 1 to 10 hearts";
         public static string UserLoginSuccess = "User {0} successfully authorized to use trakt account";
+        public static string UserCount = "User Count";
 
         // V
         public static string VideoAssistOperator = "Video Assist Operator";

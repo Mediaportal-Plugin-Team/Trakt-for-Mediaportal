@@ -32,7 +32,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json">
-      <HintPath>Externals\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\Externals\Newtonsoft.Json.dll</HintPath>
       <Aliases>nsoft</Aliases>
       <Private>False</Private>
     </Reference>
@@ -56,6 +56,8 @@
     <Compile Include="DataStructures\TraktListsPopular.cs" />
     <Compile Include="DataStructures\TraktListsTrending.cs" />
     <Compile Include="DataStructures\TraktListTrending.cs" />
+    <Compile Include="DataStructures\TraktShowsFavorited.cs" />
+    <Compile Include="DataStructures\TraktMoviesFavorited.cs" />
     <Compile Include="DataStructures\TraktPlexId.cs" />
     <Compile Include="DataStructures\TraktMediaInfo.cs" />
     <Compile Include="DataStructures\TraktMovieCalendar.cs" />

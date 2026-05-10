@@ -18,8 +18,8 @@ namespace TraktPlugin.GUI
     #endregion
 
     #region Movie Sorter
-    public class GUIListItemMovieSorter : IComparer<TraktMovieTrending>, IComparer<TraktMovieSummary>, IComparer<TraktMovieWatchListItem>, IComparer<TraktPersonMovieCast>, IComparer<TraktPersonMovieJob>, IComparer<TraktMovieAnticipated>
-    {
+    public class GUIListItemMovieSorter : IComparer<TraktMovieTrending>, IComparer<TraktMovieSummary>, IComparer<TraktMovieWatchListItem>, IComparer<TraktPersonMovieCast>, IComparer<TraktPersonMovieJob>, IComparer<TraktMovieAnticipated>, IComparer<TraktFavoriteItem>, IComparer<TraktMovieFavorited>
+  {
         private readonly SortingFields mSortField;
         private readonly SortingDirections mSortDirection;
 
@@ -115,6 +115,39 @@ namespace TraktPlugin.GUI
             return Compare(movieX.Movie as TraktMovieSummary, movieY.Movie as TraktMovieSummary);
         }
 
+        public int Compare( TraktFavoriteItem itemX, TraktFavoriteItem itemY )
+        {
+          if ( mSortField == SortingFields.Added )
+          {
+            int rtn = itemX.ListedAt.FromISO8601().CompareTo( itemY.ListedAt.FromISO8601() );
+            if ( mSortDirection == SortingDirections.Descending )
+              rtn = -rtn;
+
+            return rtn;
+          }
+
+          if ( itemX.Type == "movie" && itemY.Type == "movie" )
+          {
+            return Compare( itemX.Movie as TraktMovieSummary, itemY.Movie as TraktMovieSummary );
+          }
+
+          return 0;
+        }
+
+        public int Compare( TraktMovieFavorited movieX, TraktMovieFavorited movieY )
+        {
+          if ( mSortField == SortingFields.UserCount )
+          {
+            int rtn = movieX.UserCount.CompareTo( movieY.UserCount );
+            if ( mSortDirection == SortingDirections.Descending )
+              rtn = -rtn;
+
+            return rtn;
+          }
+
+          return Compare( movieX.Movie, movieY.Movie );
+        }
+
         public int Compare(TraktMovieAnticipated movieX, TraktMovieAnticipated movieY)
         {
             if (mSortField == SortingFields.Anticipated)
@@ -142,7 +175,7 @@ namespace TraktPlugin.GUI
     #endregion
 
     #region Show Sorter
-    public class GUIListItemShowSorter : IComparer<TraktShowTrending>, IComparer<TraktShowSummary>, IComparer<TraktShowWatchListItem>, IComparer<TraktPersonShowCast>, IComparer<TraktPersonShowJob>, IComparer<TraktShowAnticipated>
+    public class GUIListItemShowSorter : IComparer<TraktShowTrending>, IComparer<TraktShowSummary>, IComparer<TraktShowWatchListItem>, IComparer<TraktPersonShowCast>, IComparer<TraktPersonShowJob>, IComparer<TraktShowAnticipated>, IComparer<TraktFavoriteItem>, IComparer<TraktShowFavorited>
     {
         private readonly SortingFields mSortField;
         private readonly SortingDirections mSortDirection;
@@ -225,6 +258,20 @@ namespace TraktPlugin.GUI
             return Compare(showX.Show as TraktShowSummary, showY.Show as TraktShowSummary);
         }
 
+        public int Compare( TraktShowFavorited showX, TraktShowFavorited showY )
+        {
+          if ( mSortField == SortingFields.UserCount )
+          {
+            int rtn = showX.UserCount.CompareTo( showY.UserCount );
+            if ( mSortDirection == SortingDirections.Descending )
+              rtn = -rtn;
+
+            return rtn;
+          }
+
+          return Compare( showX.Show as TraktShowSummary, showY.Show as TraktShowSummary );
+        }
+
         public int Compare(TraktShowWatchListItem showX, TraktShowWatchListItem showY)
         {
             if (mSortField == SortingFields.WatchListInserted)
@@ -237,6 +284,25 @@ namespace TraktPlugin.GUI
             }
 
             return Compare(showX.Show as TraktShowSummary, showY.Show as TraktShowSummary);
+        }
+
+        public int Compare( TraktFavoriteItem itemX, TraktFavoriteItem itemY )
+        {
+          if ( mSortField == SortingFields.Added )
+          {
+            int rtn = itemX.ListedAt.FromISO8601().CompareTo( itemY.ListedAt.FromISO8601() );
+            if ( mSortDirection == SortingDirections.Descending )
+              rtn = -rtn;
+
+            return rtn;
+          }
+
+          if ( itemX.Type == "show" && itemY.Type == "show" )
+          {
+            return Compare( itemX.Show as TraktShowSummary, itemY.Show as TraktShowSummary );
+          }
+
+          return 0;
         }
 
         public int Compare(TraktShowAnticipated showX, TraktShowAnticipated showY)

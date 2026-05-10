@@ -65,6 +65,8 @@ namespace TraktPlugin.GUI
             AddMovieToList,
             AddMovieToWatchlist,
             RemoveMovieFromWatchlist,
+            AddToFavorites,
+            RemoveFromFavorites,
             Related,
             AddToLibrary,
             RemoveFromLibrary,
@@ -396,6 +398,20 @@ namespace TraktPlugin.GUI
                 listItem.ItemId = (int)ContextMenuItem.RemoveMovieFromWatchlist;
             }
 
+            // Add/Remove Movie Favorites
+            if ( !calendarItem.Movie.IsFavorited() )
+            {
+              listItem = new GUIListItem( Translation.AddToFavorites );
+              dlg.Add( listItem );
+              listItem.ItemId = (int)ContextMenuItem.AddToFavorites;
+            }
+            else
+            {
+              listItem = new GUIListItem( Translation.RemoveFromFavorites );
+              dlg.Add( listItem );
+              listItem.ItemId = (int)ContextMenuItem.RemoveFromFavorites;
+            }
+
             // Add Movie to Custom List
             listItem = new GUIListItem(Translation.AddToList);
             dlg.Add(listItem);
@@ -499,6 +515,16 @@ namespace TraktPlugin.GUI
                     OnMovieSelected(Facade.SelectedListItem, Facade);
                     GUIWatchListMovies.ClearCache(TraktSettings.Username);
                     break;
+
+                case ( (int)ContextMenuItem.AddToFavorites ):
+                  TraktHelper.AddMovieToFavorites( calendarItem.Movie, true );
+                  OnMovieSelected( Facade.SelectedListItem, Facade );
+                  break;
+
+                case ( (int)ContextMenuItem.RemoveFromFavorites ):
+                  TraktHelper.RemoveMovieFromFavorites( calendarItem.Movie, true );
+                  OnMovieSelected( Facade.SelectedListItem, Facade );
+                  break;
 
                 case ((int)ContextMenuItem.AddMovieToList):
                     TraktHelper.AddRemoveMovieInUserList(calendarItem.Movie, false);
