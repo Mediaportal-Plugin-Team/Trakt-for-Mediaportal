@@ -219,7 +219,8 @@ namespace TraktPlugin.GUI
         Popularity,
         Anticipated,
         Rank,
-        Added
+        Added,
+        UserCount
     }
 
     public enum SortingDirections
@@ -2216,6 +2217,15 @@ namespace TraktPlugin.GUI
                 pItem.ItemId = (int)SortingFields.Added;
             }
 
+            // Favorited
+            if (GUIWindowManager.ActiveWindow == (int)TraktGUIWindows.FavoritedMovies ||
+                GUIWindowManager.ActiveWindow == (int)TraktGUIWindows.FavoritedShows)
+            {
+                pItem = new GUIListItem(Translation.UserCount);
+                dlg.Add(pItem);
+                pItem.ItemId = (int)SortingFields.UserCount;
+            }
+
             // set the focus to currently used sort method
             dlg.SelectedLabel = (int)currentSortBy.Field;
 
@@ -2278,6 +2288,11 @@ namespace TraktPlugin.GUI
                     newSortBy.Field = SortingFields.Added;
                     break;
 
+                case (int)SortingFields.UserCount:
+                  newSortBy.Direction = SortingDirections.Descending;
+                  newSortBy.Field = SortingFields.UserCount;
+                  break;
+
                 default:
                     newSortBy.Field = SortingFields.Title;
                     break;
@@ -2288,7 +2303,7 @@ namespace TraktPlugin.GUI
 
         internal static string GetSortByString(SortBy currentSortBy)
         {
-            string strLine = string.Empty;
+            string strLine;
 
             switch (currentSortBy.Field)
             {
@@ -2336,12 +2351,74 @@ namespace TraktPlugin.GUI
                     strLine = Translation.Inserted;
                     break;
 
+                case SortingFields.UserCount:
+                  strLine = Translation.UserCount;
+                  break;
+
                 default:
                     strLine = Translation.Title;
                     break;
             }
 
             return string.Format(Translation.SortBy, strLine);
+        }
+
+        #endregion
+
+        #region Time Period
+
+        internal static string ShowFavoritedPeriodMenu( string currentPeriod )
+        {
+          var dlg = (GUIDialogMenu)GUIWindowManager.GetWindow( (int)GUIWindow.Window.WINDOW_DIALOG_MENU );
+          if ( dlg == null )
+            return null;
+
+          dlg.Reset();
+          dlg.SetHeading( Translation.Period );
+
+          var periods = new[] { "daily", "weekly", "monthly", "all" };
+          foreach ( var period in periods )
+          {
+            var pItem = new GUIListItem( GetPeriodString( period ) );
+            dlg.Add( pItem );
+            pItem.ItemId = Array.IndexOf(periods, period);
+          }
+
+          // set the focus to currently used period
+          dlg.SelectedLabel = Array.IndexOf(periods, currentPeriod);
+
+          // show dialog and wait for result
+          dlg.DoModal( GUIWindowManager.ActiveWindow );
+          if ( dlg.SelectedId == -1 )
+            return null;
+
+          return periods[ dlg.SelectedId ];
+        }
+
+        internal static string GetPeriodString( string period )
+        {
+          string strLine;
+
+          switch ( period )
+          {
+            case "daily":
+              strLine = Translation.PeriodDaily;
+              break;
+            case "weekly":
+              strLine = Translation.PeriodWeekly;
+              break;
+            case "monthly":
+              strLine = Translation.PeriodMonthly;
+              break;
+            case "all":
+              strLine = Translation.PeriodAll;
+              break;
+            default:
+              strLine = Translation.PeriodWeekly;
+              break;
+          }
+
+          return string.Format( Translation.CurrentPeriod, strLine );
         }
 
         #endregion
@@ -3562,6 +3639,40 @@ namespace TraktPlugin.GUI
             return showsToFilter;
         }
 
+        internal static IEnumerable<TraktMovieFavorited> FilterFavoritedMovies( IEnumerable<TraktMovieFavorited> moviesToFilter )
+        {
+          if ( TraktSettings.FavoritedMoviesHideWatched )
+            moviesToFilter = moviesToFilter.Where( t => !t.Movie.IsWatched() );
+
+          if ( TraktSettings.FavoritedMoviesHideWatchlisted )
+            moviesToFilter = moviesToFilter.Where( t => !t.Movie.IsWatchlisted() );
+
+          if ( TraktSettings.FavoritedMoviesHideCollected )
+            moviesToFilter = moviesToFilter.Where( t => !t.Movie.IsCollected() );
+
+          if ( TraktSettings.FavoritedMoviesHideRated )
+            moviesToFilter = moviesToFilter.Where( t => t.Movie.UserRating() == null );
+
+          return moviesToFilter;
+        }
+
+        internal static IEnumerable<TraktShowFavorited> FilterFavoritedShows( IEnumerable<TraktShowFavorited> showsToFilter )
+        {
+          if ( TraktSettings.FavoritedShowsHideWatched )
+            showsToFilter = showsToFilter.Where( t => !t.Show.IsWatched() );
+
+          if ( TraktSettings.FavoritedShowsHideWatchlisted )
+            showsToFilter = showsToFilter.Where( t => !t.Show.IsWatchlisted() );
+
+          if ( TraktSettings.FavoritedShowsHideCollected )
+            showsToFilter = showsToFilter.Where( t => !t.Show.IsCollected() );
+
+          if ( TraktSettings.FavoritedShowsHideRated )
+            showsToFilter = showsToFilter.Where( t => t.Show.UserRating() == null );
+
+          return showsToFilter;
+        }
+
         internal static IEnumerable<TraktListItem> FilterListItems(IEnumerable<TraktListItem> aListItemsToFilter)
         {
             if (TraktSettings.ListItemsHideWatched)
@@ -3988,9 +4099,28 @@ namespace TraktPlugin.GUI
             return false;
         }
 
-        #endregion
+    #endregion
 
         #region Translation
+        public static string GetTranslatedFavoritedPeriod( string period )
+        {
+          if ( string.IsNullOrEmpty( period ) )
+            return string.Empty;
+
+          switch ( period.ToLower().Trim() )
+          {
+            case "daily":
+              return Translation.PeriodDaily;
+            case "weekly":
+              return Translation.PeriodWeekly;
+            case "monthly":
+              return Translation.PeriodMonthly;
+            case "all":
+              return Translation.PeriodAll;
+            default:
+              return period;
+          }
+        }
 
         public static string GetTranslatedCreditJob(string job)
         {

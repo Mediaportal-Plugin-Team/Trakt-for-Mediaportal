@@ -271,6 +271,7 @@
     <Compile Include="GUI\GUIShowSeasons.cs" />
     <Compile Include="GUI\GUIRecentWatchedEpisodes.cs" />
     <Compile Include="GUI\GUIRecentWatchedMovies.cs" />
+    <Compile Include="GUI\GUIFavoritedMovies.cs" />
     <Compile Include="GUI\GUITVMenu.cs" />
     <Compile Include="GUI\GUIUserFavoriteShows.cs" />
     <Compile Include="GUI\GUIUserProfile.cs" />

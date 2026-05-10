@@ -18,8 +18,8 @@ namespace TraktPlugin.GUI
     #endregion
 
     #region Movie Sorter
-    public class GUIListItemMovieSorter : IComparer<TraktMovieTrending>, IComparer<TraktMovieSummary>, IComparer<TraktMovieWatchListItem>, IComparer<TraktPersonMovieCast>, IComparer<TraktPersonMovieJob>, IComparer<TraktMovieAnticipated>, IComparer<TraktFavoriteItem>
-    {
+    public class GUIListItemMovieSorter : IComparer<TraktMovieTrending>, IComparer<TraktMovieSummary>, IComparer<TraktMovieWatchListItem>, IComparer<TraktPersonMovieCast>, IComparer<TraktPersonMovieJob>, IComparer<TraktMovieAnticipated>, IComparer<TraktFavoriteItem>, IComparer<TraktMovieFavorited>
+  {
         private readonly SortingFields mSortField;
         private readonly SortingDirections mSortDirection;
 
@@ -134,6 +134,20 @@ namespace TraktPlugin.GUI
           return 0;
         }
 
+        public int Compare( TraktMovieFavorited movieX, TraktMovieFavorited movieY )
+        {
+          if ( mSortField == SortingFields.UserCount )
+          {
+            int rtn = movieX.UserCount.CompareTo( movieY.UserCount );
+            if ( mSortDirection == SortingDirections.Descending )
+              rtn = -rtn;
+
+            return rtn;
+          }
+
+          return Compare( movieX.Movie, movieY.Movie );
+        }
+
         public int Compare(TraktMovieAnticipated movieX, TraktMovieAnticipated movieY)
         {
             if (mSortField == SortingFields.Anticipated)
@@ -161,7 +175,7 @@ namespace TraktPlugin.GUI
     #endregion
 
     #region Show Sorter
-    public class GUIListItemShowSorter : IComparer<TraktShowTrending>, IComparer<TraktShowSummary>, IComparer<TraktShowWatchListItem>, IComparer<TraktPersonShowCast>, IComparer<TraktPersonShowJob>, IComparer<TraktShowAnticipated>, IComparer<TraktFavoriteItem>
+    public class GUIListItemShowSorter : IComparer<TraktShowTrending>, IComparer<TraktShowSummary>, IComparer<TraktShowWatchListItem>, IComparer<TraktPersonShowCast>, IComparer<TraktPersonShowJob>, IComparer<TraktShowAnticipated>, IComparer<TraktFavoriteItem>, IComparer<TraktShowFavorited>
     {
         private readonly SortingFields mSortField;
         private readonly SortingDirections mSortDirection;
@@ -242,6 +256,20 @@ namespace TraktPlugin.GUI
             }
 
             return Compare(showX.Show as TraktShowSummary, showY.Show as TraktShowSummary);
+        }
+
+        public int Compare( TraktShowFavorited showX, TraktShowFavorited showY )
+        {
+          if ( mSortField == SortingFields.UserCount )
+          {
+            int rtn = showX.UserCount.CompareTo( showY.UserCount );
+            if ( mSortDirection == SortingDirections.Descending )
+              rtn = -rtn;
+
+            return rtn;
+          }
+
+          return Compare( showX.Show as TraktShowSummary, showY.Show as TraktShowSummary );
         }
 
         public int Compare(TraktShowWatchListItem showX, TraktShowWatchListItem showY)

@@ -124,6 +124,14 @@ namespace TraktPlugin
         public static bool RememberLastSelectedActivity { get; set; }
         public static int MovPicsRatingDlgDelay { get; set; }
         public static bool ShowRateDlgForPlaylists { get; set; }
+        public static bool FavoritedMoviesHideWatched { get; set; }
+        public static bool FavoritedMoviesHideWatchlisted { get; set; }
+        public static bool FavoritedMoviesHideCollected { get; set; }
+        public static bool FavoritedMoviesHideRated { get; set; }
+        public static bool FavoritedShowsHideWatched { get; set; }
+        public static bool FavoritedShowsHideWatchlisted { get; set; }
+        public static bool FavoritedShowsHideCollected { get; set; }
+        public static bool FavoritedShowsHideRated { get; set; }
         public static bool TrendingMoviesHideWatched { get; set; }
         public static bool TrendingMoviesHideWatchlisted { get; set; }
         public static bool TrendingMoviesHideCollected { get; set; }
@@ -175,6 +183,8 @@ namespace TraktPlugin
         public static int SyncResumeDelta { get; set; }
         public static bool SyncPlaybackOnEnterPlugin { get; set; }
         public static int SyncPlaybackCacheExpiry { get; set; }
+        public static int MaxFavoritedMoviesRequest { get; set; }
+        public static int MaxFavoritedShowsRequest { get; set; }
         public static int MaxTrendingMoviesRequest { get; set; }
         public static int MaxTrendingShowsRequest { get; set; }
         public static int MaxPopularMoviesRequest { get; set; }
@@ -226,6 +236,8 @@ namespace TraktPlugin
         public static string UserRefreshToken { get; set; }
         public static int TvCalendarMaxDays { get; set; }
         public static int MovieCalendarMaxDays { get; set; }
+        public static string FavoritedMoviesPeriod { get; set; }
+        public static string FavoritedShowsPeriod { get; set; }
         #endregion
 
         #region Constants
@@ -344,6 +356,14 @@ namespace TraktPlugin
         private const string cRememberLastSelectedActivity = "RememberLastSelectedActivity";
         private const string cMovPicsRatingDlgDelay = "MovPicsRatingDlgDelay";
         private const string cShowRateDlgForPlaylists = "ShowRateDlgForPlaylists";
+        private const string cFavoritedMoviesHideWatched = "FavoritedMoviesHideWatched";
+        private const string cFavoritedMoviesHideWatchlisted = "FavoritedMoviesHideWatchlisted";
+        private const string cFavoritedMoviesHideCollected = "FavoritedMoviesHideCollected";
+        private const string cFavoritedMoviesHideRated = "FavoritedMoviesHideRated";
+        private const string cFavoritedShowsHideWatched = "FavoritedShowsHideWatched";
+        private const string cFavoritedShowsHideWatchlisted = "FavoritedShowsHideWatchlisted";
+        private const string cFavoritedShowsHideCollected = "FavoritedShowsHideCollected";
+        private const string cFavoritedShowsHideRated = "FavoritedShowsHideRated";
         private const string cTrendingMoviesHideWatched = "TrendingMoviesHideWatched";
         private const string cTrendingMoviesHideWatchlisted = "TrendingMoviesHideWatchlisted";
         private const string cTrendingMoviesHideCollected = "TrendingMoviesHideCollected";
@@ -395,6 +415,8 @@ namespace TraktPlugin
         private const string cSyncResumeDelta = "SyncResumeDelta";
         private const string cSyncPlaybackOnEnterPlugin = "SyncPlaybackOnEnterPlugin";
         private const string cSyncPlaybackCacheExpiry = "SyncPlaybackCacheExpiry";
+        private const string cMaxFavoritedMoviesRequest = "MaxFavoritedMoviesRequest";
+        private const string cMaxFavoritedShowsRequest = "MaxFavoritedShowsRequest";
         private const string cMaxTrendingMoviesRequest = "MaxTrendingMoviesRequest";
         private const string cMaxTrendingShowsRequest = "MaxTrendingShowsRequest";
         private const string cMaxPopularMoviesRequest = "MaxPopularMoviesRequest";
@@ -442,6 +464,8 @@ namespace TraktPlugin
         private const string cTraktOnlineSettings = "TraktOnlineSettings";
         private const string cTvCalendarMaxDays = "TvCalendarMaxDays";
         private const string cMovieCalendarMaxDays = "MovieCalendarMaxDays";
+        private const string cFavoritedMoviesPeriod = "FavoritedMoviesPeriod";
+        private const string cFavoritedShowsPeriod = "FavoritedShowsPeriod";
         #endregion
 
         #region Properties
@@ -804,8 +828,8 @@ namespace TraktPlugin
                 SortByRecommendedShows = xmlreader.GetValueAsString(cTrakt, cSortByRecommendedShows, "{\"Field\": 0,\"Direction\": 0}").FromJSON<SortBy>();
                 SortByUserFavoriteMovies = xmlreader.GetValueAsString( cTrakt, cSortByUserFavoriteMovies, "{\"Field\": 10,\"Direction\": 1}" ).FromJSON<SortBy>();
                 SortByUserFavoriteShows = xmlreader.GetValueAsString( cTrakt, cSortByUserFavoriteShows, "{\"Field\": 10,\"Direction\": 1}" ).FromJSON<SortBy>();
-                SortByFavoritedMovies = xmlreader.GetValueAsString( cTrakt, cSortByFavoritedMovies, "{\"Field\": 9,\"Direction\": 1}" ).FromJSON<SortBy>();
-                SortByFavoritedShows = xmlreader.GetValueAsString( cTrakt, cSortByFavoritedShows, "{\"Field\": 9,\"Direction\": 1}" ).FromJSON<SortBy>();
+                SortByFavoritedMovies = xmlreader.GetValueAsString( cTrakt, cSortByFavoritedMovies, "{\"Field\": 11,\"Direction\": 1}" ).FromJSON<SortBy>();
+                SortByFavoritedShows = xmlreader.GetValueAsString( cTrakt, cSortByFavoritedShows, "{\"Field\": 11,\"Direction\": 1}" ).FromJSON<SortBy>();
                 SortByTrendingMovies = xmlreader.GetValueAsString(cTrakt, cSortByTrendingMovies, "{\"Field\": 5,\"Direction\": 1}").FromJSON<SortBy>();
                 SortByTrendingShows = xmlreader.GetValueAsString(cTrakt, cSortByTrendingShows, "{\"Field\": 5,\"Direction\": 1}").FromJSON<SortBy>();
                 SortByPopularMovies = xmlreader.GetValueAsString(cTrakt, cSortByPopularMovies, "{\"Field\": 7,\"Direction\": 1}").FromJSON<SortBy>();
@@ -819,6 +843,14 @@ namespace TraktPlugin
                 RememberLastSelectedActivity = xmlreader.GetValueAsBool(cTrakt, cRememberLastSelectedActivity, true);
                 MovPicsRatingDlgDelay = GetValueAsIntAndValidate(cTrakt, cMovPicsRatingDlgDelay, 500, 250, 1000);
                 ShowRateDlgForPlaylists = xmlreader.GetValueAsBool(cTrakt, cShowRateDlgForPlaylists, false);
+                FavoritedMoviesHideWatched = xmlreader.GetValueAsBool( cTrakt, cFavoritedMoviesHideWatched, false );
+                FavoritedMoviesHideWatchlisted = xmlreader.GetValueAsBool( cTrakt, cFavoritedMoviesHideWatchlisted, false );
+                FavoritedMoviesHideCollected = xmlreader.GetValueAsBool( cTrakt, cFavoritedMoviesHideCollected, false );
+                FavoritedMoviesHideRated = xmlreader.GetValueAsBool( cTrakt, cFavoritedMoviesHideRated, false );
+                FavoritedShowsHideWatched = xmlreader.GetValueAsBool( cTrakt, cFavoritedShowsHideWatched, false );
+                FavoritedShowsHideWatchlisted = xmlreader.GetValueAsBool( cTrakt, cFavoritedShowsHideWatchlisted, false );
+                FavoritedShowsHideCollected = xmlreader.GetValueAsBool( cTrakt, cFavoritedShowsHideCollected, false );
+                FavoritedShowsHideRated = xmlreader.GetValueAsBool( cTrakt, cFavoritedShowsHideRated, false );
                 TrendingMoviesHideWatched = xmlreader.GetValueAsBool(cTrakt, cTrendingMoviesHideWatched, false);
                 TrendingMoviesHideWatchlisted = xmlreader.GetValueAsBool(cTrakt, cTrendingMoviesHideWatchlisted, false);
                 TrendingMoviesHideCollected = xmlreader.GetValueAsBool(cTrakt, cTrendingMoviesHideCollected, false);
@@ -866,20 +898,22 @@ namespace TraktPlugin
                 SyncResumeDelta = GetValueAsIntAndValidate(cTrakt, cSyncResumeDelta, 5, 0, 600);
                 SyncPlaybackOnEnterPlugin = xmlreader.GetValueAsBool(cTrakt, cSyncPlaybackOnEnterPlugin, false);
                 SyncPlaybackCacheExpiry = GetValueAsIntAndValidate(cTrakt, cSyncPlaybackCacheExpiry, 5, 1, 1440);
-                MaxTrendingMoviesRequest = GetValueAsIntAndValidate(cTrakt, cMaxTrendingMoviesRequest, 40, 1, 1000);
-                MaxTrendingShowsRequest = GetValueAsIntAndValidate(cTrakt, cMaxTrendingShowsRequest, 40, 1, 1000);
-                MaxPopularMoviesRequest = GetValueAsIntAndValidate(cTrakt, cMaxPopularMoviesRequest, 40, 1, 1000);
-                MaxPopularShowsRequest = GetValueAsIntAndValidate(cTrakt, cMaxPopularShowsRequest, 40, 1, 1000);
-                MaxAnticipatedMoviesRequest = GetValueAsIntAndValidate(cTrakt, cMaxAnticipatedMoviesRequest, 40, 1, 1000);
-                MaxAnticipatedShowsRequest = GetValueAsIntAndValidate(cTrakt, cMaxAnticipatedShowsRequest, 40, 1, 1000);
+                MaxFavoritedMoviesRequest = GetValueAsIntAndValidate( cTrakt, cMaxFavoritedMoviesRequest, 100, 1, 250 );
+                MaxFavoritedShowsRequest = GetValueAsIntAndValidate( cTrakt, cMaxFavoritedShowsRequest, 100, 1, 250 );
+                MaxTrendingMoviesRequest = GetValueAsIntAndValidate(cTrakt, cMaxTrendingMoviesRequest, 40, 1, 250 );
+                MaxTrendingShowsRequest = GetValueAsIntAndValidate(cTrakt, cMaxTrendingShowsRequest, 40, 1, 250 );
+                MaxPopularMoviesRequest = GetValueAsIntAndValidate(cTrakt, cMaxPopularMoviesRequest, 100, 1, 250 );
+                MaxPopularShowsRequest = GetValueAsIntAndValidate(cTrakt, cMaxPopularShowsRequest, 100, 1, 250 );
+                MaxAnticipatedMoviesRequest = GetValueAsIntAndValidate(cTrakt, cMaxAnticipatedMoviesRequest, 40, 1, 250 );
+                MaxAnticipatedShowsRequest = GetValueAsIntAndValidate(cTrakt, cMaxAnticipatedShowsRequest, 40, 1, 250 );
                 LastListActivities = xmlreader.GetValueAsString(cTrakt, cLastListActivities, "[]").FromJSONArray<TraktCache.ListActivity>();
                 MaxRelatedMoviesRequest = GetValueAsIntAndValidate(cTrakt, cMaxRelatedMoviesRequest, 10, 1, 100);
                 MaxRelatedMoviesUnWatchedRequest = GetValueAsIntAndValidate(cTrakt, cMaxRelatedMoviesUnWatchedRequest, 40, 1, 100);
                 MaxRelatedShowsRequest = GetValueAsIntAndValidate(cTrakt, cMaxRelatedShowsRequest, 10, 1, 100);
-                MaxRelatedShowsUnWatchedRequest = GetValueAsIntAndValidate(cTrakt, cMaxRelatedShowsUnWatchedRequest, 40, 1, 1000);
-                MaxUserWatchedMoviesRequest = GetValueAsIntAndValidate(cTrakt, cMaxUserWatchedMoviesRequest, 40, 1, 1000);
-                MaxUserWatchedEpisodesRequest = GetValueAsIntAndValidate(cTrakt, cMaxUserWatchedEpisodesRequest, 40, 1, 1000);
-                MaxUserCommentsRequest = GetValueAsIntAndValidate(cTrakt, cMaxUserCommentsRequest, 40, 1, 1000);
+                MaxRelatedShowsUnWatchedRequest = GetValueAsIntAndValidate(cTrakt, cMaxRelatedShowsUnWatchedRequest, 40, 1, 250 );
+                MaxUserWatchedMoviesRequest = GetValueAsIntAndValidate(cTrakt, cMaxUserWatchedMoviesRequest, 40, 1, 250 );
+                MaxUserWatchedEpisodesRequest = GetValueAsIntAndValidate(cTrakt, cMaxUserWatchedEpisodesRequest, 40, 1, 250 );
+                MaxUserCommentsRequest = GetValueAsIntAndValidate(cTrakt, cMaxUserCommentsRequest, 40, 1, 250 );
                 DashboardActivityFilter = xmlreader.GetValueAsString(cTrakt, cDashboardActivityFilter, "{}").FromJSON<ActivityFilter>();
                 SkipMoviesWithNoIdsOnSync = xmlreader.GetValueAsBool(cTrakt, cSkipMoviesWithNoIdsOnSync, true);
                 PersonMovieCreditsDefaultLayout = xmlreader.GetValueAsInt(cTrakt, cPersonMovieCreditsDefaultLayout, 0);
@@ -924,6 +958,8 @@ namespace TraktPlugin
                 OnlineSettings = xmlreader.GetValueAsString(cTrakt, cTraktOnlineSettings, "{}").FromJSON<TraktAPI.DataStructures.TraktSettings>();
                 TvCalendarMaxDays = xmlreader.GetValueAsInt(cTrakt, cTvCalendarMaxDays, 7);
                 MovieCalendarMaxDays = xmlreader.GetValueAsInt(cTrakt, cMovieCalendarMaxDays, 7);
+                FavoritedMoviesPeriod = xmlreader.GetValueAsString( cTrakt, cFavoritedMoviesPeriod, "weekly" );
+                FavoritedShowsPeriod = xmlreader.GetValueAsString( cTrakt, cFavoritedShowsPeriod, "weekly" );
             }
 
             // initialise API settings
@@ -1063,6 +1099,14 @@ namespace TraktPlugin
                 xmlwriter.SetValueAsBool(cTrakt, cSortSeasonsAscending, SortSeasonsAscending);
                 xmlwriter.SetValueAsBool(cTrakt, cRememberLastSelectedActivity, RememberLastSelectedActivity);
                 xmlwriter.SetValueAsBool(cTrakt, cShowRateDlgForPlaylists, ShowRateDlgForPlaylists);
+                xmlwriter.SetValueAsBool( cTrakt, cFavoritedMoviesHideWatched, FavoritedMoviesHideWatched );
+                xmlwriter.SetValueAsBool( cTrakt, cFavoritedMoviesHideWatchlisted, FavoritedMoviesHideWatchlisted );
+                xmlwriter.SetValueAsBool( cTrakt, cFavoritedMoviesHideCollected, FavoritedMoviesHideCollected );
+                xmlwriter.SetValueAsBool( cTrakt, cFavoritedMoviesHideRated, FavoritedMoviesHideRated );
+                xmlwriter.SetValueAsBool( cTrakt, cFavoritedShowsHideWatched, FavoritedShowsHideWatched );
+                xmlwriter.SetValueAsBool( cTrakt, cFavoritedShowsHideWatchlisted, FavoritedShowsHideWatchlisted );
+                xmlwriter.SetValueAsBool( cTrakt, cFavoritedShowsHideCollected, FavoritedShowsHideCollected );
+                xmlwriter.SetValueAsBool( cTrakt, cFavoritedShowsHideRated, FavoritedShowsHideRated );
                 xmlwriter.SetValueAsBool(cTrakt, cTrendingMoviesHideWatched, TrendingMoviesHideWatched);
                 xmlwriter.SetValueAsBool(cTrakt, cTrendingMoviesHideWatchlisted, TrendingMoviesHideWatchlisted);
                 xmlwriter.SetValueAsBool(cTrakt, cTrendingMoviesHideCollected, TrendingMoviesHideCollected);
@@ -1111,6 +1155,8 @@ namespace TraktPlugin
                 xmlwriter.SetValue(cTrakt, cSyncResumeDelta, SyncResumeDelta);
                 xmlwriter.SetValueAsBool(cTrakt, cSyncPlaybackOnEnterPlugin, SyncPlaybackOnEnterPlugin);
                 xmlwriter.SetValue(cTrakt, cSyncPlaybackCacheExpiry, SyncPlaybackCacheExpiry);
+                xmlwriter.SetValue( cTrakt, cMaxFavoritedMoviesRequest, MaxFavoritedMoviesRequest );
+                xmlwriter.SetValue( cTrakt, cMaxFavoritedShowsRequest, MaxFavoritedShowsRequest );
                 xmlwriter.SetValue(cTrakt, cMaxTrendingMoviesRequest, MaxTrendingMoviesRequest);
                 xmlwriter.SetValue(cTrakt, cMaxTrendingShowsRequest, MaxTrendingShowsRequest);
                 xmlwriter.SetValue(cTrakt, cMaxPopularMoviesRequest, MaxPopularMoviesRequest);
@@ -1166,6 +1212,8 @@ namespace TraktPlugin
                 xmlwriter.SetValue(cTrakt, cTraktOnlineSettings, OnlineSettings.ToJSON());
                 xmlwriter.SetValue(cTrakt, cTvCalendarMaxDays, TvCalendarMaxDays);
                 xmlwriter.SetValue(cTrakt, cMovieCalendarMaxDays, MovieCalendarMaxDays);
+                xmlwriter.SetValue( cTrakt, cFavoritedMoviesPeriod, FavoritedMoviesPeriod );
+                xmlwriter.SetValue( cTrakt, cFavoritedShowsPeriod, FavoritedShowsPeriod );
             }
 
             Settings.SaveCache();
