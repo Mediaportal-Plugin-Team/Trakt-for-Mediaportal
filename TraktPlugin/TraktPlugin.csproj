@@ -229,6 +229,7 @@
     <Compile Include="GUI\GUICreditsMovie.cs" />
     <Compile Include="GUI\GUICreditsShow.cs" />
     <Compile Include="GUI\GUIAnticipatedShows.cs" />
+    <Compile Include="GUI\GUIFavoritedShows.cs" />
     <Compile Include="GUI\GUIListsMenu.cs" />
     <Compile Include="GUI\GUICommon.cs" />
     <Compile Include="GUI\GUIDialogMultiSelect.cs" />
