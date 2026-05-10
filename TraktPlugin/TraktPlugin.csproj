@@ -708,7 +708,6 @@
     <Content Include="Resources\Skins\Titan\Themes\Extended Two\BasicHome.Trakt.xml" />
     <Content Include="Resources\Skins\Titan\Themes\Extended Two\Media\BasicHomeImages\Trakt.png" />
     <Content Include="Resources\Skins\Titan\Themes\Extended Two\Trakt.SkinSettings.xml" />
-    <Content Include="Resources\Skins\Titan\Trakt.AccountDialog.xml" />
     <Content Include="Resources\Skins\Titan\Trakt.Calendar.xml" />
     <Content Include="Resources\Skins\Titan\Trakt.Common.Background.xml" />
     <Content Include="Resources\Skins\Titan\Trakt.Common.Episodes.xml" />
@@ -719,6 +718,8 @@
     <Content Include="Resources\Skins\Titan\Trakt.Common.Users.xml" />
     <Content Include="Resources\Skins\Titan\Trakt.Common.xml" />
     <Content Include="Resources\Skins\Titan\Trakt.Dashboard.xml" />
+    <Content Include="Resources\Skins\Titan\Trakt.Favorited.Movies.xml" />
+    <Content Include="Resources\Skins\Titan\Trakt.Favorited.Shows.xml" />
     <Content Include="Resources\Skins\Titan\Trakt.List.Items.xml" />
     <Content Include="Resources\Skins\Titan\Trakt.Lists.Menu.xml" />
     <Content Include="Resources\Skins\Titan\Trakt.Lists.xml" />
@@ -748,7 +749,7 @@
     <Content Include="Resources\Skins\Titan\Trakt.Search.Users.xml" />
     <Content Include="Resources\Skins\Titan\Trakt.Search.xml" />
     <Content Include="Resources\Skins\Titan\Trakt.Season.Episodes.xml" />
-    <Content Include="Resources\Skins\Titan\Trakt.Settings.Account.xml" />
+    <Content Include="Resources\Skins\Titan\Trakt.Settings.AccountAuth.xml" />
     <Content Include="Resources\Skins\Titan\Trakt.Settings.General.xml" />
     <Content Include="Resources\Skins\Titan\Trakt.Settings.Plugins.xml" />
     <Content Include="Resources\Skins\Titan\Trakt.Settings.xml" />
@@ -759,6 +760,8 @@
     <Content Include="Resources\Skins\Titan\Trakt.Trending.Shows.xml" />
     <Content Include="Resources\Skins\Titan\Trakt.Trending.xml" />
     <Content Include="Resources\Skins\Titan\Trakt.TV.Menu.xml" />
+    <Content Include="Resources\Skins\Titan\Trakt.UserFavorite.Movies.xml" />
+    <Content Include="Resources\Skins\Titan\Trakt.UserFavorite.Shows.xml" />
     <Content Include="Resources\Skins\Titan\Trakt.UserProfile.xml" />
     <Content Include="Resources\Skins\Titan\Trakt.WatchList.Episodes.xml" />
     <Content Include="Resources\Skins\Titan\Trakt.WatchList.Movies.xml" />
