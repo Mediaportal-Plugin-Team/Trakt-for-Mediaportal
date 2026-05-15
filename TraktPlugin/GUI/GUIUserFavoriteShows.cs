@@ -192,7 +192,19 @@ namespace TraktPlugin.GUI
         case ( 50 ):
           if ( actionType == Action.ActionType.ACTION_SELECT_ITEM )
           {
-            CheckAndPlayEpisode( true );
+            if ( TraktSettings.EnableJumpToForTVShows )
+            {
+              CheckAndPlayEpisode( true );
+            }
+            else
+            {
+              if ( !( Facade.SelectedListItem is GUIShowListItem item ) )
+                return;
+
+              if ( item.Show == null ) return;
+              
+              GUIWindowManager.ActivateWindow( (int)TraktGUIWindows.ShowSeasons, item.Show.ToJSON() );
+            }
           }
           break;
 
