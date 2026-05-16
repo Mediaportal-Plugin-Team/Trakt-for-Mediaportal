@@ -57,19 +57,21 @@ namespace TraktPlugin.GUI
 
         enum ActivityType
         {
-            UserProfile,
-            RecentWatchedEpisodes,
-            RecentWatchedMovies,
-            RecentAddedEpisodes,
-            RecentAddedMovies,
-            RecentComments,
-            EpisodeWatchList,
-            RatedMovies,
-            RatedShows,
-            RatedEpisodes,
-            ShowWatchList,
-            MovieWatchList,
-            Lists
+          UserProfile,
+          RecentWatchedEpisodes,
+          RecentWatchedMovies,
+          RecentAddedEpisodes,
+          RecentAddedMovies,
+          RecentComments,
+          EpisodeWatchList,
+          RatedMovies,
+          RatedShows,
+          RatedEpisodes,
+          ShowWatchList,
+          MovieWatchList,
+          Lists,
+          ShowFavorites,
+          MovieFavorites,
         }
 
         #endregion
@@ -230,62 +232,74 @@ namespace TraktPlugin.GUI
                                 break;
 
                             case ViewLevel.ActivityTypes:
-                                // Launch Corresponding Activity window
-                                switch (SelectedActivity)
-                                {
-                                    case (ActivityType.UserProfile):
-                                        GUIUserProfile.CurrentUser = CurrentSelectedUser.Username;
-                                        GUIWindowManager.ActivateWindow((int)TraktGUIWindows.UserProfile);
-                                        break;
+                            {
+                              // Launch Corresponding Activity window
+                              switch ( SelectedActivity )
+                              {
+                                case ( ActivityType.UserProfile ):
+                                  GUIUserProfile.CurrentUser = CurrentSelectedUser.Username;
+                                  GUIWindowManager.ActivateWindow( (int)TraktGUIWindows.UserProfile );
+                                  break;
 
-                                    case (ActivityType.RecentWatchedMovies):
-                                        GUIRecentWatchedMovies.CurrentUser = CurrentSelectedUser.Username;
-                                        GUIWindowManager.ActivateWindow((int)TraktGUIWindows.RecentWatchedMovies);
-                                        break;
+                                case ( ActivityType.RecentWatchedMovies ):
+                                  GUIRecentWatchedMovies.CurrentUser = CurrentSelectedUser.Username;
+                                  GUIWindowManager.ActivateWindow( (int)TraktGUIWindows.RecentWatchedMovies );
+                                  break;
 
-                                    case (ActivityType.RecentWatchedEpisodes):
-                                        GUIRecentWatchedEpisodes.CurrentUser = CurrentSelectedUser.Username;
-                                        GUIWindowManager.ActivateWindow((int)TraktGUIWindows.RecentWatchedEpisodes);
-                                        break;
+                                case ( ActivityType.RecentWatchedEpisodes ):
+                                  GUIRecentWatchedEpisodes.CurrentUser = CurrentSelectedUser.Username;
+                                  GUIWindowManager.ActivateWindow( (int)TraktGUIWindows.RecentWatchedEpisodes );
+                                  break;
 
-                                    case (ActivityType.RecentAddedEpisodes):
-                                        GUIUtils.ShowNotifyDialog("Trakt", Translation.FeatureNotAvailable);
-                                        //TODOGUIRecentAddedEpisodes.CurrentUser = CurrentSelectedUser.Username;
-                                        //TODOGUIWindowManager.ActivateWindow((int)TraktGUIWindows.RecentAddedEpisodes);
-                                        break;
+                                case ( ActivityType.RecentAddedEpisodes ):
+                                  GUIUtils.ShowNotifyDialog( "Trakt", Translation.FeatureNotAvailable );
+                                  //TODOGUIRecentAddedEpisodes.CurrentUser = CurrentSelectedUser.Username;
+                                  //TODOGUIWindowManager.ActivateWindow((int)TraktGUIWindows.RecentAddedEpisodes);
+                                  break;
 
-                                    case (ActivityType.RecentAddedMovies):
-                                        GUIUtils.ShowNotifyDialog("Trakt", Translation.FeatureNotAvailable);
-                                        //TODOGUIRecentAddedMovies.CurrentUser = CurrentSelectedUser.Username;
-                                        //TODOGUIWindowManager.ActivateWindow((int)TraktGUIWindows.RecentAddedMovies);
-                                        break;
+                                case ( ActivityType.RecentAddedMovies ):
+                                  GUIUtils.ShowNotifyDialog( "Trakt", Translation.FeatureNotAvailable );
+                                  //TODOGUIRecentAddedMovies.CurrentUser = CurrentSelectedUser.Username;
+                                  //TODOGUIWindowManager.ActivateWindow((int)TraktGUIWindows.RecentAddedMovies);
+                                  break;
 
-                                    case (ActivityType.RecentComments):
-                                        GUIRecentShouts.CurrentUser = CurrentSelectedUser.Username;
-                                        GUIWindowManager.ActivateWindow((int)TraktGUIWindows.RecentShouts);
-                                        break;
+                                case ( ActivityType.RecentComments ):
+                                  GUIRecentShouts.CurrentUser = CurrentSelectedUser.Username;
+                                  GUIWindowManager.ActivateWindow( (int)TraktGUIWindows.RecentShouts );
+                                  break;
 
-                                    case (ActivityType.MovieWatchList):
-                                        GUIWatchListMovies.CurrentUser = CurrentSelectedUser.Username;
-                                        GUIWindowManager.ActivateWindow((int)TraktGUIWindows.WatchedListMovies);
-                                        break;
+                                case ( ActivityType.MovieWatchList ):
+                                  GUIWatchListMovies.CurrentUser = CurrentSelectedUser.Username;
+                                  GUIWindowManager.ActivateWindow( (int)TraktGUIWindows.WatchedListMovies );
+                                  break;
 
-                                    case (ActivityType.ShowWatchList):
-                                        GUIWatchListShows.CurrentUser = CurrentSelectedUser.Username;
-                                        GUIWindowManager.ActivateWindow((int)TraktGUIWindows.WatchedListShows);
-                                        break;
+                                case ( ActivityType.ShowWatchList ):
+                                  GUIWatchListShows.CurrentUser = CurrentSelectedUser.Username;
+                                  GUIWindowManager.ActivateWindow( (int)TraktGUIWindows.WatchedListShows );
+                                  break;
 
-                                    case (ActivityType.EpisodeWatchList):
-                                        GUIWatchListEpisodes.CurrentUser = CurrentSelectedUser.Username;
-                                        GUIWindowManager.ActivateWindow((int)TraktGUIWindows.WatchedListEpisodes);
-                                        break;
+                                case ( ActivityType.EpisodeWatchList ):
+                                  GUIWatchListEpisodes.CurrentUser = CurrentSelectedUser.Username;
+                                  GUIWindowManager.ActivateWindow( (int)TraktGUIWindows.WatchedListEpisodes );
+                                  break;
 
-                                    case (ActivityType.Lists):
-                                        GUILists.CurrentUser = CurrentSelectedUser.Username;
-                                        GUIWindowManager.ActivateWindow((int)TraktGUIWindows.CustomLists);
-                                        break;
-                                }
-                                break;
+                                case ( ActivityType.Lists ):
+                                  GUILists.CurrentUser = CurrentSelectedUser.Username;
+                                  GUIWindowManager.ActivateWindow( (int)TraktGUIWindows.CustomLists );
+                                  break;
+
+                                case ( ActivityType.ShowFavorites ):
+                                  GUIUserFavoriteShows.CurrentUser = CurrentSelectedUser.Username;
+                                  GUIWindowManager.ActivateWindow( (int)TraktGUIWindows.UserFavoriteShows );
+                                  break;
+
+                                case ( ActivityType.MovieFavorites ):
+                                  GUIUserFavoriteMovies.CurrentUser = CurrentSelectedUser.Username;
+                                  GUIWindowManager.ActivateWindow( (int)TraktGUIWindows.UserFavoriteMovies );
+                                  break;
+                              }
+                              break;
+                            }
                         }
                     }
                     break;
@@ -781,6 +795,28 @@ namespace TraktPlugin.GUI
             Utils.SetDefaultIcons(item);
             Facade.Add(item);
 
+            item = new GUIUserListItem( Translation.FavoriteShows, (int)TraktGUIWindows.Network )
+            {
+              IconImage = avatar,
+              IconImageBig = avatar,
+              ThumbnailImage = avatar,
+              PinImage = "traktActivityFavorite.png"
+            };
+            item.OnItemSelected += OnActivityTypeSelected;
+            Utils.SetDefaultIcons( item );
+            Facade.Add( item );
+
+            item = new GUIUserListItem( Translation.FavoriteMovies, (int)TraktGUIWindows.Network )
+            {
+              IconImage = avatar,
+              IconImageBig = avatar,
+              ThumbnailImage = avatar,
+              PinImage = "traktActivityFavorite.png"
+            };
+            item.OnItemSelected += OnActivityTypeSelected;
+            Utils.SetDefaultIcons( item );
+            Facade.Add( item );
+
             Facade.SelectedListItemIndex = PreviousActivityTypeSelectedIndex;
 
             // Set Facade Layout
@@ -1210,29 +1246,33 @@ namespace TraktPlugin.GUI
 
         private void OnActivityTypeSelected(GUIListItem item, GUIControl parent)
         {
-            if (item.Label == Translation.UserProfile)
-                SelectedActivity = ActivityType.UserProfile;
-            else if (item.Label == Translation.RecentWatchedEpisodes)
-                SelectedActivity = ActivityType.RecentWatchedEpisodes;
-            else if (item.Label == Translation.RecentWatchedMovies)
-                SelectedActivity = ActivityType.RecentWatchedMovies;
-            else if (item.Label == Translation.RecentAddedEpisodes)
-                SelectedActivity = ActivityType.RecentAddedEpisodes;
-            else if (item.Label == Translation.RecentAddedMovies)
-                SelectedActivity = ActivityType.RecentAddedMovies;
-            else if (item.Label == Translation.RecentComments)
-                SelectedActivity = ActivityType.RecentComments;
-            else if (item.Label == Translation.WatchListMovies)
-                SelectedActivity = ActivityType.MovieWatchList;
-            else if (item.Label == Translation.WatchListShows)
-                SelectedActivity = ActivityType.ShowWatchList;
-            else if (item.Label == Translation.WatchListEpisodes)
-                SelectedActivity = ActivityType.EpisodeWatchList;
-            else if (item.Label == Translation.Lists)
-                SelectedActivity = ActivityType.Lists;
+          if ( item.Label == Translation.UserProfile )
+            SelectedActivity = ActivityType.UserProfile;
+          else if ( item.Label == Translation.RecentWatchedEpisodes )
+            SelectedActivity = ActivityType.RecentWatchedEpisodes;
+          else if ( item.Label == Translation.RecentWatchedMovies )
+            SelectedActivity = ActivityType.RecentWatchedMovies;
+          else if ( item.Label == Translation.RecentAddedEpisodes )
+            SelectedActivity = ActivityType.RecentAddedEpisodes;
+          else if ( item.Label == Translation.RecentAddedMovies )
+            SelectedActivity = ActivityType.RecentAddedMovies;
+          else if ( item.Label == Translation.RecentComments )
+            SelectedActivity = ActivityType.RecentComments;
+          else if ( item.Label == Translation.WatchListMovies )
+            SelectedActivity = ActivityType.MovieWatchList;
+          else if ( item.Label == Translation.WatchListShows )
+            SelectedActivity = ActivityType.ShowWatchList;
+          else if ( item.Label == Translation.WatchListEpisodes )
+            SelectedActivity = ActivityType.EpisodeWatchList;
+          else if ( item.Label == Translation.FavoriteShows )
+            SelectedActivity = ActivityType.ShowFavorites;
+          else if ( item.Label == Translation.FavoriteMovies )
+            SelectedActivity = ActivityType.MovieFavorites;
+          else if ( item.Label == Translation.Lists )
+            SelectedActivity = ActivityType.Lists;
 
-            PublishUserSkinProperties(CurrentSelectedUser);
-            PreviousActivityTypeSelectedIndex = Facade.SelectedListItemIndex;
+          PublishUserSkinProperties(CurrentSelectedUser);
+          PreviousActivityTypeSelectedIndex = Facade.SelectedListItemIndex;
         }
         #endregion
         
