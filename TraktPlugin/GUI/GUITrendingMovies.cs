@@ -32,6 +32,9 @@ namespace TraktPlugin.GUI
         [SkinControl(12)]
         protected GUICheckButton filterRatedButton = null;
 
+        [SkinControl( 13 )]
+        protected GUICheckButton filterFavoritedButton = null;
+
         [SkinControl(50)]
         protected GUIFacadeControl Facade = null;
 
@@ -201,6 +204,14 @@ namespace TraktPlugin.GUI
                     LoadTrendingMovies(CurrentPage);
                     break;
 
+                // Hide Favorited
+                case ( 13 ):
+                  PreviousSelectedIndex = CurrentPage == 1 ? 0 : 1;
+                  TraktSettings.TrendingMoviesHideFavorited = !TraktSettings.TrendingMoviesHideFavorited;
+                  UpdateButtonState();
+                  LoadTrendingMovies( CurrentPage );
+                  break;
+
                 default:
                     break;
             }
@@ -275,6 +286,7 @@ namespace TraktPlugin.GUI
                   TraktHelper.AddMovieToFavorites( selectedTrendingItem.Movie, true );
                   OnMovieSelected( selectedItem, Facade );
                   ( Facade.SelectedListItem as GUIMovieListItem ).Images.NotifyPropertyChanged( "Poster" );
+                  if ( TraktSettings.TrendingMoviesHideFavorited ) LoadTrendingMovies( CurrentPage );
                   break;
 
                 case ( (int)MediaContextMenuItem.RemoveFromFavorites ):
@@ -591,6 +603,8 @@ namespace TraktPlugin.GUI
                 filterCollectedButton.Selected = TraktSettings.TrendingMoviesHideCollected;
             if (filterRatedButton != null)
                 filterRatedButton.Selected = TraktSettings.TrendingMoviesHideRated;
+            if ( filterFavoritedButton != null )
+              filterFavoritedButton.Selected = TraktSettings.TrendingMoviesHideFavorited;
         }
 
         private void ClearProperties(bool moviesOnly = false)

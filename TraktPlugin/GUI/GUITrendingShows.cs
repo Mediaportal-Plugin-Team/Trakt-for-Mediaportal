@@ -33,6 +33,9 @@ namespace TraktPlugin.GUI
         [SkinControl(12)]
         protected GUICheckButton filterRatedButton = null;
 
+        [SkinControl( 13 )]
+        protected GUICheckButton filterFavoritedButton = null;
+
         [SkinControl(50)]
         protected GUIFacadeControl Facade = null;
 
@@ -211,6 +214,14 @@ namespace TraktPlugin.GUI
                     LoadTrendingShows(CurrentPage);
                     break;
 
+                // Hide Favorited
+                case ( 13 ):
+                  PreviousSelectedIndex = CurrentPage == 1 ? 0 : 1;
+                  TraktSettings.TrendingShowsHideFavorited = !TraktSettings.TrendingShowsHideFavorited;
+                  UpdateButtonState();
+                  LoadTrendingShows( CurrentPage );
+                  break;
+
                 default:
                     break;
             }
@@ -267,6 +278,7 @@ namespace TraktPlugin.GUI
                   TraktHelper.AddShowToFavorites( selectedTrendingItem.Show );
                   OnShowSelected( selectedItem, Facade );
                   ( Facade.SelectedListItem as GUIShowListItem ).Images.NotifyPropertyChanged( "Poster" );
+                  if ( TraktSettings.TrendingShowsHideFavorited ) LoadTrendingShows( CurrentPage );
                   break;
 
                 case ( (int)MediaContextMenuItem.RemoveFromFavorites ):
@@ -586,6 +598,8 @@ namespace TraktPlugin.GUI
                 filterCollectedButton.Selected = TraktSettings.TrendingShowsHideCollected;
             if (filterRatedButton != null)
                 filterRatedButton.Selected = TraktSettings.TrendingShowsHideRated;
+            if ( filterFavoritedButton != null )
+              filterFavoritedButton.Selected = TraktSettings.TrendingShowsHideFavorited;
         }
 
         private void ClearProperties(bool showsOnly = false)

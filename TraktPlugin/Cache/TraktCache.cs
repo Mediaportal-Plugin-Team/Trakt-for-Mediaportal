@@ -3456,6 +3456,16 @@ namespace TraktPlugin
             return false;
         }
 
+        public static bool IsFavorited( this TraktListItem item )
+        {
+          if ( item.Type == "movie" && item.Movie != null )
+            return item.Movie.IsFavorited();
+          if ( item.Type == "show" && item.Show != null )
+            return item.Show.IsFavorited();
+
+          return false;
+        }
+
         public static bool IsWatchlisted(this TraktListItem item)
         {
             if (item.Type == "movie" && item.Movie != null)

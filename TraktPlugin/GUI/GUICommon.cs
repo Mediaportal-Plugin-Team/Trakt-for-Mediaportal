@@ -236,7 +236,8 @@ namespace TraktPlugin.GUI
         Collected,
         Rated,
         NotCollected,
-        NotWatched
+        NotWatched,
+        Favorited,
     }
 
     public enum Credit
@@ -3493,12 +3494,14 @@ namespace TraktPlugin.GUI
 
         internal static bool ShowMovieFiltersMenu()
         {
-            Dictionary<Filters, bool> filters = new Dictionary<Filters, bool>();
-
-            filters.Add(Filters.Watched, TraktSettings.TrendingMoviesHideWatched);
-            filters.Add(Filters.Watchlisted, TraktSettings.TrendingMoviesHideWatchlisted);
-            filters.Add(Filters.Collected, TraktSettings.TrendingMoviesHideCollected);
-            filters.Add(Filters.Rated, TraktSettings.TrendingMoviesHideRated);
+            Dictionary<Filters, bool> filters = new Dictionary<Filters, bool>
+            {
+              { Filters.Watched, TraktSettings.TrendingMoviesHideWatched },
+              { Filters.Watchlisted, TraktSettings.TrendingMoviesHideWatchlisted },
+              { Filters.Collected, TraktSettings.TrendingMoviesHideCollected },
+              { Filters.Rated, TraktSettings.TrendingMoviesHideRated },
+              { Filters.Favorited, TraktSettings.TrendingMoviesHideFavorited }
+            };
 
             var selectedItems = GUIUtils.ShowMultiSelectionDialog(Translation.Filters, GetFilterListItems(filters));
             if (selectedItems == null) return false;
@@ -3520,6 +3523,9 @@ namespace TraktPlugin.GUI
                     case Filters.Rated:
                         TraktSettings.TrendingMoviesHideRated = !TraktSettings.TrendingMoviesHideRated;
                         break;
+                    case Filters.Favorited:
+                      TraktSettings.TrendingMoviesHideFavorited = !TraktSettings.TrendingMoviesHideFavorited;
+                      break;
                 }
             }
 
@@ -3528,12 +3534,14 @@ namespace TraktPlugin.GUI
 
         internal static bool ShowTVShowFiltersMenu()
         {
-            Dictionary<Filters, bool> filters = new Dictionary<Filters, bool>();
-
-            filters.Add(Filters.Watched, TraktSettings.TrendingShowsHideWatched);
-            filters.Add(Filters.Watchlisted, TraktSettings.TrendingShowsHideWatchlisted);
-            filters.Add(Filters.Collected, TraktSettings.TrendingShowsHideCollected);
-            filters.Add(Filters.Rated, TraktSettings.TrendingShowsHideRated);
+            Dictionary<Filters, bool> filters = new Dictionary<Filters, bool>
+            {
+              { Filters.Watched, TraktSettings.TrendingShowsHideWatched },
+              { Filters.Watchlisted, TraktSettings.TrendingShowsHideWatchlisted },
+              { Filters.Collected, TraktSettings.TrendingShowsHideCollected },
+              { Filters.Rated, TraktSettings.TrendingShowsHideRated },
+              { Filters.Favorited, TraktSettings.TrendingShowsHideFavorited }
+            };
 
             var selectedItems = GUIUtils.ShowMultiSelectionDialog(Translation.Filters, GetFilterListItems(filters));
             if (selectedItems == null) return false;
@@ -3555,6 +3563,9 @@ namespace TraktPlugin.GUI
                     case Filters.Rated:
                         TraktSettings.TrendingShowsHideRated = !TraktSettings.TrendingShowsHideRated;
                         break;
+                    case Filters.Favorited:
+                      TraktSettings.TrendingShowsHideFavorited = !TraktSettings.TrendingShowsHideFavorited;
+                      break;
                 }
             }
 
@@ -3570,7 +3581,8 @@ namespace TraktPlugin.GUI
                 { Filters.Collected, TraktSettings.ListItemsHideCollected },
                 { Filters.Rated, TraktSettings.ListItemsHideRated },
                 { Filters.NotCollected, TraktSettings.ListItemsHideNotCollected },
-                { Filters.NotWatched, TraktSettings.ListItemsHideNotWatched }
+                { Filters.NotWatched, TraktSettings.ListItemsHideNotWatched },
+                { Filters.Favorited, TraktSettings.ListItemsHideFavorited }
             };
 
             var lSelectedItems = GUIUtils.ShowMultiSelectionDialog(Translation.Filters, GetFilterListItems(lFilters));
@@ -3599,6 +3611,9 @@ namespace TraktPlugin.GUI
                     case Filters.NotWatched:
                         TraktSettings.ListItemsHideNotWatched = !TraktSettings.ListItemsHideNotWatched;
                         break;
+                    case Filters.Favorited:
+                      TraktSettings.ListItemsHideFavorited = !TraktSettings.ListItemsHideFavorited;
+                      break;
                 }
             }
 
@@ -3619,6 +3634,9 @@ namespace TraktPlugin.GUI
             if (TraktSettings.TrendingMoviesHideRated)
                 moviesToFilter = moviesToFilter.Where(t => t.Movie.UserRating() == null);
 
+            if ( TraktSettings.TrendingMoviesHideFavorited )
+              moviesToFilter = moviesToFilter.Where( t => !t.Movie.IsFavorited() );
+
             return moviesToFilter;
         }
 
@@ -3635,6 +3653,9 @@ namespace TraktPlugin.GUI
 
             if (TraktSettings.TrendingShowsHideRated)
                 showsToFilter = showsToFilter.Where(t => t.Show.UserRating() == null);
+
+            if ( TraktSettings.TrendingShowsHideFavorited )
+              showsToFilter = showsToFilter.Where( t => !t.Show.IsFavorited() );
 
             return showsToFilter;
         }
@@ -3692,6 +3713,9 @@ namespace TraktPlugin.GUI
 
             if (TraktSettings.ListItemsHideNotWatched)
                 aListItemsToFilter = aListItemsToFilter.Where(t => t.IsWatched());
+
+            if ( TraktSettings.ListItemsHideFavorited )
+              aListItemsToFilter = aListItemsToFilter.Where( t => !t.IsFavorited() );
 
             return aListItemsToFilter;
         }
