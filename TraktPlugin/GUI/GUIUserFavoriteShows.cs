@@ -383,14 +383,20 @@ namespace TraktPlugin.GUI
           ( Facade.SelectedListItem as GUIShowListItem ).Images.NotifyPropertyChanged( "Poster" );
           break;
 
+        case ( (int)ContextMenuItem.AddToFavorites ):
+          // could be adding to favourites from your friends favourite list
+          TraktHelper.AddShowToFavorites( selectedFavoriteItem.Show );
+          OnShowSelected( selectedItem, Facade );
+          ( Facade.SelectedListItem as GUIShowListItem ).Images.NotifyPropertyChanged( "Poster" );
+          break;
+
         case ( (int)ContextMenuItem.RemoveFromFavorites ):
           PreviousSelectedIndex = this.Facade.SelectedListItemIndex;
           TraktHelper.RemoveShowFromFavorites( selectedFavoriteItem.Show );
           if ( _FavoriteShows.Count() >= 1 )
           {
             // remove from list
-            var showsToExcept = new List<TraktFavoriteItem>();
-            showsToExcept.Add( selectedFavoriteItem );
+            var showsToExcept = new List<TraktFavoriteItem> { selectedFavoriteItem };
             _FavoriteShows = FavoriteShows?.Except( showsToExcept );
             userFavorites[ CurrentUser ] = _FavoriteShows;
             LoadFavoriteShows();
