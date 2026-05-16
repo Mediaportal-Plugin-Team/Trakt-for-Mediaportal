@@ -136,32 +136,39 @@ namespace TraktPlugin
         public static bool TrendingMoviesHideWatchlisted { get; set; }
         public static bool TrendingMoviesHideCollected { get; set; }
         public static bool TrendingMoviesHideRated { get; set; }
+        public static bool TrendingMoviesHideFavorited { get; set; }
         public static bool TrendingShowsHideWatched { get; set; }
         public static bool TrendingShowsHideWatchlisted { get; set; }
         public static bool TrendingShowsHideCollected { get; set; }
         public static bool TrendingShowsHideRated { get; set; }
+        public static bool TrendingShowsHideFavorited { get; set; }
         public static bool PopularMoviesHideWatched { get; set; }
         public static bool PopularMoviesHideWatchlisted { get; set; }
         public static bool PopularMoviesHideCollected { get; set; }
         public static bool PopularMoviesHideRated { get; set; }
+        public static bool PopularMoviesHideFavorited { get; set; }
         public static bool PopularShowsHideWatched { get; set; }
         public static bool PopularShowsHideWatchlisted { get; set; }
         public static bool PopularShowsHideCollected { get; set; }
         public static bool PopularShowsHideRated { get; set; }
+        public static bool PopularShowsHideFavorited { get; set; }
         public static bool CreditMoviesHideWatched { get; set; }
         public static bool CreditMoviesHideWatchlisted { get; set; }
         public static bool CreditMoviesHideCollected { get; set; }
         public static bool CreditMoviesHideRated { get; set; }
+        public static bool CreditMoviesHideFavorited { get; set; }
         public static bool CreditShowsHideWatched { get; set; }
         public static bool CreditShowsHideWatchlisted { get; set; }
         public static bool CreditShowsHideCollected { get; set; }
         public static bool CreditShowsHideRated { get; set; }
+        public static bool CreditShowsHideFavorited { get; set; }
         public static bool AnticipatedMoviesHideWatchlisted { get; set; }
         public static bool AnticipatedShowsHideWatchlisted { get; set; }
         public static bool ListItemsHideWatched { get; set; }
         public static bool ListItemsHideWatchlisted { get; set; }
         public static bool ListItemsHideCollected { get; set; }
         public static bool ListItemsHideRated { get; set; }
+        public static bool ListItemsHideFavorited { get; set; }
         public static bool ListItemsHideNotCollected { get; set; }
         public static bool ListItemsHideNotWatched { get; set; }
         public static int DefaultNetworkView { get; set; }
@@ -368,32 +375,39 @@ namespace TraktPlugin
         private const string cTrendingMoviesHideWatchlisted = "TrendingMoviesHideWatchlisted";
         private const string cTrendingMoviesHideCollected = "TrendingMoviesHideCollected";
         private const string cTrendingMoviesHideRated = "TrendingMoviesHideRated";
+        private const string cTrendingMoviesHideFavorited = "TrendingMoviesHideFavorited";
         private const string cTrendingShowsHideWatched = "TrendingShowsHideWatched";
         private const string cTrendingShowsHideWatchlisted = "TrendingShowsHideWatchlisted";
         private const string cTrendingShowsHideCollected = "TrendingShowsHideCollected";
         private const string cTrendingShowsHideRated = "TrendingShowsHideRated";
+        private const string cTrendingShowsHideFavorited = "TrendingShowsHideFavorited";
         private const string cPopularMoviesHideWatched = "PopularMoviesHideWatched";
         private const string cPopularMoviesHideWatchlisted = "PopularMoviesHideWatchlisted";
         private const string cPopularMoviesHideCollected = "PopularMoviesHideCollected";
         private const string cPopularMoviesHideRated = "PopularMoviesHideRated";
+        private const string cPopularMoviesHideFavorited = "PopularMoviesHideFavorited";
         private const string cPopularShowsHideWatched = "PopularShowsHideWatched";
         private const string cPopularShowsHideWatchlisted = "PopularShowsHideWatchlisted";
         private const string cPopularShowsHideCollected = "PopularShowsHideCollected";
         private const string cPopularShowsHideRated = "PopularShowsHideRated";
+        private const string cPopularShowsHideFavorited = "PopularShowsHideFavorited";
         private const string cCreditMoviesHideWatched = "CreditMoviesHideWatched";
         private const string cCreditMoviesHideWatchlisted = "CreditMoviesHideWatchlisted";
         private const string cCreditMoviesHideCollected = "CreditMoviesHideCollected";
         private const string cCreditMoviesHideRated = "CreditMoviesHideRated";
+        private const string cCreditMoviesHideFavortited = "CreditMoviesHideFavorited";
         private const string cCreditShowsHideWatched = "CreditShowsHideWatched";
         private const string cCreditShowsHideWatchlisted = "CreditShowsHideWatchlisted";
         private const string cCreditShowsHideCollected = "CreditShowsHideCollected";
         private const string cCreditShowsHideRated = "CreditShowsHideRated";
+        private const string cCreditShowsHideFavorited = "CreditShowsHideFavorited";
         private const string cAnticipatedShowsHideWatchlisted = "AnticipatedShowsHideWatchlisted";
         private const string cAnticipatedMoviesHideWatchlisted = "AnticipatedMoviesHideWatchlisted";
         private const string cListItemsHideWatched = "ListItemsHideWatched";
         private const string cListItemsHideWatchlisted = "ListItemsHideWatchlisted";
         private const string cListItemsHideCollected = "ListItemsHideCollected";
         private const string cListItemsHideRated = "ListItemsHideRated";
+        private const string cListItemsHideFavorited = "ListItemsHideFavorited";
         private const string cListItemsHideNotCollected = "ListItemsHideNotCollected";
         private const string cListItemsHideNotWatched = "ListItemsHideNotWatched";
         private const string cDefaultNetworkView = "DefaultNetworkView";
@@ -853,26 +867,31 @@ namespace TraktPlugin
                 FavoritedShowsHideRated = xmlreader.GetValueAsBool( cTrakt, cFavoritedShowsHideRated, false );
                 TrendingMoviesHideWatched = xmlreader.GetValueAsBool(cTrakt, cTrendingMoviesHideWatched, false);
                 TrendingMoviesHideWatchlisted = xmlreader.GetValueAsBool(cTrakt, cTrendingMoviesHideWatchlisted, false);
-                TrendingMoviesHideCollected = xmlreader.GetValueAsBool(cTrakt, cTrendingMoviesHideCollected, false);
-                TrendingMoviesHideRated = xmlreader.GetValueAsBool(cTrakt, cTrendingMoviesHideRated, false);
+                TrendingMoviesHideCollected = xmlreader.GetValueAsBool(cTrakt, cTrendingMoviesHideCollected, false);                
+                TrendingMoviesHideRated = xmlreader.GetValueAsBool( cTrakt, cTrendingMoviesHideRated, false );
+                TrendingMoviesHideFavorited = xmlreader.GetValueAsBool( cTrakt, cTrendingMoviesHideFavorited, false );
                 TrendingShowsHideWatched = xmlreader.GetValueAsBool(cTrakt, cTrendingShowsHideWatched, false);
                 TrendingShowsHideWatchlisted = xmlreader.GetValueAsBool(cTrakt, cTrendingShowsHideWatchlisted, false);
                 TrendingShowsHideCollected = xmlreader.GetValueAsBool(cTrakt, cTrendingShowsHideCollected, false);
                 TrendingShowsHideRated = xmlreader.GetValueAsBool(cTrakt, cTrendingShowsHideRated, false);
+                TrendingShowsHideFavorited = xmlreader.GetValueAsBool( cTrakt, cTrendingShowsHideFavorited, false );
                 PopularMoviesHideWatched = xmlreader.GetValueAsBool(cTrakt, cPopularMoviesHideWatched, false);
                 PopularMoviesHideWatchlisted = xmlreader.GetValueAsBool(cTrakt, cPopularMoviesHideWatchlisted, false);
                 PopularMoviesHideCollected = xmlreader.GetValueAsBool(cTrakt, cPopularMoviesHideCollected, false);
                 PopularMoviesHideRated = xmlreader.GetValueAsBool(cTrakt, cPopularMoviesHideRated, false);
+                PopularMoviesHideFavorited = xmlreader.GetValueAsBool(cTrakt, cPopularMoviesHideFavorited, false);
                 PopularShowsHideWatched = xmlreader.GetValueAsBool(cTrakt, cPopularShowsHideWatched, false);
                 PopularShowsHideWatchlisted = xmlreader.GetValueAsBool(cTrakt, cPopularShowsHideWatchlisted, false);
                 PopularShowsHideCollected = xmlreader.GetValueAsBool(cTrakt, cPopularShowsHideCollected, false);
                 PopularShowsHideRated = xmlreader.GetValueAsBool(cTrakt, cPopularShowsHideRated, false);
+                PopularShowsHideFavorited = xmlreader.GetValueAsBool( cTrakt, cPopularShowsHideFavorited, false );
                 AnticipatedMoviesHideWatchlisted = xmlreader.GetValueAsBool(cTrakt, cAnticipatedMoviesHideWatchlisted, false);
                 AnticipatedShowsHideWatchlisted = xmlreader.GetValueAsBool(cTrakt, cAnticipatedShowsHideWatchlisted, false);
                 ListItemsHideWatched = xmlreader.GetValueAsBool(cTrakt, cListItemsHideWatched, false);
                 ListItemsHideWatchlisted = xmlreader.GetValueAsBool(cTrakt, cListItemsHideWatchlisted, false);
                 ListItemsHideCollected = xmlreader.GetValueAsBool(cTrakt, cListItemsHideCollected, false);
                 ListItemsHideRated = xmlreader.GetValueAsBool(cTrakt, cListItemsHideRated, false);
+                ListItemsHideFavorited = xmlreader.GetValueAsBool( cTrakt, cListItemsHideFavorited, false );
                 ListItemsHideNotCollected = xmlreader.GetValueAsBool(cTrakt, cListItemsHideNotCollected, false);
                 ListItemsHideNotWatched = xmlreader.GetValueAsBool(cTrakt, cListItemsHideNotWatched, false);
                 DefaultNetworkView = xmlreader.GetValueAsInt(cTrakt, cDefaultNetworkView, 1);
@@ -924,10 +943,12 @@ namespace TraktPlugin
                 CreditMoviesHideWatchlisted = xmlreader.GetValueAsBool(cTrakt, cCreditMoviesHideWatchlisted, false);
                 CreditMoviesHideCollected = xmlreader.GetValueAsBool(cTrakt, cCreditMoviesHideCollected, false);
                 CreditMoviesHideRated = xmlreader.GetValueAsBool(cTrakt, cCreditMoviesHideRated, false);
+                CreditMoviesHideFavorited = xmlreader.GetValueAsBool( cTrakt, cCreditMoviesHideFavortited, false );
                 CreditShowsHideWatched = xmlreader.GetValueAsBool(cTrakt, cCreditShowsHideWatched, false);
                 CreditShowsHideWatchlisted = xmlreader.GetValueAsBool(cTrakt, cCreditShowsHideWatchlisted, false);
                 CreditShowsHideCollected = xmlreader.GetValueAsBool(cTrakt, cCreditShowsHideCollected, false);
                 CreditShowsHideRated = xmlreader.GetValueAsBool(cTrakt, cCreditShowsHideRated, false);
+                CreditShowsHideFavorited = xmlreader.GetValueAsBool( cTrakt, cCreditShowsHideFavorited, false );
                 CreditsMovieDefaultLayout = xmlreader.GetValueAsInt(cTrakt, cCreditsMovieDefaultLayout, 0);
                 CreditsShowDefaultLayout = xmlreader.GetValueAsInt(cTrakt, cCreditsShowDefaultLayout, 0);
                 AnticipatedMoviesDefaultLayout = xmlreader.GetValueAsInt(cTrakt, cAnticipatedMoviesDefaultLayout, 0);
@@ -1110,25 +1131,30 @@ namespace TraktPlugin
                 xmlwriter.SetValueAsBool(cTrakt, cTrendingMoviesHideWatched, TrendingMoviesHideWatched);
                 xmlwriter.SetValueAsBool(cTrakt, cTrendingMoviesHideWatchlisted, TrendingMoviesHideWatchlisted);
                 xmlwriter.SetValueAsBool(cTrakt, cTrendingMoviesHideCollected, TrendingMoviesHideCollected);
-                xmlwriter.SetValueAsBool(cTrakt, cTrendingMoviesHideRated, TrendingMoviesHideRated);
+                xmlwriter.SetValueAsBool( cTrakt, cTrendingMoviesHideRated, TrendingMoviesHideRated );
+                xmlwriter.SetValueAsBool( cTrakt, cTrendingMoviesHideFavorited, TrendingMoviesHideFavorited );
                 xmlwriter.SetValueAsBool(cTrakt, cTrendingShowsHideWatched, TrendingShowsHideWatched);
                 xmlwriter.SetValueAsBool(cTrakt, cTrendingShowsHideWatchlisted, TrendingShowsHideWatchlisted);
                 xmlwriter.SetValueAsBool(cTrakt, cTrendingShowsHideCollected, TrendingShowsHideCollected);
                 xmlwriter.SetValueAsBool(cTrakt, cTrendingShowsHideRated, TrendingShowsHideRated);
+                xmlwriter.SetValueAsBool( cTrakt, cTrendingShowsHideFavorited, TrendingShowsHideFavorited );
                 xmlwriter.SetValueAsBool(cTrakt, cPopularMoviesHideWatched, PopularMoviesHideWatched);
                 xmlwriter.SetValueAsBool(cTrakt, cPopularMoviesHideWatchlisted, PopularMoviesHideWatchlisted);
                 xmlwriter.SetValueAsBool(cTrakt, cPopularMoviesHideCollected, PopularMoviesHideCollected);
                 xmlwriter.SetValueAsBool(cTrakt, cPopularMoviesHideRated, PopularMoviesHideRated);
+                xmlwriter.SetValueAsBool( cTrakt, cPopularMoviesHideFavorited, PopularMoviesHideFavorited );
                 xmlwriter.SetValueAsBool(cTrakt, cPopularShowsHideWatched, PopularShowsHideWatched);
                 xmlwriter.SetValueAsBool(cTrakt, cPopularShowsHideWatchlisted, PopularShowsHideWatchlisted);
                 xmlwriter.SetValueAsBool(cTrakt, cPopularShowsHideCollected, PopularShowsHideCollected);
                 xmlwriter.SetValueAsBool(cTrakt, cPopularShowsHideRated, PopularShowsHideRated);
+                xmlwriter.SetValueAsBool( cTrakt, cPopularShowsHideFavorited, PopularShowsHideFavorited );
                 xmlwriter.SetValueAsBool(cTrakt, cAnticipatedMoviesHideWatchlisted, AnticipatedMoviesHideWatchlisted);
                 xmlwriter.SetValueAsBool(cTrakt, cAnticipatedShowsHideWatchlisted, AnticipatedShowsHideWatchlisted);
                 xmlwriter.SetValueAsBool(cTrakt, cListItemsHideWatched, ListItemsHideWatched);
                 xmlwriter.SetValueAsBool(cTrakt, cListItemsHideWatchlisted, ListItemsHideWatchlisted);
                 xmlwriter.SetValueAsBool(cTrakt, cListItemsHideCollected, ListItemsHideCollected);
                 xmlwriter.SetValueAsBool(cTrakt, cListItemsHideRated, ListItemsHideRated);
+                xmlwriter.SetValueAsBool( cTrakt, cListItemsHideFavorited, ListItemsHideFavorited );
                 xmlwriter.SetValueAsBool(cTrakt, cListItemsHideNotCollected, ListItemsHideNotCollected);
                 xmlwriter.SetValueAsBool(cTrakt, cListItemsHideNotWatched, ListItemsHideNotWatched);
                 xmlwriter.SetValue(cTrakt, cDefaultNetworkView, DefaultNetworkView);
@@ -1181,10 +1207,12 @@ namespace TraktPlugin
                 xmlwriter.SetValueAsBool(cTrakt, cCreditMoviesHideWatchlisted, CreditMoviesHideWatchlisted);
                 xmlwriter.SetValueAsBool(cTrakt, cCreditMoviesHideCollected, CreditMoviesHideCollected);
                 xmlwriter.SetValueAsBool(cTrakt, cCreditMoviesHideRated, CreditMoviesHideRated);
+                xmlwriter.SetValueAsBool( cTrakt, cCreditMoviesHideFavortited, CreditMoviesHideFavorited );
                 xmlwriter.SetValueAsBool(cTrakt, cCreditShowsHideWatched, CreditShowsHideWatched);
                 xmlwriter.SetValueAsBool(cTrakt, cCreditShowsHideWatchlisted, CreditShowsHideWatchlisted);
                 xmlwriter.SetValueAsBool(cTrakt, cCreditShowsHideCollected, CreditShowsHideCollected);
                 xmlwriter.SetValueAsBool(cTrakt, cCreditShowsHideRated, CreditShowsHideRated);
+                xmlwriter.SetValueAsBool( cTrakt, cCreditShowsHideFavorited, CreditShowsHideFavorited );
                 xmlwriter.SetValue(cTrakt, cCreditsMovieDefaultLayout, CreditsMovieDefaultLayout);
                 xmlwriter.SetValue(cTrakt, cCreditsShowDefaultLayout, CreditsShowDefaultLayout);
                 xmlwriter.SetValue(cTrakt, cAnticipatedMoviesDefaultLayout, AnticipatedMoviesDefaultLayout);

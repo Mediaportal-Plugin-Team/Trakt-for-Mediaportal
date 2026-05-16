@@ -32,6 +32,9 @@ namespace TraktPlugin.GUI
         [SkinControl(12)]
         protected GUICheckButton filterRatedButton = null;
 
+        [SkinControl( 13 )]
+        protected GUICheckButton filterFavoritedButton = null;
+
         [SkinControl(50)]
         protected GUIFacadeControl Facade = null;
 
@@ -201,6 +204,14 @@ namespace TraktPlugin.GUI
                     LoadPopularMovies(CurrentPage);
                     break;
 
+                // Hide Favorited
+                case ( 13 ):
+                  PreviousSelectedIndex = CurrentPage == 1 ? 0 : 1;
+                  TraktSettings.PopularMoviesHideFavorited = !TraktSettings.PopularMoviesHideFavorited;
+                  UpdateButtonState();
+                  LoadPopularMovies( CurrentPage );
+                  break;
+
                 default:
                     break;
             }
@@ -275,6 +286,7 @@ namespace TraktPlugin.GUI
                   TraktHelper.AddMovieToFavorites( selectedPopularMovie, true );
                   OnMovieSelected( selectedItem, Facade );
                   ( Facade.SelectedListItem as GUIMovieListItem ).Images.NotifyPropertyChanged( "Poster" );
+                  if ( TraktSettings.PopularMoviesHideFavorited ) LoadPopularMovies( CurrentPage );
                   break;
 
                 case ( (int)MediaContextMenuItem.RemoveFromFavorites ):
@@ -579,6 +591,8 @@ namespace TraktPlugin.GUI
                 filterCollectedButton.Selected = TraktSettings.PopularMoviesHideCollected;
             if (filterRatedButton != null)
                 filterRatedButton.Selected = TraktSettings.PopularMoviesHideRated;
+            if ( filterFavoritedButton != null )
+              filterFavoritedButton.Selected = TraktSettings.PopularMoviesHideFavorited;
         }
 
         private void ClearProperties(bool moviesOnly = false)
@@ -639,12 +653,14 @@ namespace TraktPlugin.GUI
         
         private bool ShowMovieFiltersMenu()
         {
-            var filters = new Dictionary<Filters, bool>();
-
-            filters.Add(Filters.Watched, TraktSettings.PopularMoviesHideWatched);
-            filters.Add(Filters.Watchlisted, TraktSettings.PopularMoviesHideWatchlisted);
-            filters.Add(Filters.Collected, TraktSettings.PopularMoviesHideCollected);
-            filters.Add(Filters.Rated, TraktSettings.PopularMoviesHideRated);
+            var filters = new Dictionary<Filters, bool>
+            {
+              { Filters.Watched, TraktSettings.PopularMoviesHideWatched },
+              { Filters.Watchlisted, TraktSettings.PopularMoviesHideWatchlisted },
+              { Filters.Collected, TraktSettings.PopularMoviesHideCollected },
+              { Filters.Rated, TraktSettings.PopularMoviesHideRated },
+              { Filters.Favorited, TraktSettings.PopularMoviesHideFavorited },
+            };
 
             var selectedItems = GUIUtils.ShowMultiSelectionDialog(Translation.Filters, GUICommon.GetFilterListItems(filters));
             if (selectedItems == null) return false;
@@ -666,6 +682,9 @@ namespace TraktPlugin.GUI
                     case Filters.Rated:
                         TraktSettings.PopularMoviesHideRated = !TraktSettings.PopularMoviesHideRated;
                         break;
+                    case Filters.Favorited:
+                      TraktSettings.PopularMoviesHideFavorited = !TraktSettings.PopularMoviesHideFavorited;
+                      break;
                 }
             }
 
@@ -685,6 +704,9 @@ namespace TraktPlugin.GUI
 
             if (TraktSettings.PopularMoviesHideRated)
                 moviesToFilter = moviesToFilter.Where(m => m.UserRating() == null);
+
+            if ( TraktSettings.PopularMoviesHideFavorited )
+              moviesToFilter = moviesToFilter.Where( m => !m.IsFavorited() );
 
             return moviesToFilter;
         }

@@ -65,9 +65,11 @@ namespace TraktPlugin.GUI
 
     public GUIUserFavoriteMovies()
     {
-      backdrop = new ImageSwapper();
-      backdrop.PropertyOne = "#Trakt.UserFavoriteMovies.Fanart.1";
-      backdrop.PropertyTwo = "#Trakt.UserFavoriteMovies.Fanart.2";
+      backdrop = new ImageSwapper
+      {
+        PropertyOne = "#Trakt.UserFavoriteMovies.Fanart.1",
+        PropertyTwo = "#Trakt.UserFavoriteMovies.Fanart.2"
+      };
     }
 
     #endregion
@@ -410,14 +412,20 @@ namespace TraktPlugin.GUI
           ( Facade.SelectedListItem as GUIMovieListItem ).Images.NotifyPropertyChanged( "Poster" );
           break;
 
+        case ( (int)ContextMenuItem.AddToFavorites ):
+          // could be adding to favourites from your friends favourite list
+          TraktHelper.AddMovieToFavorites( selectedFavoriteItem.Movie, true );
+          OnMovieSelected( selectedItem, Facade );
+          ( Facade.SelectedListItem as GUIMovieListItem ).Images.NotifyPropertyChanged( "Poster" );
+          break;
+
         case ( (int)ContextMenuItem.RemoveFromFavorites ):
           PreviousSelectedIndex = this.Facade.SelectedListItemIndex;
           TraktHelper.RemoveMovieFromFavorites( selectedFavoriteItem.Movie, true );
           if ( _FavoriteMovies.Count() >= 1 )
           {
             // remove from list
-            var moviesToExcept = new List<TraktFavoriteItem>();
-            moviesToExcept.Add( selectedFavoriteItem );
+            var moviesToExcept = new List<TraktFavoriteItem> { selectedFavoriteItem };
             _FavoriteMovies = FavoriteMovies?.Except( moviesToExcept );
             userFavorites[ CurrentUser ] = _FavoriteMovies;
             LoadFavoriteMovies();

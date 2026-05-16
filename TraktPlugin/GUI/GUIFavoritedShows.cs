@@ -131,13 +131,21 @@ namespace TraktPlugin.GUI
         case ( 50 ):
           if ( actionType == Action.ActionType.ACTION_SELECT_ITEM )
           {
-            var item = Facade.SelectedListItem as GUIShowListItem;
-            if ( item == null )
+            if ( !( Facade.SelectedListItem is GUIShowListItem item ) )
               return;
 
             if ( !item.IsFolder )
             {
-              CheckAndPlayEpisode( true );
+              if ( TraktSettings.EnableJumpToForTVShows )
+              {
+                CheckAndPlayEpisode( true );
+              }
+              else
+              {
+                if ( item.Show == null ) return;
+                
+                GUIWindowManager.ActivateWindow( (int)TraktGUIWindows.ShowSeasons, item.Show.ToJSON() );
+              }
             }
             else
             {

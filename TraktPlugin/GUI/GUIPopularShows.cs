@@ -33,6 +33,9 @@ namespace TraktPlugin.GUI
         [SkinControl(12)]
         protected GUICheckButton filterRatedButton = null;
 
+        [SkinControl( 13 )]
+        protected GUICheckButton filterFavoritedButton = null;
+
         [SkinControl(50)]
         protected GUIFacadeControl Facade = null;
 
@@ -211,6 +214,14 @@ namespace TraktPlugin.GUI
                     LoadPopularShows(CurrentPage);
                     break;
 
+                // Hide Favorited
+                case ( 13 ):
+                  PreviousSelectedIndex = CurrentPage == 1 ? 0 : 1;
+                  TraktSettings.PopularShowsHideFavorited = !TraktSettings.PopularShowsHideFavorited;
+                  UpdateButtonState();
+                  LoadPopularShows( CurrentPage );
+                  break;
+
                 default:
                     break;
             }
@@ -267,6 +278,7 @@ namespace TraktPlugin.GUI
                   TraktHelper.AddShowToFavorites( selectedPopularItem );
                   OnShowSelected( selectedItem, Facade );
                   ( Facade.SelectedListItem as GUIShowListItem ).Images.NotifyPropertyChanged( "Poster" );
+                  if ( TraktSettings.PopularShowsHideFavorited ) LoadPopularShows( CurrentPage );
                   break;
 
                 case ( (int)MediaContextMenuItem.RemoveFromFavorites ):
@@ -575,6 +587,8 @@ namespace TraktPlugin.GUI
                 filterCollectedButton.Selected = TraktSettings.PopularShowsHideCollected;
             if (filterRatedButton != null)
                 filterRatedButton.Selected = TraktSettings.PopularShowsHideRated;
+            if ( filterFavoritedButton != null )
+              filterFavoritedButton.Selected = TraktSettings.PopularShowsHideFavorited;
         }
 
         private void ClearProperties(bool showsOnly = false)
@@ -638,12 +652,14 @@ namespace TraktPlugin.GUI
 
         private bool ShowTVShowFiltersMenu()
         {
-            var filters = new Dictionary<Filters, bool>();
-
-            filters.Add(Filters.Watched, TraktSettings.PopularShowsHideWatched);
-            filters.Add(Filters.Watchlisted, TraktSettings.PopularShowsHideWatchlisted);
-            filters.Add(Filters.Collected, TraktSettings.PopularShowsHideCollected);
-            filters.Add(Filters.Rated, TraktSettings.PopularShowsHideRated);
+            var filters = new Dictionary<Filters, bool>
+            {
+              { Filters.Watched, TraktSettings.PopularShowsHideWatched },
+              { Filters.Watchlisted, TraktSettings.PopularShowsHideWatchlisted },
+              { Filters.Collected, TraktSettings.PopularShowsHideCollected },
+              { Filters.Rated, TraktSettings.PopularShowsHideRated },
+              { Filters.Favorited, TraktSettings.PopularShowsHideFavorited }
+            };
 
             var selectedItems = GUIUtils.ShowMultiSelectionDialog(Translation.Filters, GUICommon.GetFilterListItems(filters));
             if (selectedItems == null) return false;
@@ -665,6 +681,9 @@ namespace TraktPlugin.GUI
                     case Filters.Rated:
                         TraktSettings.PopularShowsHideRated = !TraktSettings.PopularShowsHideRated;
                         break;
+                    case Filters.Favorited:
+                      TraktSettings.PopularShowsHideFavorited = !TraktSettings.PopularShowsHideFavorited;
+                      break;
                 }
             }
 
@@ -684,6 +703,9 @@ namespace TraktPlugin.GUI
 
             if (TraktSettings.PopularShowsHideRated)
                 showsToFilter = showsToFilter.Where(s => s.UserRating() == null);
+
+            if ( TraktSettings.PopularShowsHideFavorited )
+              showsToFilter = showsToFilter.Where( s => !s.IsFavorited() );
 
             return showsToFilter;
         }

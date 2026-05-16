@@ -33,6 +33,9 @@ namespace TraktPlugin.GUI
         [SkinControl(12)]
         protected GUICheckButton filterRatedButton = null;
 
+        [SkinControl( 13 )]
+        protected GUICheckButton filterFavoritedButton = null;
+
         [SkinControl(50)]
         protected GUIFacadeControl Facade = null;
 
@@ -195,6 +198,14 @@ namespace TraktPlugin.GUI
                     LoadCredits();
                     break;
 
+                // Hide Favorited
+                case ( 13 ):
+                  PreviousSelectedIndex = 0;
+                  TraktSettings.CreditShowsHideFavorited = !TraktSettings.CreditShowsHideFavorited;
+                  UpdateButtonState();
+                  LoadCredits();
+                  break;
+
                 default:
                     break;
             }
@@ -249,6 +260,7 @@ namespace TraktPlugin.GUI
                   TraktHelper.AddShowToFavorites( selectedShow );
                   OnItemSelected( selectedItem, Facade );
                   ( Facade.SelectedListItem as GUIShowListItem ).Images.NotifyPropertyChanged( "Poster" );
+                  if ( TraktSettings.CreditShowsHideFavorited ) LoadCredits();
                   break;
 
                 case ( (int)MediaContextMenuItem.RemoveFromFavorites ):
@@ -575,6 +587,8 @@ namespace TraktPlugin.GUI
                 filterCollectedButton.Selected = TraktSettings.CreditShowsHideCollected;
             if (filterRatedButton != null)
                 filterRatedButton.Selected = TraktSettings.CreditShowsHideRated;
+            if ( filterFavoritedButton != null )
+              filterFavoritedButton.Selected = TraktSettings.CreditShowsHideFavorited;
         }
 
         private void ClearProperties()
@@ -642,12 +656,14 @@ namespace TraktPlugin.GUI
 
         private bool ShowTVShowFiltersMenu()
         {
-            var filters = new Dictionary<Filters, bool>();
-
-            filters.Add(Filters.Watched, TraktSettings.CreditShowsHideWatched);
-            filters.Add(Filters.Watchlisted, TraktSettings.CreditShowsHideWatchlisted);
-            filters.Add(Filters.Collected, TraktSettings.CreditShowsHideCollected);
-            filters.Add(Filters.Rated, TraktSettings.CreditShowsHideRated);
+            var filters = new Dictionary<Filters, bool>
+            {
+              { Filters.Watched, TraktSettings.CreditShowsHideWatched },
+              { Filters.Watchlisted, TraktSettings.CreditShowsHideWatchlisted },
+              { Filters.Collected, TraktSettings.CreditShowsHideCollected },
+              { Filters.Rated, TraktSettings.CreditShowsHideRated },
+              { Filters.Favorited, TraktSettings.CreditShowsHideFavorited },
+            };
 
             var selectedItems = GUIUtils.ShowMultiSelectionDialog(Translation.Filters, GUICommon.GetFilterListItems(filters));
             if (selectedItems == null) return false;
@@ -669,6 +685,9 @@ namespace TraktPlugin.GUI
                     case Filters.Rated:
                         TraktSettings.CreditShowsHideRated = !TraktSettings.CreditShowsHideRated;
                         break;
+                    case Filters.Favorited:
+                      TraktSettings.CreditShowsHideFavorited = !TraktSettings.CreditShowsHideFavorited;
+                      break;
                 }
             }
 
@@ -689,6 +708,9 @@ namespace TraktPlugin.GUI
             if (TraktSettings.CreditShowsHideRated)
                 jobs = jobs.Where(m => m.Show.UserRating() == null);
 
+            if ( TraktSettings.CreditShowsHideFavorited )
+              jobs = jobs.Where( m => !m.Show.IsFavorited() );
+
             return jobs;
         }
 
@@ -705,6 +727,9 @@ namespace TraktPlugin.GUI
 
             if (TraktSettings.CreditShowsHideRated)
                 characters = characters.Where(m => m.Show.UserRating() == null);
+
+            if ( TraktSettings.CreditShowsHideFavorited )
+              characters = characters.Where( m => !m.Show.IsFavorited() );
 
             return characters;
         }

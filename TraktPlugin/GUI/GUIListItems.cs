@@ -40,6 +40,9 @@ namespace TraktPlugin.GUI
         [SkinControl(14)]
         protected GUICheckButton filterNotWatchedButton = null;
 
+        [SkinControl( 15 )]
+        protected GUICheckButton filterFavoritedButton = null;
+
         [SkinControl(50)]
         protected GUIFacadeControl Facade = null;
 
@@ -75,7 +78,9 @@ namespace TraktPlugin.GUI
             ChangeLayout,
             Trailers,
             SearchWithMpNZB,
-            SearchTorrent
+            SearchTorrent,
+            AddToFavorites,
+            RemoveFromFavorites,
         }
 
         #endregion
@@ -84,9 +89,11 @@ namespace TraktPlugin.GUI
 
         public GUIListItems()
         {
-            backdrop = new ImageSwapper();
-            backdrop.PropertyOne = "#Trakt.List.Fanart.1";
-            backdrop.PropertyTwo = "#Trakt.List.Fanart.2";
+          backdrop = new ImageSwapper
+          {
+            PropertyOne = "#Trakt.List.Fanart.1",
+            PropertyTwo = "#Trakt.List.Fanart.2"
+          };
         }
 
         #endregion
@@ -271,6 +278,13 @@ namespace TraktPlugin.GUI
                     LoadListItems();
                     break;
 
+                // Hide Favorited
+                case ( 15 ):
+                  TraktSettings.ListItemsHideFavorited = !TraktSettings.ListItemsHideFavorited;
+                  UpdateButtonState();
+                  LoadListItems();
+                  break;
+
                 default:
                     break;
             }
@@ -348,6 +362,23 @@ namespace TraktPlugin.GUI
                     dlg.Add(listItem);
                     listItem.ItemId = (int)ContextMenuItem.RemoveFromWatchList;
                 }
+            }
+
+            // Add/Remove Favorites
+            if ( SelectedType == TraktItemType.show || SelectedType == TraktItemType.movie )
+            {
+              if ( !selectedListItem.IsFavorited() )
+              {
+                listItem = new GUIListItem( Translation.AddToFavorites );
+                dlg.Add( listItem );
+                listItem.ItemId = (int)ContextMenuItem.AddToFavorites;
+              }
+              else
+              {
+                listItem = new GUIListItem( Translation.RemoveFromFavorites );
+                dlg.Add( listItem );
+                listItem.ItemId = (int)ContextMenuItem.RemoveFromFavorites;
+              }
             }
 
             // Add to Custom list
@@ -506,6 +537,28 @@ namespace TraktPlugin.GUI
 
                     GUIWatchListMovies.ClearCache(TraktSettings.Username);
                     break;
+
+                case ( (int)ContextMenuItem.AddToFavorites ):
+                  AddItemToFavorites( selectedListItem );
+                  OnItemSelected( selectedItem, Facade );
+                  if ( SelectedType == TraktItemType.movie )
+                    ( Facade.SelectedListItem as GUICustomListItem ).Images.NotifyPropertyChanged( "MoviePoster" );
+                  else
+                    ( Facade.SelectedListItem as GUICustomListItem ).Images.NotifyPropertyChanged( "ShowPoster" );
+
+                  
+                  break;
+
+                case ( (int)ContextMenuItem.RemoveFromFavorites ):
+                  RemoveItemFromFavorites( selectedListItem );
+                  OnItemSelected( selectedItem, Facade );
+                  if ( SelectedType == TraktItemType.movie )
+                    ( Facade.SelectedListItem as GUICustomListItem ).Images.NotifyPropertyChanged( "MoviePoster" );
+                  else
+                    ( Facade.SelectedListItem as GUICustomListItem ).Images.NotifyPropertyChanged( "ShowPoster" );
+
+                GUIUserFavoriteMovies.ClearCache( TraktSettings.Username );
+                break;
 
                 case ((int)ContextMenuItem.AddToList):
                     if (SelectedType == TraktItemType.movie)
@@ -814,37 +867,69 @@ namespace TraktPlugin.GUI
             GUICommon.CheckAndPlayMovie(jumpTo, userListItem.Movie);
         }
 
-        private void AddItemToWatchList(TraktListItem item)
+        private void AddItemToWatchList( TraktListItem item )
         {
-            if (SelectedType == TraktItemType.movie)
-            {
-                TraktHelper.AddMovieToWatchList(item.Movie, true);
-            }
-            else if (SelectedType == TraktItemType.show)
-            {
-                TraktHelper.AddShowToWatchList(item.Show);
-            }
-            else if (SelectedType == TraktItemType.episode)
-            {
-                TraktHelper.AddEpisodeToWatchList(item.Episode);
-                TraktCache.AddEpisodeToWatchlist(item.Show, item.Episode);
-            }
+          if ( SelectedType == TraktItemType.movie )
+          {
+            TraktHelper.AddMovieToWatchList( item.Movie, true );
+            GUIWatchListMovies.ClearCache( TraktSettings.Username );
+          }
+          else if ( SelectedType == TraktItemType.show )
+          {
+            TraktHelper.AddShowToWatchList( item.Show );
+            GUIWatchListShows.ClearCache( TraktSettings.Username );
+          }
+          else if ( SelectedType == TraktItemType.episode )
+          {
+            TraktHelper.AddEpisodeToWatchList( item.Episode );
+            TraktCache.AddEpisodeToWatchlist( item.Show, item.Episode );
+          }
         }
 
-        private void RemoveItemFromWatchList(TraktListItem item)
+        private void RemoveItemFromWatchList( TraktListItem item )
         {
-            if (SelectedType == TraktItemType.movie)
-            {
-                TraktHelper.RemoveMovieFromWatchList(item.Movie, true);
-            }
-            else if (SelectedType == TraktItemType.show)
-            {
-                TraktHelper.RemoveShowFromWatchList(item.Show);
-            }
-            else if (SelectedType == TraktItemType.episode)
-            {
-                TraktHelper.RemoveEpisodeFromWatchList(item.Episode);
-            }
+          if ( SelectedType == TraktItemType.movie )
+          {
+            TraktHelper.RemoveMovieFromWatchList( item.Movie, true );
+            GUIWatchListShows.ClearCache( TraktSettings.Username );
+          }
+          else if ( SelectedType == TraktItemType.show )
+          {
+            TraktHelper.RemoveShowFromWatchList( item.Show );
+            GUIWatchListShows.ClearCache( TraktSettings.Username );
+          }
+          else if ( SelectedType == TraktItemType.episode )
+          {
+            TraktHelper.RemoveEpisodeFromWatchList( item.Episode );
+          }
+        }
+
+        private void AddItemToFavorites( TraktListItem item )
+        {
+          if ( SelectedType == TraktItemType.movie )
+          {
+            TraktHelper.AddMovieToFavorites( item.Movie, true );
+            GUIUserFavoriteMovies.ClearCache( TraktSettings.Username );
+          }
+          else if ( SelectedType == TraktItemType.show )
+          {
+            TraktHelper.AddShowToFavorites( item.Show );
+            GUIUserFavoriteShows.ClearCache( TraktSettings.Username );
+          }
+        }
+
+        private void RemoveItemFromFavorites( TraktListItem item )
+        {
+          if ( SelectedType == TraktItemType.movie )
+          {
+            TraktHelper.RemoveMovieFromFavorites( item.Movie, true );
+            GUIUserFavoriteMovies.ClearCache( TraktSettings.Username );
+          }
+          else if ( SelectedType == TraktItemType.show )
+          {
+            TraktHelper.RemoveShowFromFavorites( item.Show );
+            GUIUserFavoriteShows.ClearCache( TraktSettings.Username );
+          }
         }
 
         private void AddItemToWatchedHistory(TraktListItem item)
@@ -1228,34 +1313,36 @@ namespace TraktPlugin.GUI
             GUIUtils.SetProperty("#Trakt.List.ItemType", SelectedType.ToString());
             GUIUtils.SetProperty("#Trakt.List.Rank", listItem.Rank.ToString());
             GUIUtils.SetProperty("#Trakt.List.Notes", listItem.Notes);
-          }
+        }
 
         private void UpdateButtonState()
         {
-            // update layout button label
-            GUIControl.SetControlLabel(GetID, layoutButton.GetID, GUICommon.GetLayoutTranslation(CurrentLayout));
+          // update layout button label
+          GUIControl.SetControlLabel( GetID, layoutButton.GetID, GUICommon.GetLayoutTranslation( CurrentLayout ) );
 
-            // update sortby button label
-            if (sortButton != null)
-            {
-                sortButton.Label = GUICommon.GetSortByString(TraktSettings.SortByListItems);
-                sortButton.IsAscending = (TraktSettings.SortByListItems.Direction == SortingDirections.Ascending);
-            }
-            GUIUtils.SetProperty("#Trakt.SortBy", GUICommon.GetSortByString(TraktSettings.SortByListItems));
+          // update sortby button label
+          if ( sortButton != null )
+          {
+            sortButton.Label = GUICommon.GetSortByString( TraktSettings.SortByListItems );
+            sortButton.IsAscending = ( TraktSettings.SortByListItems.Direction == SortingDirections.Ascending );
+          }
+          GUIUtils.SetProperty( "#Trakt.SortBy", GUICommon.GetSortByString( TraktSettings.SortByListItems ) );
 
-            // update filter buttons
-            if (filterWatchedButton != null)
-                filterWatchedButton.Selected = TraktSettings.ListItemsHideWatched;
-            if (filterWatchListedButton != null)
-                filterWatchListedButton.Selected = TraktSettings.ListItemsHideWatchlisted;
-            if (filterCollectedButton != null)
-                filterCollectedButton.Selected = TraktSettings.ListItemsHideCollected;
-            if (filterRatedButton != null)
-                filterRatedButton.Selected = TraktSettings.ListItemsHideRated;
-            if (filterNotCollectedButton != null)
-                filterNotCollectedButton.Selected = TraktSettings.ListItemsHideNotCollected;
-            if (filterNotWatchedButton != null)
-                filterNotWatchedButton.Selected = TraktSettings.ListItemsHideNotWatched;
+          // update filter buttons
+          if ( filterWatchedButton != null )
+            filterWatchedButton.Selected = TraktSettings.ListItemsHideWatched;
+          if ( filterWatchListedButton != null )
+            filterWatchListedButton.Selected = TraktSettings.ListItemsHideWatchlisted;
+          if ( filterCollectedButton != null )
+            filterCollectedButton.Selected = TraktSettings.ListItemsHideCollected;
+          if ( filterRatedButton != null )
+            filterRatedButton.Selected = TraktSettings.ListItemsHideRated;
+          if ( filterNotCollectedButton != null )
+            filterNotCollectedButton.Selected = TraktSettings.ListItemsHideNotCollected;
+          if ( filterNotWatchedButton != null )
+            filterNotWatchedButton.Selected = TraktSettings.ListItemsHideNotWatched;
+          if ( filterFavoritedButton != null )
+            filterFavoritedButton.Selected = TraktSettings.ListItemsHideFavorited;
         }
         #endregion
 
