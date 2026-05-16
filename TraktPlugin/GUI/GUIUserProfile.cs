@@ -18,25 +18,27 @@ namespace TraktPlugin.GUI
 
         [SkinControl(4)]
         protected GUIButtonControl refreshButton = null;
-        
+
         #endregion
 
         #region Enums
-        
+
         enum ActivityType
         {
-            RecentWatchedEpisodes,
-            RecentWatchedMovies,
-            RecentAddedEpisodes,
-            RecentAddedMovies,
-            RecentComments,
-            EpisodeWatchList,
-            RatedMovies,
-            RatedShows,
-            RatedEpisodes,
-            ShowWatchList,
-            MovieWatchList,
-            Lists
+          RecentWatchedEpisodes,
+          RecentWatchedMovies,
+          RecentAddedEpisodes,
+          RecentAddedMovies,
+          RecentComments,
+          EpisodeWatchList,
+          RatedMovies,
+          RatedShows,
+          RatedEpisodes,
+          ShowWatchList,
+          MovieWatchList,
+          Lists,
+          ShowFavorites,
+          MovieFavorites,
         }
 
         #endregion
@@ -219,6 +221,16 @@ namespace TraktPlugin.GUI
                                 GUILists.CurrentUser = CurrentUser;
                                 GUIWindowManager.ActivateWindow((int)TraktGUIWindows.CustomLists);
                                 break;
+
+                            case ( ActivityType.ShowFavorites ):
+                              GUILists.CurrentUser = CurrentUser;
+                              GUIWindowManager.ActivateWindow( (int)TraktGUIWindows.UserFavoriteShows );
+                              break;
+
+                            case ( ActivityType.MovieFavorites ):
+                              GUILists.CurrentUser = CurrentUser;
+                              GUIWindowManager.ActivateWindow( (int)TraktGUIWindows.UserFavoriteMovies );
+                              break;
                         }
                     }
                     break;
@@ -386,6 +398,28 @@ namespace TraktPlugin.GUI
             Utils.SetDefaultIcons(item);
             Facade.Add(item);
 
+            item = new GUIUserListItem( Translation.FavoriteShows, (int)TraktGUIWindows.Network )
+            {
+              IconImage = avatar,
+              IconImageBig = avatar,
+              ThumbnailImage = avatar,
+              PinImage = "traktActivityFavorite.png"
+            };
+            item.OnItemSelected += OnActivityTypeSelected;
+            Utils.SetDefaultIcons( item );
+            Facade.Add( item );
+
+            item = new GUIUserListItem( Translation.FavoriteMovies, (int)TraktGUIWindows.Network )
+            {
+              IconImage = avatar,
+              IconImageBig = avatar,
+              ThumbnailImage = avatar,
+              PinImage = "traktActivityFavorite.png"
+            };
+            item.OnItemSelected += OnActivityTypeSelected;
+            Utils.SetDefaultIcons( item );
+            Facade.Add( item );
+
             Facade.SelectedListItemIndex = PreviousActivityTypeSelectedIndex;
 
             // Set Facade Layout
@@ -421,28 +455,32 @@ namespace TraktPlugin.GUI
             GUICommon.SetStatisticProperties(user.Statistics, user.Profile.Username);
         }
 
-        private void OnActivityTypeSelected(GUIListItem item, GUIControl parent)
+        private void OnActivityTypeSelected( GUIListItem item, GUIControl parent )
         {
-            if (item.Label == Translation.RecentWatchedEpisodes)
-                SelectedActivity = ActivityType.RecentWatchedEpisodes;
-            else if (item.Label == Translation.RecentWatchedMovies)
-                SelectedActivity = ActivityType.RecentWatchedMovies;
-            else if (item.Label == Translation.RecentAddedEpisodes)
-                SelectedActivity = ActivityType.RecentAddedEpisodes;
-            else if (item.Label == Translation.RecentAddedMovies)
-                SelectedActivity = ActivityType.RecentAddedMovies;
-            else if (item.Label == Translation.RecentComments)
-                SelectedActivity = ActivityType.RecentComments;
-            else if (item.Label == Translation.WatchListMovies)
-                SelectedActivity = ActivityType.MovieWatchList;
-            else if (item.Label == Translation.WatchListShows)
-                SelectedActivity = ActivityType.ShowWatchList;
-            else if (item.Label == Translation.WatchListEpisodes)
-                SelectedActivity = ActivityType.EpisodeWatchList;
-            else if (item.Label == Translation.Lists)
-                SelectedActivity = ActivityType.Lists;
+          if ( item.Label == Translation.RecentWatchedEpisodes )
+            SelectedActivity = ActivityType.RecentWatchedEpisodes;
+          else if ( item.Label == Translation.RecentWatchedMovies )
+            SelectedActivity = ActivityType.RecentWatchedMovies;
+          else if ( item.Label == Translation.RecentAddedEpisodes )
+            SelectedActivity = ActivityType.RecentAddedEpisodes;
+          else if ( item.Label == Translation.RecentAddedMovies )
+            SelectedActivity = ActivityType.RecentAddedMovies;
+          else if ( item.Label == Translation.RecentComments )
+            SelectedActivity = ActivityType.RecentComments;
+          else if ( item.Label == Translation.WatchListMovies )
+            SelectedActivity = ActivityType.MovieWatchList;
+          else if ( item.Label == Translation.WatchListShows )
+            SelectedActivity = ActivityType.ShowWatchList;
+          else if ( item.Label == Translation.WatchListEpisodes )
+            SelectedActivity = ActivityType.EpisodeWatchList;
+          else if ( item.Label == Translation.Lists )
+            SelectedActivity = ActivityType.Lists;
+          else if ( item.Label == Translation.FavoriteShows )
+            SelectedActivity = ActivityType.ShowFavorites;
+          else if ( item.Label == Translation.FavoriteMovies )
+            SelectedActivity = ActivityType.MovieFavorites;
 
-            PreviousActivityTypeSelectedIndex = Facade.SelectedListItemIndex;
+          PreviousActivityTypeSelectedIndex = Facade.SelectedListItemIndex;
         }
 
         #endregion
