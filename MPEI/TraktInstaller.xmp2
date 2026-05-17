@@ -1301,6 +1301,41 @@ Trailers can be accessed from the F9 context menu (INFO button on remote).</Desc
               <ZipFileName>Installer{CopyFile}\{588cd113-bdfb-40f2-9e1b-23232c605efc}-Trakt.Calendar.Movies.xml</ZipFileName>
               <DestinationFilename>%Skin%\Titan\Trakt.Calendar.Movies.xml</DestinationFilename>
             </FileItem>
+            <FileItem InstallType="CopyFile" SystemFile="false" Modified="false" Condition="None">
+              <Param1 />
+              <UpdateOption>OverwriteIfOlder</UpdateOption>
+              <LocalFileName>..\TraktPlugin\Resources\Skins\Titan\Trakt.Favorited.Movies.xml</LocalFileName>
+              <ZipFileName>Installer{CopyFile}\{294e06a9-f4b9-47c6-aae7-a279bb63fd46}-Trakt.Favorited.Movies.xml</ZipFileName>
+              <DestinationFilename>%Skin%\Titan\Trakt.Favorited.Movies.xml</DestinationFilename>
+            </FileItem>
+            <FileItem InstallType="CopyFile" SystemFile="false" Modified="false" Condition="None">
+              <Param1 />
+              <UpdateOption>OverwriteIfOlder</UpdateOption>
+              <LocalFileName>..\TraktPlugin\Resources\Skins\Titan\Trakt.Favorited.Shows.xml</LocalFileName>
+              <ZipFileName>Installer{CopyFile}\{1958ad6d-cfc1-4e19-8547-67caa768c855}-Trakt.Favorited.Shows.xml</ZipFileName>
+              <DestinationFilename>%Skin%\Titan\Trakt.Favorited.Shows.xml</DestinationFilename>
+            </FileItem>
+            <FileItem InstallType="CopyFile" SystemFile="false" Modified="false" Condition="None">
+              <Param1 />
+              <UpdateOption>OverwriteIfOlder</UpdateOption>
+              <LocalFileName>..\TraktPlugin\Resources\Skins\Titan\Trakt.UserFavorite.Movies.xml</LocalFileName>
+              <ZipFileName>Installer{CopyFile}\{37bd8519-4bb3-4a0f-949c-534f4d5e369e}-Trakt.UserFavorite.Movies.xml</ZipFileName>
+              <DestinationFilename>%Skin%\Titan\Trakt.UserFavorite.Movies.xml</DestinationFilename>
+            </FileItem>
+            <FileItem InstallType="CopyFile" SystemFile="false" Modified="false" Condition="None">
+              <Param1 />
+              <UpdateOption>OverwriteIfOlder</UpdateOption>
+              <LocalFileName>..\TraktPlugin\Resources\Skins\Titan\Trakt.UserFavorite.Shows.xml</LocalFileName>
+              <ZipFileName>Installer{CopyFile}\{edaf1e36-6cc7-48b2-aa77-5d6032ade23c}-Trakt.UserFavorite.Shows.xml</ZipFileName>
+              <DestinationFilename>%Skin%\Titan\Trakt.UserFavorite.Shows.xml</DestinationFilename>
+            </FileItem>
+            <FileItem InstallType="CopyFile" SystemFile="false" Modified="false" Condition="None">
+              <Param1 />
+              <UpdateOption>OverwriteIfOlder</UpdateOption>
+              <LocalFileName>..\TraktPlugin\Resources\Skins\Titan\Media\traktActivityFavorite.png</LocalFileName>
+              <ZipFileName>Installer{CopyFile}\{1d2b3b7c-9602-4ca5-a6a9-e7cdc3f8f0f4}-traktActivityFavorite.png</ZipFileName>
+              <DestinationFilename>%Skin%\Titan\Media\traktActivityFavorite.png</DestinationFilename>
+            </FileItem>
           </Items>
         </Files>
       </GroupItem>
@@ -1559,13 +1594,14 @@ Click Next to continue or Cancel to exit Setup.
     </Version>
     <ExtensionDescription>Trakt actively keeps a record of what TV shows and movies you are watching. Based on your favorites, your friends, and the community, trakt recommends other TV shows and movies.
 
-
-
 Trakt will also synchronize your watched flags across multiple installations.</ExtensionDescription>
-    <VersionDescription>* Fixed error with new onlinevideos</VersionDescription>
+    <VersionDescription>* Support for adding movies and shows to your Favourites (via context menu);
+* New GUIs to view your own favourites as well community favourited movies and shows. 
+* Updated Titan skin to fully support Favourites (skin designers can diff to see what has changed);
+* Favourites integration into MovingPictures categories and filters if enabled.</VersionDescription>
     <DevelopmentStatus>Stable</DevelopmentStatus>
     <OnlineLocation>https://github.com/Mediaportal-Plugin-Team/Trakt-for-Mediaportal/releases/download/v[Version]/TraktPlugin-v[Version].mpe1</OnlineLocation>
-    <ReleaseDate>2026-05-03T13:13:13</ReleaseDate>
+    <ReleaseDate>2026-05-17T13:13:13</ReleaseDate>
     <Tags>trakt,tv shows,movies,mp-tvseries,movingpictures,my videos,my films</Tags>
     <PlatformCompatibility>AnyCPU</PlatformCompatibility>
     <Location>.\Release\TraktPlugin-v[Version].mpe1</Location>
@@ -2864,6 +2900,41 @@ Trakt will also synchronize your watched flags across multiple installations.</E
         <LocalFileName>..\TraktPlugin\Resources\Skins\Titan\Trakt.Calendar.Movies.xml</LocalFileName>
         <ZipFileName>Installer{CopyFile}\{588cd113-bdfb-40f2-9e1b-23232c605efc}-Trakt.Calendar.Movies.xml</ZipFileName>
         <DestinationFilename>%Skin%\Titan\Trakt.Calendar.Movies.xml</DestinationFilename>
+      </FileItem>
+      <FileItem InstallType="CopyFile" SystemFile="false" Modified="false" Condition="None">
+        <Param1 />
+        <UpdateOption>OverwriteIfOlder</UpdateOption>
+        <LocalFileName>..\TraktPlugin\Resources\Skins\Titan\Trakt.Favorited.Movies.xml</LocalFileName>
+        <ZipFileName>Installer{CopyFile}\{294e06a9-f4b9-47c6-aae7-a279bb63fd46}-Trakt.Favorited.Movies.xml</ZipFileName>
+        <DestinationFilename>%Skin%\Titan\Trakt.Favorited.Movies.xml</DestinationFilename>
+      </FileItem>
+      <FileItem InstallType="CopyFile" SystemFile="false" Modified="false" Condition="None">
+        <Param1 />
+        <UpdateOption>OverwriteIfOlder</UpdateOption>
+        <LocalFileName>..\TraktPlugin\Resources\Skins\Titan\Trakt.Favorited.Shows.xml</LocalFileName>
+        <ZipFileName>Installer{CopyFile}\{1958ad6d-cfc1-4e19-8547-67caa768c855}-Trakt.Favorited.Shows.xml</ZipFileName>
+        <DestinationFilename>%Skin%\Titan\Trakt.Favorited.Shows.xml</DestinationFilename>
+      </FileItem>
+      <FileItem InstallType="CopyFile" SystemFile="false" Modified="false" Condition="None">
+        <Param1 />
+        <UpdateOption>OverwriteIfOlder</UpdateOption>
+        <LocalFileName>..\TraktPlugin\Resources\Skins\Titan\Trakt.UserFavorite.Movies.xml</LocalFileName>
+        <ZipFileName>Installer{CopyFile}\{37bd8519-4bb3-4a0f-949c-534f4d5e369e}-Trakt.UserFavorite.Movies.xml</ZipFileName>
+        <DestinationFilename>%Skin%\Titan\Trakt.UserFavorite.Movies.xml</DestinationFilename>
+      </FileItem>
+      <FileItem InstallType="CopyFile" SystemFile="false" Modified="false" Condition="None">
+        <Param1 />
+        <UpdateOption>OverwriteIfOlder</UpdateOption>
+        <LocalFileName>..\TraktPlugin\Resources\Skins\Titan\Trakt.UserFavorite.Shows.xml</LocalFileName>
+        <ZipFileName>Installer{CopyFile}\{edaf1e36-6cc7-48b2-aa77-5d6032ade23c}-Trakt.UserFavorite.Shows.xml</ZipFileName>
+        <DestinationFilename>%Skin%\Titan\Trakt.UserFavorite.Shows.xml</DestinationFilename>
+      </FileItem>
+      <FileItem InstallType="CopyFile" SystemFile="false" Modified="false" Condition="None">
+        <Param1 />
+        <UpdateOption>OverwriteIfOlder</UpdateOption>
+        <LocalFileName>..\TraktPlugin\Resources\Skins\Titan\Media\traktActivityFavorite.png</LocalFileName>
+        <ZipFileName>Installer{CopyFile}\{1d2b3b7c-9602-4ca5-a6a9-e7cdc3f8f0f4}-traktActivityFavorite.png</ZipFileName>
+        <DestinationFilename>%Skin%\Titan\Media\traktActivityFavorite.png</DestinationFilename>
       </FileItem>
       <FileItem InstallType="CopyFile" SystemFile="true" Modified="true" Condition="None">
         <Param1 />
