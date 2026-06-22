@@ -22,12 +22,12 @@ jobs:
           vs-version: 16.11
 
       - name: Git Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
       - name: Git Checkout / MPE / XPath
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           repository: Mediaportal-Plugin-Team/Mediaportal-Tools
           path: Tools
