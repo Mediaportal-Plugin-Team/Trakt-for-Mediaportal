@@ -2447,9 +2447,12 @@ namespace TraktPlugin.TraktHandlers
                 var currentNodes = new List<DBNode<DBMovieInfo>>(TraktCategoriesMenuRootNode.Children);
                 foreach (var node in currentNodes)
                 {
-                    if (node.Name == string.Format("${{{0}}}", GUI.Translation.WatchList) ||
-                        node.Name == string.Format("${{{0}}}", GUI.Translation.Recommendations) ||
-                        node.Name == "$(Watchlist)" || node.Name == "${Recommendations}")
+                    if ( node.Name == string.Format( "${{{0}}}", GUI.Translation.WatchList ) ||
+                         node.Name == string.Format( "${{{0}}}", GUI.Translation.Recommendations ) ||
+                         node.Name == string.Format( "${{{0}}}", GUI.Translation.Favorites ) ||
+                         node.Name == "$(Watchlist)" || 
+                         node.Name == "${Recommendations}" || 
+                         node.Name == "${Favorites}" )
                         continue;
 
                     if (!customLists.Keys.Any(key => string.Format("${{{0}}}", key.Name) == node.Name))
@@ -2533,16 +2536,19 @@ namespace TraktPlugin.TraktHandlers
                 var currentNodes = new List<DBNode<DBMovieInfo>>(TraktFiltersMenuRootNode.Children);
                 foreach (var node in currentNodes)
                 {
-                    if (node.Name == string.Format("${{{0}}}", GUI.Translation.WatchList) ||
-                        node.Name == string.Format("${{{0}}}", GUI.Translation.Recommendations) ||
-                        node.Name == "$(Watchlist)" || node.Name == "${Recommendations}")
-                        continue;
+                  if ( node.Name == string.Format( "${{{0}}}", GUI.Translation.WatchList ) ||
+                       node.Name == string.Format( "${{{0}}}", GUI.Translation.Recommendations ) ||
+                       node.Name == string.Format( "${{{0}}}", GUI.Translation.Favorites ) ||
+                       node.Name == "$(Watchlist)" ||
+                       node.Name == "${Recommendations}" ||
+                       node.Name == "${Favorites}" )
+                    continue;
 
-                    if (!customLists.Keys.Any(key => string.Format("${{{0}}}", key.Name) == node.Name))
-                    {
-                        TraktLogger.Info("Removing node '{0}' from filters menu as custom list no longer exists online", node.Name);
-                        RemoveNode(TraktFiltersMenuRootNode, node.Name);
-                    }
+                  if (!customLists.Keys.Any(key => string.Format("${{{0}}}", key.Name) == node.Name))
+                  {
+                      TraktLogger.Info("Removing node '{0}' from filters menu as custom list no longer exists online", node.Name);
+                      RemoveNode(TraktFiltersMenuRootNode, node.Name);
+                  }
                 }
             }
         }

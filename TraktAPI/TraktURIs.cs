@@ -21,7 +21,7 @@ namespace TraktAPI
     public const string SyncRatedMovies = "https://api.trakt.tv/sync/ratings/movies?page={0}&limit={1}";
 
     public const string SyncCollectionEpisodes = "https://api.trakt.tv/sync/collection/shows?page={0}&limit={1}";
-    public const string SyncWatchedEpisodes = "https://api.trakt.tv/sync/watched/shows?page={0}&limit={1}";
+    public const string SyncWatchedEpisodes = "https://api.trakt.tv/sync/watched/shows?extended=progress&page={0}&limit={1}";
     public const string SyncRatedEpisodes = "https://api.trakt.tv/sync/ratings/episodes?page={0}&limit={1}";
     public const string SyncRatedSeasons = "https://api.trakt.tv/sync/ratings/seasons?page={0}&limit={1}";
     public const string SyncRatedShows = "https://api.trakt.tv/sync/ratings/shows?page={0}&limit={1}";

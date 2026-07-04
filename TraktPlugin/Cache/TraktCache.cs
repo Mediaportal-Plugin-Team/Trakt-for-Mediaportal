@@ -645,13 +645,13 @@ namespace TraktPlugin
             TraktLogger.Info("TV episode watched history cache is out of date, requesting updated data. Local Date = '{0}', Online Date = '{1}'", TraktSettings.LastSyncActivities.Episodes.Watched ?? "<empty>", lastSyncActivities.Episodes.Watched ?? "<empty>");
 
             // we get from online, local cache is not up to date
-            TraktEpisodesWatched onlineItems = TraktAPI.TraktAPI.GetWatchedEpisodes(page: 1, maxItems: 250);
+            TraktEpisodesWatched onlineItems = TraktAPI.TraktAPI.GetWatchedEpisodes(page: 1, maxItems: 100);
             if (onlineItems == null || onlineItems.Items == null)
                 return null;
             
             for (int page = 2; page <= onlineItems.TotalPages; page++)
             {
-                TraktEpisodesWatched nextOnlineItems = TraktAPI.TraktAPI.GetWatchedEpisodes(page: page, maxItems: 250);
+                TraktEpisodesWatched nextOnlineItems = TraktAPI.TraktAPI.GetWatchedEpisodes(page: page, maxItems: 100);
                 if (nextOnlineItems == null || nextOnlineItems.Items == null)
                     break;
 
@@ -2984,8 +2984,11 @@ namespace TraktPlugin
 
         internal static void SaveFileCache(string file, string value)
         {
-            if ((file.Contains("{username}") && string.IsNullOrEmpty(TraktSettings.Username)) || value == null)
-                return;
+          if (string.IsNullOrEmpty(file) || string.IsNullOrEmpty(value))
+            return;
+
+          if ((file.Contains("{username}") && string.IsNullOrEmpty(TraktSettings.Username)))
+            return;
 
             // add username to filename
             string filename = file.Replace("{username}", TraktSettings.Username.ToSafeFilename());
@@ -4991,39 +4994,39 @@ namespace TraktPlugin
         /// </summary>
         internal static void Save()
         {
-            SaveFileCache(MoviesWatchlistedFile, _WatchListMovies.ToList().ToJSON());
-            SaveFileCache(MoviesCollectedFile, _CollectedMovies.ToList().ToJSON());
-            SaveFileCache(MoviesWatchedFile, _WatchedMovies.ToList().ToJSON());
-            SaveFileCache(MoviesRatedFile, _RatedMovies.ToList().ToJSON());
-            SaveFileCache(MoviesPausedFile, _PausedMovies.ToList().ToJSON());
-            SaveFileCache(MoviesCommentedFile, _CommentedMovies.ToList().ToJSON());
-            SaveFileCache(MoviesHiddenFile, _HiddenMovies.ToList().ToJSON());
-            SaveFileCache(MoviesFavoritesFile, _FavoriteMovies.ToList().ToJSON());
+            SaveFileCache(MoviesWatchlistedFile, _WatchListMovies?.ToList().ToJSON());
+            SaveFileCache(MoviesCollectedFile, _CollectedMovies?.ToList().ToJSON());
+            SaveFileCache(MoviesWatchedFile, _WatchedMovies?.ToList().ToJSON());
+            SaveFileCache(MoviesRatedFile, _RatedMovies?.ToList().ToJSON());
+            SaveFileCache(MoviesPausedFile, _PausedMovies?.ToList().ToJSON());
+            SaveFileCache(MoviesCommentedFile, _CommentedMovies?.ToList().ToJSON());
+            SaveFileCache(MoviesHiddenFile, _HiddenMovies?.ToList().ToJSON());
+            SaveFileCache(MoviesFavoritesFile, _FavoriteMovies?.ToList().ToJSON());
 
-            SaveFileCache(EpisodesWatchlistedFile, _WatchListEpisodes.ToList().ToJSON());
-            SaveFileCache(EpisodesCollectedFile, _CollectedEpisodes.ToList().ToJSON());
-            SaveFileCache(EpisodesWatchedFile, _WatchedEpisodes.ToList().ToJSON());
-            SaveFileCache(EpisodesRatedFile, _RatedEpisodes.ToList().ToJSON());
-            SaveFileCache(EpisodesPausedFile, _PausedEpisodes.ToList().ToJSON());
-            SaveFileCache(EpisodesCommentedFile, _CommentedEpisodes.ToList().ToJSON());
+            SaveFileCache(EpisodesWatchlistedFile, _WatchListEpisodes?.ToList().ToJSON());
+            SaveFileCache(EpisodesCollectedFile, _CollectedEpisodes?.ToList().ToJSON());
+            SaveFileCache(EpisodesWatchedFile, _WatchedEpisodes?.ToList().ToJSON());
+            SaveFileCache(EpisodesRatedFile, _RatedEpisodes?.ToList().ToJSON());
+            SaveFileCache(EpisodesPausedFile, _PausedEpisodes?.ToList().ToJSON());
+            SaveFileCache(EpisodesCommentedFile, _CommentedEpisodes?.ToList().ToJSON());
             //SaveFileCache(EpisodesFavoritesFile, _FavoriteEpisodes.ToList().ToJSON());
-       
-            SaveFileCache(ShowsWatchlistedFile, _WatchListShows.ToList().ToJSON());
-            SaveFileCache(ShowsRatedFile, _RatedShows.ToList().ToJSON());
-            SaveFileCache(ShowsCommentedFile, _CommentedShows.ToList().ToJSON());
-            SaveFileCache(ShowsHiddenFile, _HiddenShows.ToList().ToJSON());
-            SaveFileCache(ShowsFavoritesFile, _FavoriteShows.ToList().ToJSON());
 
-            SaveFileCache(SeasonsWatchlistedFile, _WatchListSeasons.ToList().ToJSON());
-            SaveFileCache(SeasonsRatedFile, _RatedSeasons.ToList().ToJSON());
-            SaveFileCache(SeasonsCommentedFile, _CommentedSeasons.ToList().ToJSON());
-            SaveFileCache(SeasonsHiddenFile, _HiddenSeasons.ToList().ToJSON());
+            SaveFileCache(ShowsWatchlistedFile, _WatchListShows?.ToList().ToJSON());
+            SaveFileCache(ShowsRatedFile, _RatedShows?.ToList().ToJSON());
+            SaveFileCache(ShowsCommentedFile, _CommentedShows?.ToList().ToJSON());
+            SaveFileCache(ShowsHiddenFile, _HiddenShows?.ToList().ToJSON());
+            SaveFileCache(ShowsFavoritesFile, _FavoriteShows?.ToList().ToJSON());
+
+            SaveFileCache(SeasonsWatchlistedFile, _WatchListSeasons?.ToList().ToJSON());
+            SaveFileCache(SeasonsRatedFile, _RatedSeasons?.ToList().ToJSON());
+            SaveFileCache(SeasonsCommentedFile, _CommentedSeasons?.ToList().ToJSON());
+            SaveFileCache(SeasonsHiddenFile, _HiddenSeasons?.ToList().ToJSON());
             //SaveFileCache(SeasonsFavoritesFile, _FavoriteSeasons.ToList().ToJSON());
 
-            SaveFileCache(CustomListCommentedFile, _CommentedLists.ToList().ToJSON());
-            SaveFileCache(CustomListLikedFile, _LikedLists.ToList().ToJSON());
+            SaveFileCache(CustomListCommentedFile, _CommentedLists?.ToList().ToJSON());
+            SaveFileCache(CustomListLikedFile, _LikedLists?.ToList().ToJSON());
 
-            SaveFileCache(CommentsLikedFile, _LikedComments.ToList().ToJSON());
+            SaveFileCache(CommentsLikedFile, _LikedComments?.ToList().ToJSON());
         }
 
         #endregion

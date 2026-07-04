@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30717.126
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36915.13 d17.14
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TraktPlugin", "TraktPlugin\TraktPlugin.csproj", "{63CC7924-F7B5-47C9-92A4-08428D9C5F9C}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -11,6 +11,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MPEI", "MPEI", "{CE1EB7DF-4B75-4BD0-B744-B8898FC75371}"
 	ProjectSection(SolutionItems) = preProject
 		MPEI\TraktInstaller.xmp2 = MPEI\TraktInstaller.xmp2
+		MPEI\update.xml = MPEI\update.xml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Settings", "Settings", "{A5187FF9-35B1-4CDC-91A3-A6FAE372FD3C}"
@@ -71,18 +72,6 @@ Global
 		{F9354E34-2955-4E54-AFB2-040236542D19}.Release|x64.Build.0 = Release|Any CPU
 		{F9354E34-2955-4E54-AFB2-040236542D19}.Release|x86.ActiveCfg = Release|Any CPU
 		{F9354E34-2955-4E54-AFB2-040236542D19}.Release|x86.Build.0 = Release|Any CPU
-		{38C5077A-6BDC-49B5-BFF3-39026A4E3560}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{38C5077A-6BDC-49B5-BFF3-39026A4E3560}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{38C5077A-6BDC-49B5-BFF3-39026A4E3560}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{38C5077A-6BDC-49B5-BFF3-39026A4E3560}.Debug|x64.Build.0 = Debug|Any CPU
-		{38C5077A-6BDC-49B5-BFF3-39026A4E3560}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{38C5077A-6BDC-49B5-BFF3-39026A4E3560}.Debug|x86.Build.0 = Debug|Any CPU
-		{38C5077A-6BDC-49B5-BFF3-39026A4E3560}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{38C5077A-6BDC-49B5-BFF3-39026A4E3560}.Release|Any CPU.Build.0 = Release|Any CPU
-		{38C5077A-6BDC-49B5-BFF3-39026A4E3560}.Release|x64.ActiveCfg = Release|Any CPU
-		{38C5077A-6BDC-49B5-BFF3-39026A4E3560}.Release|x64.Build.0 = Release|Any CPU
-		{38C5077A-6BDC-49B5-BFF3-39026A4E3560}.Release|x86.ActiveCfg = Release|Any CPU
-		{38C5077A-6BDC-49B5-BFF3-39026A4E3560}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
