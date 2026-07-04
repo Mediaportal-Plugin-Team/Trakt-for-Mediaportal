@@ -645,13 +645,13 @@ namespace TraktPlugin
             TraktLogger.Info("TV episode watched history cache is out of date, requesting updated data. Local Date = '{0}', Online Date = '{1}'", TraktSettings.LastSyncActivities.Episodes.Watched ?? "<empty>", lastSyncActivities.Episodes.Watched ?? "<empty>");
 
             // we get from online, local cache is not up to date
-            TraktEpisodesWatched onlineItems = TraktAPI.TraktAPI.GetWatchedEpisodes(page: 1, maxItems: 250);
+            TraktEpisodesWatched onlineItems = TraktAPI.TraktAPI.GetWatchedEpisodes(page: 1, maxItems: 100);
             if (onlineItems == null || onlineItems.Items == null)
                 return null;
             
             for (int page = 2; page <= onlineItems.TotalPages; page++)
             {
-                TraktEpisodesWatched nextOnlineItems = TraktAPI.TraktAPI.GetWatchedEpisodes(page: page, maxItems: 250);
+                TraktEpisodesWatched nextOnlineItems = TraktAPI.TraktAPI.GetWatchedEpisodes(page: page, maxItems: 100);
                 if (nextOnlineItems == null || nextOnlineItems.Items == null)
                     break;
 
