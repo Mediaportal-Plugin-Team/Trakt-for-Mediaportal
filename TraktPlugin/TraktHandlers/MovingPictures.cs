@@ -2453,7 +2453,7 @@ namespace TraktPlugin.TraktHandlers
                          node.Name == "$(Watchlist)" || 
                          node.Name == "${Recommendations}" || 
                          node.Name == "${Favorites}" )
-                         continue;
+                        continue;
 
                     if (!customLists.Keys.Any(key => string.Format("${{{0}}}", key.Name) == node.Name))
                     {
