@@ -1595,13 +1595,11 @@ Click Next to continue or Cancel to exit Setup.
     <ExtensionDescription>Trakt actively keeps a record of what TV shows and movies you are watching. Based on your favorites, your friends, and the community, trakt recommends other TV shows and movies.
 
 Trakt will also synchronize your watched flags across multiple installations.</ExtensionDescription>
-    <VersionDescription>* Support for adding movies and shows to your Favourites (via context menu);
-* New GUIs to view your own favourites as well community favourited movies and shows. 
-* Updated Titan skin to fully support Favourites (skin designers can diff to see what has changed);
-* Favourites integration into MovingPictures categories and filters if enabled.</VersionDescription>
+    <VersionDescription>* Fixed TV show sync due to recent API changes;
+* Fixed Favourites not syncing to MovingPictures categories/filters when enabled.</VersionDescription>
     <DevelopmentStatus>Stable</DevelopmentStatus>
     <OnlineLocation>https://github.com/Mediaportal-Plugin-Team/Trakt-for-Mediaportal/releases/download/v[Version]/TraktPlugin-v[Version].mpe1</OnlineLocation>
-    <ReleaseDate>2026-05-17T13:13:13</ReleaseDate>
+    <ReleaseDate>2026-07-05T13:13:13</ReleaseDate>
     <Tags>trakt,tv shows,movies,mp-tvseries,movingpictures,my videos,my films</Tags>
     <PlatformCompatibility>AnyCPU</PlatformCompatibility>
     <Location>.\Release\TraktPlugin-v[Version].mpe1</Location>
