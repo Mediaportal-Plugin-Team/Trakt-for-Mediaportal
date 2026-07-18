@@ -1274,7 +1274,7 @@ namespace TraktPlugin
                 {
                   // Note: API returns total pages for all watchlist types not just this one (movies)
                   // so we need to check returned items against our expected max items per page
-                  if ( onlineItems.Items.Count() < ( maxItemsPerPage * onlineItems.CurrentPage ) )
+                  if ( _WatchListMovies.Count() < ( maxItemsPerPage * onlineItems.CurrentPage ) )
                     break;
 
                   onlineItems = TraktAPI.TraktAPI.GetWatchListMovies( page: onlineItems.CurrentPage + 1, maxItems: maxItemsPerPage );
@@ -1397,7 +1397,7 @@ namespace TraktPlugin
             {
               // Note: API returns total pages for all favorite types not just this one (movies)
               // so we need to check returned items against our expected max items per page
-              if ( onlineItems.Items.Count() < ( maxItemsPerPage * onlineItems.CurrentPage ) )
+              if ( _FavoriteMovies.Count() < ( maxItemsPerPage * onlineItems.CurrentPage ) )
                 break;
 
               onlineItems = TraktAPI.TraktAPI.GetFavourites( type: "movies", page: onlineItems.CurrentPage + 1, maxItems: maxItemsPerPage );
@@ -1481,7 +1481,7 @@ namespace TraktPlugin
                 {
                   // Note: API returns total pages for all watchlist types not just this one (shows)
                   // so we need to check returned items against our expected max items per page
-                  if (onlineItems.Items.Count() < ( maxItemsPerPage * onlineItems.CurrentPage ) )
+                  if ( _WatchListShows.Count() < ( maxItemsPerPage * onlineItems.CurrentPage ) )
                     break;
 
                   onlineItems = TraktAPI.TraktAPI.GetWatchListShows( page: onlineItems.CurrentPage + 1, maxItems: maxItemsPerPage );
@@ -1561,7 +1561,7 @@ namespace TraktPlugin
             {
               // Note: API returns total pages for all favorite types not just this one (shows)
               // so we need to check returned items against our expected max items per page
-              if ( onlineItems.Items.Count() < ( maxItemsPerPage * onlineItems.CurrentPage ) )
+              if ( _FavoriteShows.Count() < ( maxItemsPerPage * onlineItems.CurrentPage ) )
                 break;
 
               onlineItems = TraktAPI.TraktAPI.GetFavourites( type: "shows", page: onlineItems.CurrentPage + 1, maxItems: maxItemsPerPage );
@@ -1645,7 +1645,7 @@ namespace TraktPlugin
                 {
                   // Note: API returns total pages for all watchlist types not just this one (seasons)
                   // so we need to check returned items against our expected max items per page
-                  if ( onlineItems.Items.Count() < ( maxItemsPerPage * onlineItems.CurrentPage ) )
+                  if ( _WatchListSeasons.Count() < ( maxItemsPerPage * onlineItems.CurrentPage ) )
                     break;
 
                   onlineItems = TraktAPI.TraktAPI.GetWatchListSeasons( page: onlineItems.CurrentPage + 1, maxItems: maxItemsPerPage );
@@ -1725,7 +1725,7 @@ namespace TraktPlugin
             {
               // Note: API returns total pages for all favorite types not just this one (seasons)
               // so we need to check returned items against our expected max items per page
-              if ( onlineItems.Items.Count() < ( maxItemsPerPage * onlineItems.CurrentPage ) )
+              if ( _FavoriteSeasons.Count() < ( maxItemsPerPage * onlineItems.CurrentPage ) )
                 break;
 
               onlineItems = TraktAPI.TraktAPI.GetFavourites( type: "seasons", page: onlineItems.CurrentPage + 1, maxItems: maxItemsPerPage );
@@ -1809,7 +1809,7 @@ namespace TraktPlugin
                 {
                   // Note: API returns total pages for all watchlist types not just this one (shows)
                   // so we need to check returned items against our expected max items per page
-                  if ( onlineItems.Items.Count() < ( maxItemsPerPage * onlineItems.CurrentPage ) )
+                  if ( _WatchListEpisodes.Count() < ( maxItemsPerPage * onlineItems.CurrentPage ) )
                     break;
 
                   onlineItems = TraktAPI.TraktAPI.GetWatchListEpisodes( page: onlineItems.CurrentPage + 1, maxItems: maxItemsPerPage );
@@ -1889,7 +1889,7 @@ namespace TraktPlugin
             {
               // Note: API returns total pages for all favorite types not just this one (episodes)
               // so we need to check returned items against our expected max items per page
-              if ( onlineItems.Items.Count() < ( maxItemsPerPage * onlineItems.CurrentPage ) )
+              if ( _FavoriteEpisodes.Count() < ( maxItemsPerPage * onlineItems.CurrentPage ) )
                 break;
 
               onlineItems = TraktAPI.TraktAPI.GetFavourites( type: "episodes", page: onlineItems.CurrentPage + 1, maxItems: maxItemsPerPage );
