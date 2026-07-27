@@ -1443,6 +1443,44 @@ namespace TraktPlugin
                 }
               }
             }
+      #endregion
+
+            #region rated episodes
+            if ( TraktSettings.DashboardActivityFilter.Types.Episodes && TraktSettings.DashboardActivityFilter.Actions.Rated )
+            {
+              var ratedEpisodes = TraktCache.GetRatedEpisodesFromTrakt( true );
+              if ( ratedEpisodes != null )
+              {
+                foreach ( var episode in ratedEpisodes.OrderByDescending( e => e.RatedAt ).Take( maxActivityItems ) )
+                {
+                  var ratedEpActivity = new TraktActivity.Activity
+                  {
+                    Id = i++,
+                    Action = ActivityAction.rating.ToString(),
+                    Type = ActivityType.episode.ToString(),
+                    Episode = new TraktEpisodeSummary
+                    {
+                      Ids = episode.Episode.Ids,
+                      Number = episode.Episode.Number,
+                      Season = episode.Episode.Season,
+                      Title = episode.Episode.Title
+                    },
+                    Show = new TraktShowSummary
+                    {
+                      Title = episode.Show.Title,
+                      Year = episode.Show.Year,
+                      Ids = episode.Show.Ids
+                    },
+                    Rating = episode.Rating,
+                    Timestamp = episode.RatedAt,
+                    User = GetUserProfile()
+                  };
+
+                  // add activity to the list
+                  activity.Activities.Add( ratedEpActivity );
+                }
+              }
+            }
             #endregion
 
             #region rated seasons
