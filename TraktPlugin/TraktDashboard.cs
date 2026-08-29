@@ -436,7 +436,10 @@ namespace TraktPlugin
             var userImages = new List<GUITraktImage>();
             
             // Add each activity item to the facade
-            foreach (var activity in activities.Activities.Distinct().OrderByDescending(a => a.Timestamp))
+            foreach ( var activity in activities.Activities
+                                                  .Where( a => a != null )
+                                                  .Distinct()
+                                                  .OrderByDescending( a => a.Timestamp ) )
             {
                 if (PreviousSelectedIdx == -1 && mPreviousSelectedActivity != null && TraktSettings.RememberLastSelectedActivity)
                 {
