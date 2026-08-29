@@ -2602,9 +2602,9 @@ namespace TraktAPI
                 }
                 catch (WebException ex) when (IsTokenExpired(ex))
                 {
-                    (ex.Response as HttpWebResponse).Close();
+                    (ex.Response as HttpWebResponse)?.Close();
                     OnDataError?.Invoke("Token expired, refreshing");
-                    if (OnTokenExpired())
+                    if ( OnTokenExpired?.Invoke() == true )
                     {
                         request = CreateGetRequest(address, out headerCollection, method);
                         // measure how long it took to get a response
@@ -2765,7 +2765,7 @@ namespace TraktAPI
 
                 OnDataReceived?.Invoke(strResponse, response);
 
-                OnLatency?.Invoke(watch.Elapsed.TotalMilliseconds, response, postData.Length * sizeof(Char), strResponse.Length * sizeof(Char));
+                OnLatency?.Invoke(watch.Elapsed.TotalMilliseconds, response, ( postData?.Length ?? 0 ) * sizeof( char ), strResponse.Length * sizeof(Char));
 
                 // cleanup
                 response.Close();
@@ -2782,20 +2782,23 @@ namespace TraktAPI
                 {
                     var response = ex.Response as HttpWebResponse;
 
-                    string headers = string.Empty;
-                    foreach (string key in response.Headers.AllKeys)
+                    if ( response != null )
                     {
-                        headers += string.Format("{0}: {1}, ", key, response.Headers[key]);
+                      string headers = string.Empty;
+                      foreach ( string key in response.Headers.AllKeys )
+                      {
+                        headers += string.Format( "{0}: {1}, ", key, response.Headers[ key ] );
+                      }
+                      errorMessage = string.Format( "Protocol Error, Code = '{0}', Description = '{1}', Url = '{2}', Headers = '{3}'", (int)response.StatusCode, response.StatusDescription, address, headers.TrimEnd( new char[] { ',', ' ' } ) );
+
+                      result = new TraktStatus { Code = (int)response.StatusCode, Description = response.StatusDescription }.ToJSON();
+
+                      OnLatency?.Invoke( watch.Elapsed.TotalMilliseconds, response, ( postData?.Length ?? 0 ) * sizeof( char ), 0 );
                     }
-                    errorMessage = string.Format("Protocol Error, Code = '{0}', Description = '{1}', Url = '{2}', Headers = '{3}'", (int)response.StatusCode, response.StatusDescription, address, headers.TrimEnd(new char[] { ',', ' ' }));
-
-                    result = new TraktStatus { Code = (int)response.StatusCode, Description = response.StatusDescription }.ToJSON();
-
-                    OnLatency?.Invoke(watch.Elapsed.TotalMilliseconds, response, postData.Length * sizeof(Char), 0);
                 }
 
                 // don't log an error on the authentication process if polling (status code 400)
-                if (!address.Contains("oauth/device/token") || !result.Contains("400"))
+                if (!address.Contains("oauth/device/token") || !( result?.Contains( "400" ) ?? false ) )
                 {
                     OnDataError?.Invoke(errorMessage);
                 }
