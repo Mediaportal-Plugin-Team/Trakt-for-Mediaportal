@@ -12,7 +12,7 @@ using System.Linq;
 using System.Threading;
 using TraktPlugin.Extensions;
 using TraktPlugin.GUI;
-using TraktAPI.DataStructures;
+using TraktAPI.DataModels;
 using TraktAPI.Enums;
 using TraktAPI.Extensions;
 

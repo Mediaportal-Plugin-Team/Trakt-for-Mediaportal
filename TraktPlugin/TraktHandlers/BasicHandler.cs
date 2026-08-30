@@ -5,7 +5,7 @@ using System.Threading;
 using MediaPortal.Player;
 using TraktPlugin.Extensions;
 using TraktPlugin.GUI;
-using TraktAPI.DataStructures;
+using TraktAPI.DataModels;
 using TraktAPI.Extensions;
 
 namespace TraktPlugin.TraktHandlers

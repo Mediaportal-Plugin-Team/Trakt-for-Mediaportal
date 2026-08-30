@@ -8,12 +8,12 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
-using TraktAPI.DataStructures;
+using TraktAPI.DataModels;
 using TraktAPI.Enums;
 using TraktAPI.Extensions;
 using TraktPlugin.Extensions;
 using TraktPlugin.GUI;
-using TraktPlugin.TmdbAPI.DataStructures;
+using TraktPlugin.TmdbAPI.DataModels;
 
 namespace TraktPlugin
 {
@@ -237,7 +237,7 @@ namespace TraktPlugin
     public static int TmdbEpisodeImageMaxCacheAge { get; set; }
     public static int TmdbPersonImageMaxCacheAge { get; set; }
     public static string TmdbPreferredImageLanguage { get; set; }
-    public static TraktAPI.DataStructures.TraktSettings OnlineSettings { get; set; }
+    public static TraktAPI.DataModels.TraktSettings OnlineSettings { get; set; }
     public static string Username { get; set; }
     public static string UserAccessTokenExpiry { get; set; }
     public static string UserRefreshToken { get; set; }
@@ -980,7 +980,7 @@ namespace TraktPlugin
         TmdbEpisodeImageMaxCacheAge = GetValueAsIntAndValidate( cTrakt, cTmdbEpisodeImageMaxCacheAge, 30, 1, 365 );
         TmdbPersonImageMaxCacheAge = GetValueAsIntAndValidate( cTrakt, cTmdbPersonImageMaxCacheAge, 30, 1, 365 );
         TmdbPreferredImageLanguage = xmlreader.GetValueAsString( cTrakt, cTmdbPreferredImageLanguage, "en" );
-        OnlineSettings = xmlreader.GetValueAsString( cTrakt, cTraktOnlineSettings, "{}" ).FromJSON<TraktAPI.DataStructures.TraktSettings>();
+        OnlineSettings = xmlreader.GetValueAsString( cTrakt, cTraktOnlineSettings, "{}" ).FromJSON<TraktAPI.DataModels.TraktSettings>();
         TvCalendarMaxDays = xmlreader.GetValueAsInt( cTrakt, cTvCalendarMaxDays, 7 );
         MovieCalendarMaxDays = xmlreader.GetValueAsInt( cTrakt, cMovieCalendarMaxDays, 7 );
         FavoritedMoviesPeriod = xmlreader.GetValueAsString( cTrakt, cFavoritedMoviesPeriod, "weekly" );

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
-using TraktAPI.DataStructures;
+using TraktAPI.DataModels;
 using TraktAPI.Extensions;
 using TraktPlugin.Extensions;
 using Action = MediaPortal.GUI.Library.Action;

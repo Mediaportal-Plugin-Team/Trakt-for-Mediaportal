@@ -1,6 +1,6 @@
 ﻿using System.IO;
 using System.Net;
-using TraktPlugin.TmdbAPI.DataStructures;
+using TraktPlugin.TmdbAPI.DataModels;
 using TraktPlugin.TmdbAPI.Extensions;
 using System.Threading;
 

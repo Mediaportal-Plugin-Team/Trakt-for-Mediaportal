@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Trailers.Providers;
-using TraktAPI.DataStructures;
+using TraktAPI.DataModels;
 using TraktAPI.Enums;
 using TraktAPI.Extensions;
 using TraktPlugin.Cache;

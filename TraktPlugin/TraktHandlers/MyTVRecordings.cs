@@ -11,7 +11,7 @@ using MediaPortal.Player;
 using TraktPlugin.Extensions;
 using TraktPlugin.GUI;
 using TraktAPI;
-using TraktAPI.DataStructures;
+using TraktAPI.DataModels;
 using TvDatabase;
 
 namespace TraktPlugin.TraktHandlers

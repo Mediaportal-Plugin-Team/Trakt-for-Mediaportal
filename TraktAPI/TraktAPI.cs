@@ -6,7 +6,7 @@ using System.Net;
 using System.Text;
 using System.Threading;
 using System.Web;
-using TraktAPI.DataStructures;
+using TraktAPI.DataModels;
 using TraktAPI.Enums;
 using TraktAPI.Extensions;
 

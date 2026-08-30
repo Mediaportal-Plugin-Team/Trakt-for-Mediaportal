@@ -4,12 +4,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading;
-using TraktAPI.DataStructures;
+using TraktAPI.DataModels;
 using TraktAPI.Extensions;
 using TraktPlugin.Cache;
 using TraktPlugin.Extensions;
 using TraktPlugin.GUI;
-using TraktPlugin.TmdbAPI.DataStructures;
+using TraktPlugin.TmdbAPI.DataModels;
 using Action = MediaPortal.GUI.Library.Action;
 
 namespace TraktPlugin

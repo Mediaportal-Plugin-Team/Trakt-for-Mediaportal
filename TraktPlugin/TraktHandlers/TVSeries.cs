@@ -6,7 +6,7 @@ using MediaPortal.GUI.Library;
 using MediaPortal.Player;
 using TraktPlugin.Extensions;
 using TraktPlugin.GUI;
-using TraktAPI.DataStructures;
+using TraktAPI.DataModels;
 using TraktAPI.Enums;
 using TraktAPI.Extensions;
 using WindowPlugins.GUITVSeries;

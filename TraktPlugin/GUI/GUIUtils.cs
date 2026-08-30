@@ -4,7 +4,7 @@ using System.Threading;
 using MediaPortal.Dialogs;
 using MediaPortal.GUI.Library;
 using TraktAPI.Enums;
-using TraktAPI.DataStructures;
+using TraktAPI.DataModels;
 using System.IO;
 using MediaPortal.Player;
 

@@ -5,9 +5,9 @@ using System.Linq;
 using System.Threading;
 using MediaPortal.GUI.Library;
 using TraktPlugin.Cache;
-using TraktPlugin.TmdbAPI.DataStructures;
+using TraktPlugin.TmdbAPI.DataModels;
 using TraktPlugin.Extensions;
-using TraktAPI.DataStructures;
+using TraktAPI.DataModels;
 
 namespace TraktPlugin.GUI
 {

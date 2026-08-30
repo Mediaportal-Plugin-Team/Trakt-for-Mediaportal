@@ -6,7 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading;
-using TraktAPI.DataStructures;
+using TraktAPI.DataModels;
 using TraktAPI.Extensions;
 
 namespace TraktPlugin

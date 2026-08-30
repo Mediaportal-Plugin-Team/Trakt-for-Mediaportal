@@ -5,8 +5,8 @@ using System.ComponentModel;
 using System.Drawing;
 using System.IO;
 using System.Net;
-using TraktAPI.DataStructures;
-using TraktPlugin.TmdbAPI.DataStructures;
+using TraktAPI.DataModels;
+using TraktPlugin.TmdbAPI.DataModels;
 
 namespace TraktPlugin.GUI
 {

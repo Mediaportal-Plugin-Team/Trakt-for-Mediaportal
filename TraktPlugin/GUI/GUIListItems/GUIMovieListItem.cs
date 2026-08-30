@@ -5,7 +5,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
 using System.Threading;
-using TraktAPI.DataStructures;
+using TraktAPI.DataModels;
 using TraktPlugin.Cache;
 using TraktPlugin.Extensions;
 

@@ -6,7 +6,7 @@ using System.Linq;
 using System.Threading;
 using MediaPortal.GUI.Library;
 using TraktPlugin.Extensions;
-using TraktAPI.DataStructures;
+using TraktAPI.DataModels;
 
 namespace TraktPlugin.GUI
 {

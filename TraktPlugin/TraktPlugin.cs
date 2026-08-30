@@ -8,7 +8,7 @@ using MediaPortal.Player;
 using TraktPlugin.Cache;
 using TraktPlugin.Extensions;
 using TraktPlugin.GUI;
-using TraktAPI.DataStructures;
+using TraktAPI.DataModels;
 using TraktAPI.Enums;
 using TraktAPI.Extensions;
 using TraktPlugin.TraktHandlers;

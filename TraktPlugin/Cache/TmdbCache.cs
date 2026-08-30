@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using TraktPlugin.Extensions;
-using TraktPlugin.TmdbAPI.DataStructures;
+using TraktPlugin.TmdbAPI.DataModels;
 using TraktPlugin.TmdbAPI.Extensions;
 
 namespace TraktPlugin.Cache

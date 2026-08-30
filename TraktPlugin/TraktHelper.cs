@@ -9,11 +9,11 @@ using MediaPortal.GUI.Library;
 using MediaPortal.Profile;
 using TraktPlugin.Extensions;
 using TraktPlugin.GUI;
-using TraktAPI.DataStructures;
+using TraktAPI.DataModels;
 using TraktAPI.Extensions;
 using TraktPlugin.TraktHandlers;
 using TraktPlugin.Cache;
-using TraktPlugin.TmdbAPI.DataStructures;
+using TraktPlugin.TmdbAPI.DataModels;
 
 namespace TraktPlugin
 {

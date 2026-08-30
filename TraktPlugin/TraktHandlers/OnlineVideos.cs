@@ -10,7 +10,7 @@ using OnlineVideos;
 using OnlineVideos.MediaPortal1;
 using TraktPlugin.Extensions;
 using TraktPlugin.GUI;
-using TraktAPI.DataStructures;
+using TraktAPI.DataModels;
 using TraktAPI.Extensions;
 
 namespace TraktPlugin.TraktHandlers

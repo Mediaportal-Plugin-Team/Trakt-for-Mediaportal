@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using MediaPortal.GUI.Library;
 using TraktPlugin.GUI;
-using TraktAPI.DataStructures;
+using TraktAPI.DataModels;
 
 namespace TraktPlugin
 {

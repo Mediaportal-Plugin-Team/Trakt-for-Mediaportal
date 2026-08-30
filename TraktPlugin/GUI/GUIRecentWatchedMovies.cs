@@ -5,8 +5,8 @@ using MediaPortal.GUI.Library;
 using MediaPortal.Util;
 using TraktPlugin.Cache;
 using TraktPlugin.Extensions;
-using TraktPlugin.TmdbAPI.DataStructures;
-using TraktAPI.DataStructures;
+using TraktPlugin.TmdbAPI.DataModels;
+using TraktAPI.DataModels;
 using TraktAPI.Extensions;
 using Action = MediaPortal.GUI.Library.Action;
 

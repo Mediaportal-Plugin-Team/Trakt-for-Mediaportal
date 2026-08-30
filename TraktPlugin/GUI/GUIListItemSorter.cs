@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.Serialization;
-using TraktAPI.DataStructures;
+using TraktAPI.DataModels;
 using TraktAPI.Extensions;
 
 namespace TraktPlugin.GUI
