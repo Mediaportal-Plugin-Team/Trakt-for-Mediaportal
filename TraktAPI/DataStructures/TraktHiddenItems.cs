@@ -2,8 +2,8 @@
 
 namespace TraktAPI.DataStructures
 {
-    public class TraktHiddenItems : TraktPagination
-    {
-        public IEnumerable<TraktHiddenItem> HiddenItems { get; set; }
-    }
+  public class TraktHiddenItems : TraktPagination
+  {
+    public IEnumerable<TraktHiddenItem> HiddenItems { get; set; }
+  }
 }

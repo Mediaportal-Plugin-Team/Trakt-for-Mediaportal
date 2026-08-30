@@ -2,8 +2,8 @@
 
 namespace TraktAPI.DataStructures
 {
-    public class TraktMoviesPopular : TraktPagination
-    {
-        public IEnumerable<TraktMovieSummary> Movies { get; set; }
-    }
+  public class TraktMoviesPopular : TraktPagination
+  {
+    public IEnumerable<TraktMovieSummary> Movies { get; set; }
+  }
 }

@@ -6,10 +6,10 @@ using System.Runtime.Serialization;
 
 namespace TraktAPI.DataStructures
 {
-    [DataContract]
-    public class TraktUserImages
-    {
-        [DataMember(Name = "avatar")]
-        public TraktImage Avatar { get; set; }
-    }
+  [DataContract]
+  public class TraktUserImages
+  {
+    [DataMember( Name = "avatar" )]
+    public TraktImage Avatar { get; set; }
+  }
 }

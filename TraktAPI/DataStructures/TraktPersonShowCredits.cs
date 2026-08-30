@@ -3,13 +3,13 @@ using System.Runtime.Serialization;
 
 namespace TraktAPI.DataStructures
 {
-    [DataContract]
-    public class TraktPersonShowCredits
-    {
-        [DataMember(Name = "cast")]
-        public List<TraktPersonShowCast> Cast { get; set; }
+  [DataContract]
+  public class TraktPersonShowCredits
+  {
+    [DataMember( Name = "cast" )]
+    public List<TraktPersonShowCast> Cast { get; set; }
 
-        [DataMember(Name = "crew")]
-        public TraktPersonShowCrew Crew { get; set; }
-    }
+    [DataMember( Name = "crew" )]
+    public TraktPersonShowCrew Crew { get; set; }
+  }
 }

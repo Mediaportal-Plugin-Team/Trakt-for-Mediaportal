@@ -2,8 +2,8 @@
 
 namespace TraktAPI.DataStructures
 {
-    public class TraktShowsAnticipated : TraktPagination
-    {
-        public IEnumerable<TraktShowAnticipated> Shows { get; set; }
-    }
+  public class TraktShowsAnticipated : TraktPagination
+  {
+    public IEnumerable<TraktShowAnticipated> Shows { get; set; }
+  }
 }

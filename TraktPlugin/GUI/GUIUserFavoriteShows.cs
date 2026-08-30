@@ -201,8 +201,9 @@ namespace TraktPlugin.GUI
               if ( !( Facade.SelectedListItem is GUIShowListItem item ) )
                 return;
 
-              if ( item.Show == null ) return;
-              
+              if ( item.Show == null )
+                return;
+
               GUIWindowManager.ActivateWindow( (int)TraktGUIWindows.ShowSeasons, item.Show.ToJSON() );
             }
           }

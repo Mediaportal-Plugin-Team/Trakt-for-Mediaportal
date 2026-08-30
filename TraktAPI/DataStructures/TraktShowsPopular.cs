@@ -2,8 +2,8 @@
 
 namespace TraktAPI.DataStructures
 {
-    public class TraktShowsPopular : TraktPagination
-    {
-        public IEnumerable<TraktShowSummary> Shows { get; set; }
-    }
+  public class TraktShowsPopular : TraktPagination
+  {
+    public IEnumerable<TraktShowSummary> Shows { get; set; }
+  }
 }

@@ -2,8 +2,8 @@
 
 namespace TraktAPI.DataStructures
 {
-    public class TraktListsPopular: TraktPagination
-    {
-        public IEnumerable<TraktListPopular> Lists { get; set; }
-    }
+  public class TraktListsPopular : TraktPagination
+  {
+    public IEnumerable<TraktListPopular> Lists { get; set; }
+  }
 }

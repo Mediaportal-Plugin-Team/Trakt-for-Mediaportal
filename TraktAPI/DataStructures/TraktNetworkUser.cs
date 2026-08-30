@@ -6,13 +6,13 @@ using System.Runtime.Serialization;
 
 namespace TraktAPI.DataStructures
 {
-    [DataContract]
-    public class TraktNetworkUser
-    {
-        [DataMember(Name = "followed_at")]
-        public string FollowedAt { get; set; }
+  [DataContract]
+  public class TraktNetworkUser
+  {
+    [DataMember( Name = "followed_at" )]
+    public string FollowedAt { get; set; }
 
-        [DataMember(Name = "user")]
-        public TraktUserSummary User { get; set; }
-    }
+    [DataMember( Name = "user" )]
+    public TraktUserSummary User { get; set; }
+  }
 }

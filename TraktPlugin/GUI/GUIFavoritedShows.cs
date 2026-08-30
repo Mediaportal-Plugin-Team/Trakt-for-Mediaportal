@@ -142,8 +142,9 @@ namespace TraktPlugin.GUI
               }
               else
               {
-                if ( item.Show == null ) return;
-                
+                if ( item.Show == null )
+                  return;
+
                 GUIWindowManager.ActivateWindow( (int)TraktGUIWindows.ShowSeasons, item.Show.ToJSON() );
               }
             }

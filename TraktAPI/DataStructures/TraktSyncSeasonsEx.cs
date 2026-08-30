@@ -6,10 +6,10 @@ using System.Runtime.Serialization;
 
 namespace TraktAPI.DataStructures
 {
-    [DataContract]
-    public class TraktSyncSeasonsEx
-    {
-        [DataMember(Name = "shows")]
-        public List<TraktSyncSeasonEx> Shows { get; set; }
-    }
+  [DataContract]
+  public class TraktSyncSeasonsEx
+  {
+    [DataMember( Name = "shows" )]
+    public List<TraktSyncSeasonEx> Shows { get; set; }
+  }
 }

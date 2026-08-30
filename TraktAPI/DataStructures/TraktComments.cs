@@ -2,8 +2,8 @@
 
 namespace TraktAPI.DataStructures
 {
-    public class TraktComments : TraktPagination
-    {
-        public IEnumerable<TraktCommentItem> Comments { get; set; }
-    }
+  public class TraktComments : TraktPagination
+  {
+    public IEnumerable<TraktCommentItem> Comments { get; set; }
+  }
 }
