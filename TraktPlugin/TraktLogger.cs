@@ -5,6 +5,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Text.RegularExpressions;
 using System.Threading;
 using TraktAPI.DataModels;
 using TraktAPI.Extensions;
@@ -17,6 +18,12 @@ namespace TraktPlugin
     private static readonly string latencyFilename = Config.GetFile( Config.Dir.Log, "TraktPlugin-Latencies.csv" );
     private static readonly string logFilename = Config.GetFile( Config.Dir.Log, "TraktPlugin.log" );
     private static readonly string logFilePattern = Config.GetFile( Config.Dir.Log, "TraktPlugin.{0}.log" );
+    private static readonly Regex SensitiveDataRegex = new Regex(
+      @"(?<prefix>[""]?(?:device_code|user_code|code|access_token|refresh_token|client_secret|api_key|api_secret|password|authorization|token)[""]?\s*[:=]\s*)[""][^""]*[""]",
+      RegexOptions.Compiled | RegexOptions.IgnoreCase );
+    private static readonly Regex SensitiveQueryStringRegex = new Regex(
+      @"(?<prefix>[?&](?:api_key|api_secret|access_token|refresh_token|client_secret|password|token)=)[^&]*",
+      RegexOptions.Compiled | RegexOptions.IgnoreCase );
 
     internal delegate void OnLogReceivedDelegate( string message, bool error );
     internal static event OnLogReceivedDelegate OnLogReceived;
@@ -126,6 +133,17 @@ namespace TraktPlugin
       Warning( String.Format( format, args ) );
     }
 
+    private static string MaskSensitiveData( string log )
+    {
+      if ( string.IsNullOrEmpty( log ) )
+        return log;
+
+      log = SensitiveDataRegex.Replace( log, "${prefix}\"****\"" );
+      log = SensitiveQueryStringRegex.Replace( log, "${prefix}****" );
+
+      return log;
+    }
+
     private static String CreatePrefix()
     {
       return DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss.fff" ) + " [{0}] " + String.Format( "[{0}][{1}]", Thread.CurrentThread.Name, Thread.CurrentThread.ManagedThreadId.ToString().PadLeft( 2, '0' ) ) + ": {1}";
@@ -160,6 +178,9 @@ namespace TraktPlugin
 
     private static void WriteToFile( String log )
     {
+      // Always sanitise immediately before writing to disk.
+      log = MaskSensitiveData( log );
+
       try
       {
         lock ( lockObject )
