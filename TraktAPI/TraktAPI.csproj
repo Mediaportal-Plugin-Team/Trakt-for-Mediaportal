@@ -47,6 +47,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DataModels\TraktPermissions.cs" />
+    <Compile Include="DataModels\TraktItemCount.cs" />
+    <Compile Include="DataModels\TraktLimits.cs" />
     <Compile Include="DataModels\TraktHiddenItem.cs" />
     <Compile Include="DataModels\TraktAccount.cs" />
     <Compile Include="DataModels\TraktActivity.cs" />

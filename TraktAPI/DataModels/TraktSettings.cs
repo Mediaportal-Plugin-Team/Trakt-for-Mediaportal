@@ -16,5 +16,11 @@ namespace TraktAPI.DataModels
 
     [DataMember( Name = "sharing_text" )]
     public TraktSharingText SharingText { get; set; }
+
+    [DataMember( Name = "limits" )]
+    public TraktLimits Limits { get; set; }
+
+    [DataMember( Name = "permissions" )]
+    public TraktPermissions Permissions { get; set; }
   }
 }

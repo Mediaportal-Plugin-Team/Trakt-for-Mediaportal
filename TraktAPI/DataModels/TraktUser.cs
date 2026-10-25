@@ -26,6 +26,9 @@ namespace TraktAPI.DataModels
     [DataMember( Name = "private" )]
     public bool IsPrivate { get; set; }
 
+    [DataMember( Name = "director" )]
+    public bool IsDirector { get; set; }
+
     [DataMember( Name = "ids" )]
     public TraktUserId Ids { get; set; }
   }

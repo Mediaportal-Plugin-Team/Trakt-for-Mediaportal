@@ -439,8 +439,7 @@ namespace TraktAPI
 
     public static TraktSettings GetUserSettings()
     {
-      WebHeaderCollection headerCollection = null;
-      var response = GetFromTrakt( TraktURIs.UserSettings, out headerCollection, "GET", true );
+      var response = GetFromTrakt( TraktURIs.UserSettings, out WebHeaderCollection _, "GET", true );
       return response.FromJSON<TraktSettings>();
     }
 

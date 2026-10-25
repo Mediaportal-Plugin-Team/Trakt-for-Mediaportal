@@ -6,9 +6,12 @@ namespace TraktAPI.DataModels
   public class TraktSharingText
   {
     [DataMember( Name = "watching" )]
-    public string Watching { get; set; }
+    public string WatchingFormat { get; set; }
 
     [DataMember( Name = "watched" )]
-    public string Watched { get; set; }
+    public string WatchedFormat { get; set; }
+
+    [DataMember( Name = "rated" )]
+    public string RatedFormat { get; set; }
   }
 }
