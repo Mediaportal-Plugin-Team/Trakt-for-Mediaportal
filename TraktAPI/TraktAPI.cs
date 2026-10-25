@@ -2529,6 +2529,7 @@ namespace TraktAPI
     #endregion
 
     #region Web Helpers
+    private const int MaxRateLimitRetries = 3;
 
     static string ReplaceOnTrakt( string address, string postData )
     {
@@ -2550,14 +2551,29 @@ namespace TraktAPI
     private static bool IsTokenExpired( WebException ex )
     {
       return ex.Status == WebExceptionStatus.ProtocolError &&
-          ex.Response.Headers[ "WWW-Authenticate" ].Contains( "The access token expired" );
+             ex.Response?.Headers[ "WWW-Authenticate" ]?.IndexOf( "The access token expired", StringComparison.OrdinalIgnoreCase ) >= 0;
+    }
+
+    private static bool IsRateLimited( WebException ex )
+    {
+      return ex.Status == WebExceptionStatus.ProtocolError &&
+             ( ex.Response as HttpWebResponse )?.StatusCode == (HttpStatusCode)429;
+    }
+
+    private static int GetRetryAfter( WebException ex )
+    {
+      if ( ex.Response is HttpWebResponse response &&
+           int.TryParse( response.Headers[ "Retry-After" ], out int retryAfterInSecs ) )
+      {
+        return retryAfterInSecs;
+      }
+
+      return 1;
     }
 
     private static HttpWebRequest CreateGetRequest( string address, out WebHeaderCollection headerCollection, string method )
     {
       headerCollection = new WebHeaderCollection();
-
-
 
       var request = WebRequest.Create( address ) as HttpWebRequest;
 
@@ -2590,33 +2606,57 @@ namespace TraktAPI
     static string GetFromTrakt( string address, out WebHeaderCollection headerCollection, string method = "GET", bool serialiseError = false )
     {
       OnDataSend?.Invoke( address, null );
-      Stopwatch watch;
-      var request = CreateGetRequest( address, out headerCollection, method );
-      // measure how long it took to get a response
-      watch = Stopwatch.StartNew();
+
+      Stopwatch watch = Stopwatch.StartNew();
       string strResponse = null;
+      headerCollection = new WebHeaderCollection();
 
       try
       {
         HttpWebResponse response = null;
-        try
+        int rateLimitRetries = 0;
+
+        // rate-limiting and token expiry loop
+        while ( true )
         {
-          response = (HttpWebResponse)request.GetResponse();
-        }
-        catch ( WebException ex ) when ( IsTokenExpired( ex ) )
-        {
-          ( ex.Response as HttpWebResponse )?.Close();
-          OnDataError?.Invoke( "Token expired, refreshing" );
-          if ( OnTokenExpired?.Invoke() == true )
+          var request = CreateGetRequest( address, out headerCollection, method );
+
+          try
           {
-            request = CreateGetRequest( address, out headerCollection, method );
-            // measure how long it took to get a response
-            watch = Stopwatch.StartNew();
             response = (HttpWebResponse)request.GetResponse();
+            break;
           }
-          else
-            return "Something went wrong with refreshing tokens";
+          catch ( WebException ex ) when ( IsTokenExpired( ex ) )
+          {
+            ( ex.Response as HttpWebResponse )?.Close();
+
+            OnDataError?.Invoke( "Token expired, refreshing" );
+
+            if ( OnTokenExpired?.Invoke() == true )
+            {
+              // refreshed, make request again after token refreshed
+              watch = Stopwatch.StartNew();
+              continue;
+            }
+
+            return "Something went wrong when refreshing token";
+          }
+          catch ( WebException ex ) when ( IsRateLimited( ex ) && rateLimitRetries < MaxRateLimitRetries )
+          {
+            int retryAfterInSecs = GetRetryAfter( ex );
+            rateLimitRetries++;
+
+            ( ex.Response as HttpWebResponse )?.Close();
+
+            OnDataError?.Invoke( $"Rate limited by Trakt, retrying in {retryAfterInSecs} seconds (attempt {rateLimitRetries}/{MaxRateLimitRetries})" );
+
+            Thread.Sleep( retryAfterInSecs * 1_000 );
+
+            // rate-limited, make request again after waiting
+            watch = Stopwatch.StartNew();
+          }
         }
+
         if ( response == null )
         {
           watch.Stop();
@@ -2626,21 +2666,23 @@ namespace TraktAPI
         using ( Stream stream = response.GetResponseStream() )
         using ( StreamReader reader = new StreamReader( stream ) )
         {
-          watch.Stop();
-
           strResponse = reader.ReadToEnd();
         }
+
+        watch.Stop();
 
         headerCollection = response.Headers;
 
         if ( method == "DELETE" )
         {
-          strResponse = response.StatusCode == HttpStatusCode.NoContent ? "Item Deleted" : "Failed to delete item";
+          strResponse = response.StatusCode == HttpStatusCode.NoContent
+            ? "Item Deleted"
+            : "Failed to delete item";
         }
 
         OnDataReceived?.Invoke( strResponse, response );
 
-        OnLatency?.Invoke( watch.Elapsed.TotalMilliseconds, response, 0, strResponse.Length * sizeof( Char ) );
+        OnLatency?.Invoke( watch.Elapsed.TotalMilliseconds, response, 0, strResponse.Length * sizeof( char ) );
 
         response.Close();
       }
@@ -2649,30 +2691,47 @@ namespace TraktAPI
         watch.Stop();
 
         string errorMessage = wex.Message;
+
         if ( wex.Status == WebExceptionStatus.ProtocolError )
         {
-          var response = wex.Response as HttpWebResponse;
-
-          string headers = string.Empty;
-          foreach ( string key in response.Headers.AllKeys )
+          if ( wex.Response is HttpWebResponse response )
           {
-            headers += string.Format( "{0}: {1}, ", key, response.Headers[ key ] );
+            string headers = string.Empty;
+
+            foreach ( string key in response.Headers.AllKeys )
+            {
+              headers += string.Format( "{0}: {1}, ", key, response.Headers[ key ] );
+            }
+
+            errorMessage = string.Format(
+              "Protocol Error, Code = '{0}', Description = '{1}', Url = '{2}', Headers = '{3}'",
+              (int)response.StatusCode,
+              response.StatusDescription,
+              address,
+              headers.TrimEnd( new char[] { ',', ' ' } ) );
+
+            strResponse = new TraktStatus
+            {
+              Code = (int)response.StatusCode,
+              Description = response.StatusDescription
+            }.ToJSON();
+
+            OnLatency?.Invoke( watch.Elapsed.TotalMilliseconds, response, 0, 0 );
+
+            response.Close();
+
+            if ( !serialiseError )
+              return null;
           }
-          errorMessage = string.Format( "Protocol Error, Code = '{0}', Description = '{1}', Url = '{2}', Headers = '{3}'", (int)response.StatusCode, response.StatusDescription, address, headers.TrimEnd( new char[] { ',', ' ' } ) );
-
-          strResponse = new TraktStatus { Code = (int)response.StatusCode, Description = response.StatusDescription }.ToJSON();
-
-          OnLatency?.Invoke( watch.Elapsed.TotalMilliseconds, response, 0, 0 );
-
-          if ( !serialiseError )
-            return null;
         }
 
         OnDataError?.Invoke( errorMessage );
       }
       catch ( IOException ioe )
       {
-        string errorMessage = string.Format( "Request failed due to an IO error, Description = '{0}', Url = '{1}', Method = '{2}'", ioe.Message, address, method );
+        string errorMessage = string.Format(
+          "Request failed due to an IO error, Description = '{0}', Url = '{1}', Method = '{2}'",
+          ioe.Message, address, method );
 
         OnDataError?.Invoke( ioe.Message );
 
@@ -2681,6 +2740,7 @@ namespace TraktAPI
 
       return strResponse;
     }
+    
 
     private static HttpWebRequest CreatePostRequest( string address, string postData, string method, string contentType )
     {
@@ -2716,46 +2776,66 @@ namespace TraktAPI
       return request;
     }
 
-    static string PostToTrakt( string address, string postData, bool logRequest = true, string method = "POST", string contentType = "application/json",
-        bool tryRefresh = true )
+
+    static string PostToTrakt( string address, string postData, bool logRequest = true, string method = "POST", string contentType = "application/json", bool tryRefresh = true )
     {
       if ( OnDataSend != null && logRequest )
         OnDataSend( address, postData );
 
-      Stopwatch watch;
-      var request = CreatePostRequest( address, postData, method, contentType );
-
-      // measure how long it took to get a response
-      watch = Stopwatch.StartNew();
+      Stopwatch watch = Stopwatch.StartNew();
 
       try
       {
-        // get the response
         HttpWebResponse response = null;
-        try
+        int rateLimitRetries = 0;
+
+        // rate-limiting and token expiry loop
+        while ( true )
         {
-          response = (HttpWebResponse)request.GetResponse();
-        }
-        catch ( WebException ex ) when ( IsTokenExpired( ex ) && tryRefresh )
-        {
-          ( ex.Response as HttpWebResponse ).Close();
-          OnDataError?.Invoke( "Token expired, refreshing" );
-          if ( OnTokenExpired() )
+          var request = CreatePostRequest( address, postData, method, contentType );
+
+          try
           {
-            request = CreatePostRequest( address, postData, method, contentType );
-            // measure how long it took to get a response
-            watch = Stopwatch.StartNew();
             response = (HttpWebResponse)request.GetResponse();
+            break;
           }
-          else
+          catch ( WebException ex ) when ( IsTokenExpired( ex ) && tryRefresh )
+          {
+            ( ex.Response as HttpWebResponse )?.Close();
+
+            OnDataError?.Invoke( "Token expired, refreshing" );
+
+            if ( OnTokenExpired?.Invoke() == true )
+            {
+              // refreshed, make request again after token refreshed
+              watch = Stopwatch.StartNew();
+              continue;
+            }
+
             return "Something went wrong with refreshing tokens";
+          }
+          catch ( WebException ex ) when ( IsRateLimited( ex ) && rateLimitRetries < MaxRateLimitRetries )
+          {
+            int retryAfterInSecs = GetRetryAfter( ex );
+            rateLimitRetries++;
+
+            ( ex.Response as HttpWebResponse )?.Close();
+
+            OnDataError?.Invoke( $"Rate limited by Trakt, retrying in {retryAfterInSecs} seconds (attempt {rateLimitRetries}/{MaxRateLimitRetries})" );
+
+            Thread.Sleep( retryAfterInSecs * 1_000 );
+
+            // rate-limited, make request again after waiting
+            watch = Stopwatch.StartNew();
+          }
         }
+
         watch.Stop();
 
-        if ( response == null )
-          return null;
+        if ( response == null ) return null;
 
         string strResponse;
+
         using ( Stream responseStream = response.GetResponseStream() )
         using ( var reader = new StreamReader( responseStream ) )
         {
@@ -2768,10 +2848,8 @@ namespace TraktAPI
         }
 
         OnDataReceived?.Invoke( strResponse, response );
+        OnLatency?.Invoke( watch.Elapsed.TotalMilliseconds, response, ( postData?.Length ?? 0 ) * sizeof( char ), strResponse.Length * sizeof( char ) );
 
-        OnLatency?.Invoke( watch.Elapsed.TotalMilliseconds, response, ( postData?.Length ?? 0 ) * sizeof( char ), strResponse.Length * sizeof( Char ) );
-
-        // cleanup
         response.Close();
 
         return strResponse;
@@ -2782,26 +2860,38 @@ namespace TraktAPI
 
         string result = null;
         string errorMessage = ex.Message;
+
         if ( ex.Status == WebExceptionStatus.ProtocolError )
         {
-          var response = ex.Response as HttpWebResponse;
-
-          if ( response != null )
+          if ( ex.Response is HttpWebResponse response )
           {
             string headers = string.Empty;
+
             foreach ( string key in response.Headers.AllKeys )
             {
               headers += string.Format( "{0}: {1}, ", key, response.Headers[ key ] );
             }
-            errorMessage = string.Format( "Protocol Error, Code = '{0}', Description = '{1}', Url = '{2}', Headers = '{3}'", (int)response.StatusCode, response.StatusDescription, address, headers.TrimEnd( new char[] { ',', ' ' } ) );
 
-            result = new TraktStatus { Code = (int)response.StatusCode, Description = response.StatusDescription }.ToJSON();
+            errorMessage = string.Format(
+              "Protocol Error, Code = '{0}', Description = '{1}', Url = '{2}', Headers = '{3}'",
+              (int)response.StatusCode,
+              response.StatusDescription,
+              address,
+              headers.TrimEnd( new char[] { ',', ' ' } ) );
+
+            result = new TraktStatus
+            {
+              Code = (int)response.StatusCode,
+              Description = response.StatusDescription
+            }.ToJSON();
 
             OnLatency?.Invoke( watch.Elapsed.TotalMilliseconds, response, ( postData?.Length ?? 0 ) * sizeof( char ), 0 );
+
+            response.Close();
           }
         }
 
-        // don't log an error on the authentication process if polling (status code 400)
+        // Don't log an error on the authentication process if polling (status code 400).
         if ( !address.Contains( "oauth/device/token" ) || !( result?.Contains( "400" ) ?? false ) )
         {
           OnDataError?.Invoke( errorMessage );
@@ -2811,7 +2901,9 @@ namespace TraktAPI
       }
       catch ( IOException ioe )
       {
-        string errorMessage = string.Format( "Request failed due to an IO error, Description = '{0}', Url = '{1}', Method = '{2}'", ioe.Message, address, method );
+        string errorMessage = string.Format(
+          "Request failed due to an IO error, Description = '{0}', Url = '{1}', Method = '{2}'",
+          ioe.Message, address, method );
 
         OnDataError?.Invoke( ioe.Message );
 
