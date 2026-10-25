@@ -535,14 +535,17 @@ namespace TraktPlugin.TraktHandlers
               TraktLogger.LogTraktResponse<TraktSyncResponse>( response );
 
               // only add to cache if it was a success
-              if ( response != null && response.Added != null && response.Added.Episodes == showEpisodeCount )
+              if ( response != null && response.Added != null )
               {
-                // update local cache
-                TraktCache.AddEpisodesToCollection( show );
+                // update local cache if all episodes added successfully
+                if ( response.Added.Episodes == showEpisodeCount )
+                {
+                  TraktCache.AddEpisodesToCollection( show );
+                }
 
-                // Update collection counts.
-                currentCollectionCount += showEpisodeCount;
-                remainingCapacity -= showEpisodeCount;
+                // Update collection counts using the number actually added.
+                currentCollectionCount += response.Added.Episodes;
+                remainingCapacity -= response.Added.Episodes;
               }
             }
           }

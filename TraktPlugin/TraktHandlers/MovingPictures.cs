@@ -359,39 +359,71 @@ namespace TraktPlugin.TraktHandlers
         #region Add movies to collection at trakt.tv
         if ( traktCollectedMovies != null )
         {
-          var syncCollectedMovies = new List<TraktSyncMovieCollected>();
           TraktLogger.Info( "Finding movies to add to trakt.tv collection" );
 
-          syncCollectedMovies = ( from movie in collectedMovies
-                                  where !traktCollectedMovies.ToList().Exists( c => MovieMatch( movie, c.Movie ) )
-                                  select new TraktSyncMovieCollected
-                                  {
-                                    Ids = new TraktMovieId { Imdb = movie.ImdbID.ToNullIfEmpty(), Tmdb = GetTmdbID( movie ).ToNullableInt32() },
-                                    Title = movie.Title,
-                                    Year = movie.Year,
-                                    CollectedAt = movie.DateAdded.ToUniversalTime().ToISO8601(),
-                                    MediaType = GetMovieMediaType( movie ),
-                                    Resolution = GetMovieResolution( movie ),
-                                    AudioCodec = GetMovieAudioCodec( movie ),
-                                    AudioChannels = GetMovieAudioChannels( movie ),
-                                    Is3D = IsMovie3D( movie ),
-                                    HdrType = IsHdrCompatible ? GetMovieHdrInfo( movie ) : null
-                                  } ).ToList();
+          var onlineMovies = traktCollectedMovies.ToList();
 
-          TraktLogger.Info( "Adding {0} movies to trakt.tv collection", syncCollectedMovies.Count );
-
-          if ( syncCollectedMovies.Count > 0 )
-          {
-            // update internal cache
-            TraktCache.AddMoviesToCollection( syncCollectedMovies );
-
-            int pageSize = TraktSettings.SyncBatchSize;
-            int pages = (int)Math.Ceiling( (double)syncCollectedMovies.Count / pageSize );
-            for ( int i = 0; i < pages; i++ )
+          var syncCollectedMovies = ( 
+            from movie in collectedMovies
+            where !onlineMovies.Exists( c => MovieMatch( movie, c.Movie ) )
+            select new TraktSyncMovieCollected
             {
-              TraktLogger.Info( "Adding movies [{0}/{1}] to trakt.tv collection", i + 1, pages );
+              Ids = new TraktMovieId { Imdb = movie.ImdbID.ToNullIfEmpty(), Tmdb = GetTmdbID( movie ).ToNullableInt32() },
+              Title = movie.Title,
+              Year = movie.Year,
+              CollectedAt = movie.DateAdded.ToUniversalTime().ToISO8601(),
+              MediaType = GetMovieMediaType( movie ),
+              Resolution = GetMovieResolution( movie ),
+              AudioCodec = GetMovieAudioCodec( movie ),
+              AudioChannels = GetMovieAudioChannels( movie ),
+              Is3D = IsMovie3D( movie ),
+              HdrType = IsHdrCompatible ? GetMovieHdrInfo( movie ) : null
+            } ).ToList();
 
-              var pagedMovies = syncCollectedMovies.Skip( i * pageSize ).Take( pageSize ).ToList();
+          // collection limit for this account
+          uint collectionLimit = TraktSettings.OnlineSettings.Limits.Collection.ItemCount;
+          // current collection count online (could be inaccurate)
+          int currentCollectionCount = traktCollectedMovies.Count() + ( TraktCache.GetCollectedEpisodesFromTrakt( ignoreLastSyncTime: true )?.Count() ?? 0 );
+          // number of movies we want to add to the current collection online
+          int syncMovieCount = syncCollectedMovies.Count;
+          // our remaining capacity online 
+          int remainingCapacity = (int)collectionLimit - currentCollectionCount;
+
+          TraktLogger.Info( "Adding {0} movies to trakt.tv collection", syncMovieCount );
+
+          if ( remainingCapacity <= 0 && syncMovieCount > 0 )
+          {
+            TraktLogger.Warning( $"Unable to add movies to collection due to trakt.tv account limits. Current collection limit of {collectionLimit} has already been reached" );
+          }
+          else if ( syncMovieCount > 0 )
+          {
+            int i = 0;
+            int offset = 0;
+            int pageSize = TraktSettings.SyncBatchSize;
+            int pages = (int)Math.Ceiling( (double)syncMovieCount / pageSize );
+
+            while ( offset < syncCollectedMovies.Count )
+            {
+              // quit if no more remaining capacity
+              if ( remainingCapacity <= 0 )
+              {
+                TraktLogger.Warning(
+                  $"Unable to add remaining {syncMovieCount} movies to collection due to trakt.tv account limits. " +
+                  $"Current collection contains {currentCollectionCount} movies and episodes with 0 slots remaining." );
+
+                // no point looking for a smaller page but we could grab only a subset if we wanted
+                break;
+              }
+
+              TraktLogger.Info( "Adding movies [{0}/{1}] to trakt.tv collection", ++i, pages );
+
+              // ensure page size also takes into account the remaining capacity
+              var pagedMovies = syncCollectedMovies
+                .Skip( offset )
+                .Take( Math.Min( pageSize, remainingCapacity ) )
+                .ToList();
+
+              offset += pagedMovies.Count;
 
               pagedMovies.ForEach( s => TraktLogger.Info( "Adding movie to trakt.tv collection. Title = '{0}', Year = '{1}', IMDb ID = '{2}', TMDb ID = '{3}', Date Added = '{4}', MediaType = '{5}', Resolution = '{6}', Audio Codec = '{7}', Audio Channels = '{8}'",
                                                           s.Title, s.Year.HasValue ? s.Year.ToString() : "<empty>", s.Ids.Imdb ?? "<empty>", s.Ids.Tmdb.HasValue ? s.Ids.Tmdb.ToString() : "<empty>",
@@ -406,10 +438,19 @@ namespace TraktPlugin.TraktHandlers
               var response = TraktAPI.TraktAPI.AddMoviesToCollecton( new TraktSyncMoviesCollected { Movies = pagedMovies } );
               TraktLogger.LogTraktResponse( response );
 
-              // remove movies from cache which didn't succeed
-              if ( response != null && response.NotFound != null && response.NotFound.Movies.Count > 0 )
+              // only add to cache if it was a success
+              if ( response != null && response.Added != null )
               {
-                TraktCache.RemoveMoviesFromCollection( response.NotFound.Movies );
+                // update local cache if all movies added successfully
+                if ( response.Added.Movies == pagedMovies.Count )
+                {
+                  TraktCache.AddMoviesToCollection( pagedMovies );
+                }
+
+                // Update collection counts using the number actually added.
+                currentCollectionCount += response.Added.Movies;
+                remainingCapacity -= response.Added.Movies;
+                syncMovieCount -= response.Added.Movies;
               }
             }
           }
