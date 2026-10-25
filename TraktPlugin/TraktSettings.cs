@@ -671,7 +671,17 @@ namespace TraktPlugin
             var response = TraktAPI.TraktAPI.GetUserSettings();
             if ( response != null && response.User != null )
             {
-              TraktLogger.Info( "User {0} successfully signed in and retrieved online settings from trakt.tv", response.User.Username );
+              TraktLogger.Info(
+                "User {0} successfully signed in and retrieved online settings from trakt.tv",
+                response.User.Username );
+
+              TraktLogger.Info(
+                "Account limits: Collection = {0}, Lists = {1}, Watchlist = {2}, Favourites = {3}",
+                response.Limits.Collection.ItemCount,
+                response.Limits.List.ItemCount,
+                response.Limits.Watchlist.ItemCount,
+                response.Limits.Favourites.ItemCount );
+
               _AccountStatus = ConnectionState.Connected;
 
               // update username incase it has been updated online

@@ -485,33 +485,68 @@ namespace TraktPlugin.TraktHandlers
         {
           var syncCollectedShows = GetCollectedShowsForSyncEx( localCollectedEpisodes, traktCollectedEpisodes );
 
-          TraktLogger.Info( "Found {0} local tv show(s) with {1} collected episode(s) to add to trakt.tv collection", syncCollectedShows.Shows.Count, syncCollectedShows.Shows.Sum( sh => sh.Seasons.Sum( se => se.Episodes.Count() ) ) );
+          // collection limit for this account
+          uint collectionLimit = TraktSettings.OnlineSettings.Limits.Collection.ItemCount;
+          // current collection count online (could be inaccurate)
+          int currentCollectionCount = traktCollectedEpisodes.Count() + ( TraktCache.GetCollectedMoviesFromTrakt( ignoreLastSyncTime: true )?.Count() ?? 0 );
+          // number of episodes we want to add to the current collection online
+          int syncEpisodeCount = syncCollectedShows.Shows.Sum( show => show.Seasons.Sum( season => season.Episodes.Count() ) );
+          // our remaining capacity online 
+          int remainingCapacity = (int)collectionLimit - currentCollectionCount;
 
-          iSyncCounter = 0;
-          showCount = syncCollectedShows.Shows.Count;
-          foreach ( var show in syncCollectedShows.Shows )
+          TraktLogger.Info( "Found {0} local tv show(s) with {1} collected episode(s) to add to trakt.tv collection", syncCollectedShows.Shows.Count, syncEpisodeCount );
+
+          if ( remainingCapacity <= 0 && syncEpisodeCount > 0 )
           {
-            int showEpisodeCount = show.Seasons.Sum( s => s.Episodes.Count() );
-            TraktLogger.Info( "Adding tv show [{0}/{1}] to trakt.tv episode collection, Episode Count = '{2}', Show Title = '{3}', Show Year = '{4}', Show TVDb ID = '{5}', Show IMDb ID = '{6}'",
-                                ++iSyncCounter, showCount, showEpisodeCount, show.Title, show.Year.HasValue ? show.Year.ToString() : "<empty>", show.Ids.Tvdb, show.Ids.Imdb ?? "<empty>" );
-
-            show.Seasons.ForEach( s => s.Episodes.ForEach( e =>
+            TraktLogger.Warning( $"Unable to add episodes to collection due to trakt.tv account limits. Current collection limit of {collectionLimit} has already been reached" );
+          }
+          else
+          {
+            iSyncCounter = 0;
+            showCount = syncCollectedShows.Shows.Count;
+            foreach ( var show in syncCollectedShows.Shows )
             {
-              TraktLogger.Info( $"Adding episode to trakt.tv collection, Title = '{show.Title} - {s.Number}x{e.Number}', Collected At = '{e.CollectedAt.ToLogString()}', Audio Channels = '{e.AudioChannels.ToLogString()}', Audio Codec = '{e.AudioCodec.ToLogString()}', Resolution = '{e.Resolution.ToLogString()}', HDR = '{e.HdrType.ToLogString()}', Media Type = '{e.MediaType.ToLogString()}', Is 3D = '{e.Is3D}'" );
-            } ) );
+              // number of episodes for this show to be added to online collection
+              int showEpisodeCount = show.Seasons.Sum( s => s.Episodes.Count() );
 
-            // only sync one show at a time regardless of batch size in settings
-            var pagedShows = new List<TraktSyncShowCollectedEx>();
-            pagedShows.Add( show );
+              TraktLogger.Info( "Adding tv show [{0}/{1}] to trakt.tv episode collection, Episode Count = '{2}', Show Title = '{3}', Show Year = '{4}', Show TVDb ID = '{5}', Show IMDb ID = '{6}'",
+                                  ++iSyncCounter, showCount, showEpisodeCount, show.Title, show.Year.HasValue ? show.Year.ToString() : "<empty>", show.Ids.Tvdb, show.Ids.Imdb ?? "<empty>" );
 
-            var response = TraktAPI.TraktAPI.AddShowsToCollectonEx( new TraktSyncShowsCollectedEx { Shows = pagedShows } );
-            TraktLogger.LogTraktResponse<TraktSyncResponse>( response );
+              // continue until we have enough capacity
+              if ( showEpisodeCount > remainingCapacity )
+              {
+                TraktLogger.Warning(
+                  $"Unable to add {show.Title} episodes to collection due to trakt.tv account limits. " +
+                  $"Adding {showEpisodeCount} episodes would exceed the limit of {collectionLimit}. " +
+                  $"Current collection contains {currentCollectionCount} movies and episodes with {remainingCapacity} slots remaining." );
 
-            // only add to cache if it was a success
-            if ( response != null && response.Added != null && response.Added.Episodes == showEpisodeCount )
-            {
-              // update local cache
-              TraktCache.AddEpisodesToCollection( show );
+                continue;
+              }
+
+              show.Seasons.ForEach( s => s.Episodes.ForEach( e =>
+              {
+                TraktLogger.Info( $"Adding episode to trakt.tv collection, Title = '{show.Title} - {s.Number}x{e.Number}', Collected At = '{e.CollectedAt.ToLogString()}', Audio Channels = '{e.AudioChannels.ToLogString()}', Audio Codec = '{e.AudioCodec.ToLogString()}', Resolution = '{e.Resolution.ToLogString()}', HDR = '{e.HdrType.ToLogString()}', Media Type = '{e.MediaType.ToLogString()}', Is 3D = '{e.Is3D}'" );
+              } ) );
+
+              // only sync one show at a time regardless of batch size in settings
+              var pagedShows = new List<TraktSyncShowCollectedEx> { show };
+
+              var response = TraktAPI.TraktAPI.AddShowsToCollectonEx( new TraktSyncShowsCollectedEx { Shows = pagedShows } );
+              TraktLogger.LogTraktResponse<TraktSyncResponse>( response );
+
+              // only add to cache if it was a success
+              if ( response != null && response.Added != null )
+              {
+                // update local cache if all episodes added successfully
+                if ( response.Added.Episodes == showEpisodeCount )
+                {
+                  TraktCache.AddEpisodesToCollection( show );
+                }
+
+                // Update collection counts using the number actually added.
+                currentCollectionCount += response.Added.Episodes;
+                remainingCapacity -= response.Added.Episodes;
+              }
             }
           }
         }

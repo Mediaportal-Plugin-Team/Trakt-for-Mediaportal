@@ -8,6 +8,9 @@ namespace TraktAPI.DataModels
     [DataMember( Name = "timezone" )]
     public string Timezone { get; set; }
 
+    [DataMember( Name = "date_format" )]
+    public string DateFormat { get; set; }
+
     [DataMember( Name = "time_24hr" )]
     public bool MiltaryTime { get; set; }
 

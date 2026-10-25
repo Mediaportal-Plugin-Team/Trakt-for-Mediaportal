@@ -7,5 +7,8 @@ namespace TraktAPI.DataModels
   {
     [DataMember( Name = "slug" )]
     public string Slug { get; set; }
+
+    [DataMember( Name = "uuid" )]
+    public string Uuid { get; set; }
   }
 }

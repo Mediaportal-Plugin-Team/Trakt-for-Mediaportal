@@ -22,5 +22,17 @@ namespace TraktAPI.DataModels
 
     [DataMember( Name = "slack" )]
     public bool Slack { get; set; }
+
+    [DataMember( Name = "mastodon" )]
+    public bool Mastodon { get; set; }
+
+    [DataMember( Name = "apple" )]
+    public bool Apple { get; set; }
+
+    [DataMember( Name = "dropbox" )]
+    public bool Dropbox { get; set; }
+
+    [DataMember( Name = "microsoft" )]
+    public bool Microsoft { get; set; }
   }
 }
