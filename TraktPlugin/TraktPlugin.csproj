@@ -304,6 +304,7 @@
     <Compile Include="TmdbAPI\TmdbAPI.cs" />
     <Compile Include="TmdbAPI\TmdbURIs.cs" />
     <Compile Include="Cache\TraktCache.cs" />
+    <Compile Include="TmdbAPI\TmdbCredentials.cs" />
     <Compile Include="TraktCredentials.cs" />
     <Compile Include="TraktDashboard.cs" />
     <Compile Include="TraktGenres.cs" />
