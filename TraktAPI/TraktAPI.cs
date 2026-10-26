@@ -1470,6 +1470,17 @@ namespace TraktAPI
     }
 
     /// <summary>
+    /// Returns list of show finales (mid_season_finale, season_finale, series_finale) in the users Calendar
+    /// </summary>
+    /// <param name="startDate">Start Date of calendar in the form yyyy-MM-dd</param>
+    /// <param name="days">Number of days to return in calendar, maximum days allowed is 31</param>
+    public static IEnumerable<TraktShowCalendar> GetCalendarUserFinaleShows( string startDate, int days = 7 )
+    {
+      string calendar = GetFromTrakt( string.Format( TraktURIs.CalendarMyFinaleShows, startDate, days ), "GET" );
+      return calendar.FromJSONArray<TraktShowCalendar>();
+    }
+
+    /// <summary>
     /// Returns list of season premiere episodes in the users Calendar
     /// </summary>
     /// <param name="startDate">Start Date of calendar in the form yyyy-MM-dd</param>
@@ -1513,6 +1524,17 @@ namespace TraktAPI
       return calendar.FromJSONArray<TraktShowCalendar>();
     }
 
+    // <summary>
+    /// Returns list of all show finales (mid_season_finale, season_finale, series_finale) in the Calendar
+    /// </summary>
+    /// <param name="startDate">Start Date of calendar in the form yyyy-MM-dd</param>
+    /// <param name="days">Number of days to return in calendar, maximum days allowed is 31</param>
+    public static IEnumerable<TraktShowCalendar> GetCalendarFinaleShows( string startDate, int days = 7 )
+    {
+      string calendar = GetFromTrakt( string.Format( TraktURIs.CalendarAllFinaleShows, startDate, days ), "GET" );
+      return calendar.FromJSONArray<TraktShowCalendar>();
+    }
+
     #endregion
 
     #region Movie Calendar
@@ -1540,6 +1562,17 @@ namespace TraktAPI
     }
 
     /// <summary>
+    /// Returns list of movies with a us streaming release date during the time period specified.
+    /// </summary>
+    /// <param name="startDate">Start Date of calendar in the form yyyy-MM-dd</param>
+    /// <param name="days">Number of days to return in calendar, maximum days allowed is 31</param>
+    public static IEnumerable<TraktMovieCalendar> GetCalendarUserStreamingMovies( string startDate, int days = 7 )
+    {
+      string calendar = GetFromTrakt( string.Format( TraktURIs.CalendarMyStreamingMovies, startDate, days ), "GET" );
+      return calendar.FromJSONArray<TraktMovieCalendar>();
+    }
+
+    /// <summary>
     /// Returns list of all movies in the Calendar
     /// </summary>
     /// <param name="startDate">Start Date of calendar in the form yyyy-MM-dd</param>
@@ -1558,6 +1591,17 @@ namespace TraktAPI
     public static IEnumerable<TraktMovieCalendar> GetCalendarDVDs( string startDate, int days = 7 )
     {
       string calendar = GetFromTrakt( string.Format( TraktURIs.CalendarAllDVDs, startDate, days ), "GET" );
+      return calendar.FromJSONArray<TraktMovieCalendar>();
+    }
+
+    /// <summary>
+    /// Returns list of movies with a us streaming release date during the time period specified
+    /// </summary>
+    /// <param name="startDate">Start Date of calendar in the form yyyy-MM-dd</param>
+    /// <param name="days">Number of days to return in calendar, maximum days allowed is 31</param>
+    public static IEnumerable<TraktMovieCalendar> GetCalendarStreamingMovies( string startDate, int days = 7 )
+    {
+      string calendar = GetFromTrakt( string.Format( TraktURIs.CalendarAllStreamingMovies, startDate, days ), "GET" );
       return calendar.FromJSONArray<TraktMovieCalendar>();
     }
 

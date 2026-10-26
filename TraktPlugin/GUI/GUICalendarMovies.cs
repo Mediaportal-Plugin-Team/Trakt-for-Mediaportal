@@ -50,8 +50,10 @@ namespace TraktPlugin.GUI
     {
       UserMovies,
       UserDVDs,
+      UserStreaming,
       AllMovies,
-      AllDVDs
+      AllDVDs,
+      AllStreaming,
     }
 
     enum ContextMenuItem
@@ -111,7 +113,7 @@ namespace TraktPlugin.GUI
     int CurrentPage;
     int PreviousSelectedIndex;
 
-    ImageSwapper backdrop;
+    readonly ImageSwapper backdrop;
     static DateTime LastRequest = new DateTime();
 
     bool FilterHiddenMovies;
@@ -131,11 +133,17 @@ namespace TraktPlugin.GUI
         case CalendarType.UserDVDs:
           result = TraktAPI.TraktAPI.GetCalendarUserDVDs( GetStartDate().ToString( "yyyy-MM-dd" ), GetDaysForward() );
           break;
+        case CalendarType.UserStreaming:
+          result = TraktAPI.TraktAPI.GetCalendarUserStreamingMovies( GetStartDate().ToString( "yyyy-MM-dd" ), GetDaysForward() );
+          break;
         case CalendarType.AllMovies:
           result = TraktAPI.TraktAPI.GetCalendarMovies( GetStartDate().ToString( "yyyy-MM-dd" ), GetDaysForward() );
           break;
         case CalendarType.AllDVDs:
           result = TraktAPI.TraktAPI.GetCalendarDVDs( GetStartDate().ToString( "yyyy-MM-dd" ), GetDaysForward() );
+          break;
+        case CalendarType.AllStreaming:
+          result = TraktAPI.TraktAPI.GetCalendarStreamingMovies( GetStartDate().ToString( "yyyy-MM-dd" ), GetDaysForward() );
           break;
       }
 
@@ -745,11 +753,17 @@ namespace TraktPlugin.GUI
         case CalendarType.UserDVDs:
           return Translation.CalendarMyDVDs;
 
+        case CalendarType.UserStreaming:
+          return Translation.CalendarMyStreaming;
+
         case CalendarType.AllMovies:
           return Translation.CalendarAllMovies;
 
         case CalendarType.AllDVDs:
           return Translation.CalendarAllDVDs;
+
+        case CalendarType.AllStreaming:
+          return Translation.CalendarAllStreaming;
 
         default:
           return Translation.CalendarMyMovies;
@@ -1138,11 +1152,17 @@ namespace TraktPlugin.GUI
         case CalendarType.UserDVDs:
           GUICommon.SetProperty( "#Trakt.CurrentView", Translation.CalendarMyDVDs );
           break;
+        case CalendarType.UserStreaming:
+          GUICommon.SetProperty( "#Trakt.CurrentView", Translation.CalendarMyStreaming );
+          break;
         case CalendarType.AllMovies:
           GUICommon.SetProperty( "#Trakt.CurrentView", Translation.CalendarAllMovies );
           break;
         case CalendarType.AllDVDs:
           GUICommon.SetProperty( "#Trakt.CurrentView", Translation.CalendarAllDVDs );
+          break;
+        case CalendarType.AllStreaming:
+          GUICommon.SetProperty( "#Trakt.CurrentView", Translation.CalendarAllStreaming );
           break;
       }
     }

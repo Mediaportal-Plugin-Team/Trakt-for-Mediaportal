@@ -54,9 +54,11 @@ namespace TraktPlugin.GUI
       UserShows,
       UserSeasonPremieres,
       UserNewShows,
+      UserFinales,
       AllShows,
       AllNewShows,
-      AllSeasonPremieres
+      AllSeasonPremieres,
+      AllFinales,
     }
 
     enum ContextMenuItem
@@ -144,6 +146,9 @@ namespace TraktPlugin.GUI
         case CalendarType.UserNewShows:
           result = TraktAPI.TraktAPI.GetCalendarUserNewShows( GetStartDate().ToString( "yyyy-MM-dd" ), GetDaysForward() );
           break;
+        case CalendarType.UserFinales:
+          result = TraktAPI.TraktAPI.GetCalendarUserFinaleShows( GetStartDate().ToString( "yyyy-MM-dd" ), GetDaysForward() );
+          break;
         case CalendarType.AllShows:
           result = TraktAPI.TraktAPI.GetCalendarShows( GetStartDate().ToString( "yyyy-MM-dd" ), GetDaysForward() );
           break;
@@ -152,6 +157,9 @@ namespace TraktPlugin.GUI
           break;
         case CalendarType.AllNewShows:
           result = TraktAPI.TraktAPI.GetCalendarNewShows( GetStartDate().ToString( "yyyy-MM-dd" ), GetDaysForward() );
+          break;
+        case CalendarType.AllFinales:
+          result = TraktAPI.TraktAPI.GetCalendarFinaleShows( GetStartDate().ToString( "yyyy-MM-dd" ), GetDaysForward() );
           break;
       }
 
@@ -851,6 +859,9 @@ namespace TraktPlugin.GUI
         case CalendarType.UserSeasonPremieres:
           return Translation.CalendarMyPremieres;
 
+        case CalendarType.UserFinales:
+          return Translation.CalendarMyFinales;
+
         case CalendarType.AllShows:
           return Translation.CalendarAllShows;
 
@@ -859,6 +870,9 @@ namespace TraktPlugin.GUI
 
         case CalendarType.AllSeasonPremieres:
           return Translation.CalendarAllPremieres;
+
+        case CalendarType.AllFinales:
+          return Translation.CalendarAllFinales;
 
         default:
           return Translation.CalendarMyShows;
@@ -1279,6 +1293,9 @@ namespace TraktPlugin.GUI
         case CalendarType.UserSeasonPremieres:
           GUICommon.SetProperty( "#Trakt.CurrentView", Translation.CalendarMySeasonPremieres );
           break;
+        case CalendarType.UserFinales:
+          GUICommon.SetProperty( "#Trakt.CurrentView", Translation.CalendarMyFinales );
+          break;
         case CalendarType.AllShows:
           GUICommon.SetProperty( "#Trakt.CurrentView", Translation.CalendarAllShows );
           break;
@@ -1287,6 +1304,9 @@ namespace TraktPlugin.GUI
           break;
         case CalendarType.AllSeasonPremieres:
           GUICommon.SetProperty( "#Trakt.CurrentView", Translation.CalendarAllSeasonPremieres );
+          break;
+        case CalendarType.AllFinales:
+          GUICommon.SetProperty( "#Trakt.CurrentView", Translation.CalendarAllFinales );
           break;
       }
     }

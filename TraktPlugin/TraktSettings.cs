@@ -22,7 +22,7 @@ namespace TraktPlugin
     private static readonly Object lockObject = new object();
 
     #region Settings
-    static readonly int SettingsVersion = 14;
+    static readonly int SettingsVersion = 15;
 
     public static int MovingPictures { get; set; }
     public static int TVSeries { get; set; }
@@ -823,7 +823,7 @@ namespace TraktPlugin
         SeasonEpisodesDefaultLayout = xmlreader.GetValueAsInt( cTrakt, cSeasonEpisodesDefaultLayout, 0 );
         DefaultTVCalendarView = xmlreader.GetValueAsInt( cTrakt, cDefaultTVCalendarView, 0 );
         DefaultTVCalendarStartDate = xmlreader.GetValueAsInt( cTrakt, cDefaultTVCalendarStartDate, 0 );
-        DefaultMovieCalendarView = xmlreader.GetValueAsInt( cTrakt, cDefaultMovieCalendarView, 0 );
+        DefaultMovieCalendarView = xmlreader.GetValueAsInt( cTrakt, cDefaultMovieCalendarView, 3 /* All Movies */ );
         DefaultMovieCalendarStartDate = xmlreader.GetValueAsInt( cTrakt, cDefaultMovieCalendarStartDate, 0 );
         DownloadFullSizeFanart = xmlreader.GetValueAsBool( cTrakt, cDownloadFullSizeFanart, false );
         DownloadFanart = xmlreader.GetValueAsBool( cTrakt, cDownloadFanart, true );
@@ -1549,6 +1549,12 @@ namespace TraktPlugin
             case 13:
               // new settings for the dashboard activity filter (Favorites)
               xmlreader.RemoveEntry( cTrakt, cDashboardActivityFilter );
+              currentSettingsVersion++;
+              break;
+            case 14:
+              // calendar views updated
+              xmlreader.RemoveEntry( cTrakt, cDefaultTVCalendarView );
+              xmlreader.RemoveEntry( cTrakt, cDefaultMovieCalendarView );
               currentSettingsVersion++;
               break;
           }
