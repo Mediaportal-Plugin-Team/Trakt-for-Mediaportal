@@ -823,7 +823,7 @@ namespace TraktPlugin
         SeasonEpisodesDefaultLayout = xmlreader.GetValueAsInt( cTrakt, cSeasonEpisodesDefaultLayout, 0 );
         DefaultTVCalendarView = xmlreader.GetValueAsInt( cTrakt, cDefaultTVCalendarView, 0 );
         DefaultTVCalendarStartDate = xmlreader.GetValueAsInt( cTrakt, cDefaultTVCalendarStartDate, 0 );
-        DefaultMovieCalendarView = xmlreader.GetValueAsInt( cTrakt, cDefaultMovieCalendarView, 0 );
+        DefaultMovieCalendarView = xmlreader.GetValueAsInt( cTrakt, cDefaultMovieCalendarView, 3 /* All Movies */ );
         DefaultMovieCalendarStartDate = xmlreader.GetValueAsInt( cTrakt, cDefaultMovieCalendarStartDate, 0 );
         DownloadFullSizeFanart = xmlreader.GetValueAsBool( cTrakt, cDownloadFullSizeFanart, false );
         DownloadFanart = xmlreader.GetValueAsBool( cTrakt, cDownloadFanart, true );
@@ -1554,6 +1554,7 @@ namespace TraktPlugin
             case 14:
               // calendar views updated
               xmlreader.RemoveEntry( cTrakt, cDefaultTVCalendarView );
+              xmlreader.RemoveEntry( cTrakt, cDefaultMovieCalendarView );
               currentSettingsVersion++;
               break;
           }

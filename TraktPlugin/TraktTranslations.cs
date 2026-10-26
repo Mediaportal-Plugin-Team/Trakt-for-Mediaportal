@@ -356,6 +356,7 @@ namespace TraktPlugin.GUI
     public static string CalendarMySeasonPremieres = "My Season Premieres";
     public static string CalendarMyMovies = "My Movies";
     public static string CalendarMyDVDs = "My DVDs and Blurays";
+    public static string CalendarMyStreaming = "My Streaming Releases";
     public static string CalendarPremieres = "Premieres";
     public static string CalendarAllFinales = "All Finales";
     public static string CalendarAllPremieres = "All Premieres";
@@ -364,6 +365,7 @@ namespace TraktPlugin.GUI
     public static string CalendarAllDVDs = "All DVDs and Blurays";
     public static string CalendarAllNewShows = "All New Shows";
     public static string CalendarAllSeasonPremieres = "All Season Premieres";
+    public static string CalendarAllStreaming = "All Streaming Releases";
     public static string Certification = "Certification";
     public static string Cast = "Cast";
     public static string CastAndCrew = "Cast and Crew";
