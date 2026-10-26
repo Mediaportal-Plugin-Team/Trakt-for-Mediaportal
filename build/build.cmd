@@ -42,12 +42,19 @@ IF DEFINED CLIENT_SECRET (
   "Tools\Tools\sed.exe" -i -r "s/SECRET_PLACEHOLDER_CLIENT_SECRET/%CLIENT_SECRET%/g" "TraktPlugin\TraktCredentials.cs"
 )
 
+REM Prepare Tmdb API Key
+IF DEFINED TMDB_API_SECRET (
+  ECHO [INFO] Tmdb API Key found...
+  "Tools\Tools\sed.exe" -i -r "s/SECRET_PLACEHOLDER_TMDB_API_KEY/%TMDB_API_KEY%/g" "TraktPlugin\TmdbAPI\TmdbCredentials.cs"
+)
+
 REM Build
 "%MSBUILD_PATH%" /target:Rebuild /property:Configuration=RELEASE /property:Platform=%ARCH% /fl /flp:logfile=Trakt.log;verbosity=diagnostic TraktPlugin.sln
 
 REM Revert version
 git checkout "TraktPlugin\Properties\AssemblyInfo.cs"
 git checkout "TraktPlugin\TraktCredentials.cs"
+git checkout "TraktPlugin\TmdbAPI\TmdbCredentials.cs"
 
 CD build
 PAUSE
