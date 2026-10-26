@@ -22,7 +22,7 @@ namespace TraktPlugin
     private static readonly Object lockObject = new object();
 
     #region Settings
-    static readonly int SettingsVersion = 14;
+    static readonly int SettingsVersion = 15;
 
     public static int MovingPictures { get; set; }
     public static int TVSeries { get; set; }
@@ -1549,6 +1549,11 @@ namespace TraktPlugin
             case 13:
               // new settings for the dashboard activity filter (Favorites)
               xmlreader.RemoveEntry( cTrakt, cDashboardActivityFilter );
+              currentSettingsVersion++;
+              break;
+            case 14:
+              // calendar views updated
+              xmlreader.RemoveEntry( cTrakt, cDefaultTVCalendarView );
               currentSettingsVersion++;
               break;
           }

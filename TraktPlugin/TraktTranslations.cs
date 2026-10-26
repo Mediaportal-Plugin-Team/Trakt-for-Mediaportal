@@ -349,6 +349,7 @@ namespace TraktPlugin.GUI
     public static string Cancel = "Cancel";
     public static string Canceled = "Cancelled";
     public static string Calendar = "Calendar";
+    public static string CalendarMyFinales = "My Finales";
     public static string CalendarMyShows = "My Shows";
     public static string CalendarMyNewShows = "My New Shows";
     public static string CalendarMyPremieres = "My Premieres";
@@ -356,6 +357,7 @@ namespace TraktPlugin.GUI
     public static string CalendarMyMovies = "My Movies";
     public static string CalendarMyDVDs = "My DVDs and Blurays";
     public static string CalendarPremieres = "Premieres";
+    public static string CalendarAllFinales = "All Finales";
     public static string CalendarAllPremieres = "All Premieres";
     public static string CalendarAllShows = "All Shows";
     public static string CalendarAllMovies = "All Movies";

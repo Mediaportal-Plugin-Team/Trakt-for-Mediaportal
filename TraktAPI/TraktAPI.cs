@@ -1470,6 +1470,17 @@ namespace TraktAPI
     }
 
     /// <summary>
+    /// Returns list of show finales (mid_season_finale, season_finale, series_finale) in the users Calendar
+    /// </summary>
+    /// <param name="startDate">Start Date of calendar in the form yyyy-MM-dd</param>
+    /// <param name="days">Number of days to return in calendar, maximum days allowed is 31</param>
+    public static IEnumerable<TraktShowCalendar> GetCalendarUserFinaleShows( string startDate, int days = 7 )
+    {
+      string calendar = GetFromTrakt( string.Format( TraktURIs.CalendarMyFinaleShows, startDate, days ), "GET" );
+      return calendar.FromJSONArray<TraktShowCalendar>();
+    }
+
+    /// <summary>
     /// Returns list of season premiere episodes in the users Calendar
     /// </summary>
     /// <param name="startDate">Start Date of calendar in the form yyyy-MM-dd</param>
@@ -1510,6 +1521,17 @@ namespace TraktAPI
     public static IEnumerable<TraktShowCalendar> GetCalendarSeasonPremieresShows( string startDate, int days = 7 )
     {
       string calendar = GetFromTrakt( string.Format( TraktURIs.CalendarAllSeasonPremieresShows, startDate, days ), "GET" );
+      return calendar.FromJSONArray<TraktShowCalendar>();
+    }
+
+    // <summary>
+    /// Returns list of all show finales (mid_season_finale, season_finale, series_finale) in the Calendar
+    /// </summary>
+    /// <param name="startDate">Start Date of calendar in the form yyyy-MM-dd</param>
+    /// <param name="days">Number of days to return in calendar, maximum days allowed is 31</param>
+    public static IEnumerable<TraktShowCalendar> GetCalendarFinaleShows( string startDate, int days = 7 )
+    {
+      string calendar = GetFromTrakt( string.Format( TraktURIs.CalendarAllFinaleShows, startDate, days ), "GET" );
       return calendar.FromJSONArray<TraktShowCalendar>();
     }
 

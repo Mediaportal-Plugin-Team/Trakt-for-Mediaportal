@@ -107,6 +107,7 @@
   <string name="Cancel">Cancel</string>
   <string name="Canceled">Cancelled</string>
   <string name="Calendar">Calendar</string>
+  <string name="CalendarMyFinales">My Finales</string>
   <string name="CalendarMyShows">My Shows</string>
   <string name="CalendarMyMovies">My Movies</string>
   <string name="CalendarMyDVDs">My DVDs and Blurays</string>
@@ -114,6 +115,7 @@
   <string name="CalendarMyPremieres">My Premieres</string>
   <string name="CalendarMySeasonPremieres">My Season Premieres</string>  
   <string name="CalendarPremieres">Premieres</string>
+  <string name="CalendarAllFinales">All Finales</string>
   <string name="CalendarAllPremieres">All Premieres</string>
   <string name="CalendarAllMovies">All Movies</string>
   <string name="CalendarAllDVDs">All DVDs and Blurays</string>
