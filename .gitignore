@@ -46,3 +46,4 @@ packages/
 
 # Trakt
 **/TraktCredentials.cs
+/.vscode

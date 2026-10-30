@@ -43,7 +43,7 @@ IF DEFINED CLIENT_SECRET (
 )
 
 REM Prepare Tmdb API Key
-IF DEFINED TMDB_API_SECRET (
+IF DEFINED TMDB_API_KEY (
   ECHO [INFO] Tmdb API Key found...
   "Tools\Tools\sed.exe" -i -r "s/SECRET_PLACEHOLDER_TMDB_API_KEY/%TMDB_API_KEY%/g" "TraktPlugin\TmdbAPI\TmdbCredentials.cs"
 )

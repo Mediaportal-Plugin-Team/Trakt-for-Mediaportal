@@ -1596,10 +1596,12 @@ Click Next to continue or Cancel to exit Setup.
 
 Trakt will also synchronize your watched flags across multiple installations.</ExtensionDescription>
     <VersionDescription>* Added My Streaming Releases and All Streaming Releases to movie calendar views.
-* Added My Finales and All Finales to tv show calendar views.</VersionDescription>
+* Added My Finales and All Finales to tv show calendar views.
+
+Re-released due to invalid themoviedb.org API key set during build process.</VersionDescription>
     <DevelopmentStatus>Stable</DevelopmentStatus>
     <OnlineLocation>https://github.com/Mediaportal-Plugin-Team/Trakt-for-Mediaportal/releases/download/v[Version]/TraktPlugin-v[Version].mpe1</OnlineLocation>
-    <ReleaseDate>2026-10-28T13:13:13</ReleaseDate>
+    <ReleaseDate>2026-10-31T13:13:13</ReleaseDate>
     <Tags>trakt,tv shows,movies,mp-tvseries,movingpictures,my videos,my films</Tags>
     <PlatformCompatibility>AnyCPU</PlatformCompatibility>
     <Location>.\Release\TraktPlugin-v[Version].mpe1</Location>

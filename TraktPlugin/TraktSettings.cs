@@ -676,8 +676,9 @@ namespace TraktPlugin
                 response.User.Username );
 
               TraktLogger.Info(
-                "Account limits: Collection = {0}, Lists = {1}, Watchlist = {2}, Favourites = {3}",
+                "Account limits: Collection = {0}, Lists = {1}, ListItems = {2}, Watchlist = {3}, Favourites = {4}",
                 response.Limits.Collection.ItemCount,
+                response.Limits.List.Count,
                 response.Limits.List.ItemCount,
                 response.Limits.Watchlist.ItemCount,
                 response.Limits.Favourites.ItemCount );
