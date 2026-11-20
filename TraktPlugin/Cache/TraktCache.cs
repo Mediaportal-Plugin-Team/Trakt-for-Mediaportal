@@ -1015,6 +1015,16 @@ namespace TraktPlugin
 
     #region Shows
 
+    public static int GetCollectedShowsCountFromTrakt()
+    {
+      IEnumerable<EpisodeCollected> lCollectedEpisodes = GetCollectedEpisodesFromTrakt( true );
+      if ( lCollectedEpisodes == null )
+        return 0;
+
+      // count unique show ids from collected episodes
+      return lCollectedEpisodes.Select( ce => ce.ShowId ).Distinct().Count();
+    }
+
     /// <summary>
     /// Get the users rated shows from Trakt
     /// </summary>

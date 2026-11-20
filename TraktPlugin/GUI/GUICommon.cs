@@ -1284,6 +1284,9 @@ namespace TraktPlugin.GUI
       // TODO
       // Can't work out the ratings loved/hated for other users, only current
 
+      // library/collection count no longer supported by API so use cache values
+      // https://github.com/trakt/trakt-api/issues/1041#issuecomment-6973492261
+
       #region Network Statistics
       if ( stats.Network != null )
       {
@@ -1296,8 +1299,8 @@ namespace TraktPlugin.GUI
       #region Shows Statistics
       if ( stats.Shows != null )
       {
-        SetProperty( "#Trakt.Statistics.Shows.Library", stats.Shows.Collected );
-        SetProperty( "#Trakt.Statistics.Shows.Collection", stats.Shows.Collected );
+        SetProperty( "#Trakt.Statistics.Shows.Library", Username == TraktSettings.Username ? TraktCache.GetCollectedShowsCountFromTrakt() : 0 );
+        SetProperty( "#Trakt.Statistics.Shows.Collection", Username == TraktSettings.Username ? TraktCache.GetCollectedShowsCountFromTrakt() : 0 );
         SetProperty( "#Trakt.Statistics.Shows.Watched", stats.Shows.Watched );
         SetProperty( "#Trakt.Statistics.Shows.Shouts", stats.Shows.Comments );
         SetProperty( "#Trakt.Statistics.Shows.Loved", Username == TraktSettings.Username ? TraktCache.StatsShowsLoved() : stats.Shows.Ratings );
@@ -1311,8 +1314,8 @@ namespace TraktPlugin.GUI
       {
         //SetProperty("#Trakt.Statistics.Episodes.Checkins", stats.Episodes.Checkins);
         //SetProperty("#Trakt.Statistics.Episodes.CheckinsUnique", stats.Episodes.CheckinsUnique);
-        SetProperty( "#Trakt.Statistics.Episodes.Library", stats.Episodes.Collected );
-        SetProperty( "#Trakt.Statistics.Episodes.Collection", stats.Episodes.Collected );
+        SetProperty( "#Trakt.Statistics.Episodes.Library", Username == TraktSettings.Username ? TraktCache.GetCollectedEpisodesFromTrakt( true )?.Count() ?? 0 : 0 );
+        SetProperty( "#Trakt.Statistics.Episodes.Collection", Username == TraktSettings.Username ? TraktCache.GetCollectedEpisodesFromTrakt( true )?.Count() ?? 0 : 0 );
         SetProperty( "#Trakt.Statistics.Episodes.Loved", Username == TraktSettings.Username ? TraktCache.StatsEpisodesLoved() : stats.Episodes.Ratings );
         SetProperty( "#Trakt.Statistics.Episodes.Hated", Username == TraktSettings.Username ? TraktCache.StatsEpisodesHated() : 0 );
         SetProperty( "#Trakt.Statistics.Episodes.Ratings", stats.Episodes.Ratings );
@@ -1335,8 +1338,8 @@ namespace TraktPlugin.GUI
       {
         //SetProperty("#Trakt.Statistics.Movies.Checkins", stats.Movies.Checkins);
         //SetProperty("#Trakt.Statistics.Movies.CheckinsUnique", stats.Movies.CheckinsUnique);
-        SetProperty( "#Trakt.Statistics.Movies.Collection", stats.Movies.Collected );
-        SetProperty( "#Trakt.Statistics.Movies.Library", stats.Movies.Collected );
+        SetProperty( "#Trakt.Statistics.Movies.Collection", Username == TraktSettings.Username ? TraktCache.GetCollectedMoviesFromTrakt( true )?.Count() ?? 0 : 0 );
+        SetProperty( "#Trakt.Statistics.Movies.Library", Username == TraktSettings.Username ? TraktCache.GetCollectedMoviesFromTrakt( true )?.Count() ?? 0 : 0 );
         SetProperty( "#Trakt.Statistics.Movies.Ratings", stats.Movies.Ratings );
         SetProperty( "#Trakt.Statistics.Movies.Loved", Username == TraktSettings.Username ? TraktCache.StatsMoviesLoved() : stats.Movies.Ratings );
         SetProperty( "#Trakt.Statistics.Movies.Hated", Username == TraktSettings.Username ? TraktCache.StatsMoviesHated() : 0 );
