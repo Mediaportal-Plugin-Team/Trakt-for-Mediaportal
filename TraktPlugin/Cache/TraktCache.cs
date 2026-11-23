@@ -3687,6 +3687,16 @@ namespace TraktPlugin
 
     #endregion
 
+    public static int GetWatchlistedCount()
+    {
+      int lTotalCount = 0;      
+      lTotalCount += WatchListMovies?.Count() ?? 0;      
+      lTotalCount += WatchListShows?.Count() ?? 0;      
+      lTotalCount += WatchListSeasons?.Count() ?? 0;      
+      lTotalCount += WatchListEpisodes?.Count() ?? 0;
+      return lTotalCount;
+    }
+
     #endregion
 
     #region Clear Cache

@@ -196,6 +196,16 @@ namespace TraktPlugin
       if ( !GUICommon.CheckLogin( false ) )
         return;
 
+      // check API limits before we continue
+      if ( TraktSettings.OnlineSettings?.Limits?.Watchlist?.ItemCount <= TraktCache.GetWatchlistedCount() )
+      {
+        GUIUtils.ShowNotifyDialog( 
+          Translation.Error, 
+          string.Format( Translation.LimitReached, TraktSettings.OnlineSettings?.Limits?.Watchlist?.ItemCount ) );
+
+        return;
+      }
+
       var movie = new TraktMovie
       {
         Ids = new TraktMovieId
@@ -401,6 +411,16 @@ namespace TraktPlugin
       if ( !GUICommon.CheckLogin( false ) )
         return;
 
+      // check API limits before we continue
+      if ( TraktSettings.OnlineSettings?.Limits?.Watchlist?.ItemCount <= TraktCache.GetWatchlistedCount() )
+      {
+        GUIUtils.ShowNotifyDialog(
+          Translation.Error,
+          string.Format( Translation.LimitReached, TraktSettings.OnlineSettings?.Limits?.Watchlist?.ItemCount ) );
+
+        return;
+      }
+
       var show = new TraktShow
       {
         Ids = new TraktShowId
@@ -566,6 +586,17 @@ namespace TraktPlugin
       if ( !GUICommon.CheckLogin( false ) )
         return;
 
+      // check API limits before we continue
+      if ( TraktSettings.OnlineSettings?.Limits?.Watchlist?.ItemCount <= TraktCache.GetWatchlistedCount() )
+      {
+        GUIUtils.ShowNotifyDialog(
+          Translation.Error,
+          string.Format( Translation.LimitReached, TraktSettings.OnlineSettings?.Limits?.Watchlist?.ItemCount ) );
+
+        return;
+      }
+
+
       var seasonSync = new TraktSyncSeasonEx
       {
         Ids = new TraktShowId
@@ -675,6 +706,16 @@ namespace TraktPlugin
     /// </summary>
     public static void AddEpisodeToWatchList( TraktShowSummary show, TraktEpisodeSummary episode )
     {
+      // check API limits before we continue
+      if ( TraktSettings.OnlineSettings?.Limits?.Watchlist?.ItemCount <= TraktCache.GetWatchlistedCount() )
+      {
+        GUIUtils.ShowNotifyDialog(
+          Translation.Error,
+          string.Format( Translation.LimitReached, TraktSettings.OnlineSettings?.Limits?.Watchlist?.ItemCount ) );
+
+        return;
+      }
+
       var episodeSync = new TraktSyncShowEx
       {
         Title = show.Title,
@@ -720,6 +761,16 @@ namespace TraktPlugin
     {
       if ( !GUICommon.CheckLogin( false ) )
         return;
+
+      // check API limits before we continue
+      if ( TraktSettings.OnlineSettings?.Limits?.Watchlist?.ItemCount <= TraktCache.GetWatchlistedCount() )
+      {
+        GUIUtils.ShowNotifyDialog(
+          Translation.Error,
+          string.Format( Translation.LimitReached, TraktSettings.OnlineSettings?.Limits?.Watchlist?.ItemCount ) );
+
+        return;
+      }
 
       var episode = new TraktEpisode
       {

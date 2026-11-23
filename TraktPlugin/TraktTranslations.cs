@@ -654,6 +654,7 @@ namespace TraktPlugin.GUI
     public static string LikedLists = "Liked Lists";
     public static string Likes = "Likes";
     public static string LikesThisWeek = "Likes this week";
+    public static string LimitReached = "API Limit of {0} has been reached, unable to add more items";
     public static string LineProducer = "Line Producer";
     public static string List = "List";
     public static string ListNameAlreadyExists = "List with this name already exists!";

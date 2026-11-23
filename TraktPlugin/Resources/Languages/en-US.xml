@@ -404,6 +404,7 @@
   <string name="LikedLists">Liked Lists</string>
   <string name="Likes">Likes</string>
   <string name="LikesThisWeek">Likes this week</string>
+  <string name="LimitReached">API Limit of {0} has been reached, unable to add more items</string>
   <string name="LineProducer">Line Producer</string>
   <string name="List">List</string>
   <string name="Lists">Lists</string>
